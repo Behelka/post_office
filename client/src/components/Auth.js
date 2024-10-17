@@ -1,12 +1,12 @@
 import {useState} from 'react'
 
 const Auth =() =>{
-    const [isLogIn,setIsLogin]=useState(true);
+    const [isLogIn,setLogin]=useState(true);
     const [error,setError]= useState(null);
 
     const viewLogin=(status) =>{
-        setError(null)
-        setLogin(status)
+        setError(null);
+        setLogin(status);
 
     }
 
