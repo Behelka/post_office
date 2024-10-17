@@ -1,27 +1,15 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import cougarlogo from "./assets/cougarlogo.jpg"
-import './App.css'
 import Navbar from './components/navBar/navBar';
+import Home from './components/Home/Home';
+import Login from './components/Login/Loign';
+import Shop from './components/Shop/Shop';
 
-
-
-function Home() {
-  return(
-    <div className="container">
-      <div className="color-bar"/>
-      <div className="image-container">
-        <img src={cougarlogo} alt="logo"/>
-      </div>
-    </div>
-  );
-}
 
 
 const App = ()  =>{
 
 
-const authToken=true; 
-let links = [["", "Home"]];
+let links = [["", "Home"],["Login","Login"],["Shop","Shop"]];
 
 
   return (
@@ -29,6 +17,8 @@ let links = [["", "Home"]];
       <Navbar links={links}/>
      <Routes>
       <Route path="/" element={<Home/>} />
+      <Route path="Login" element={<Login/>}/>
+      <Route path="Shop" element={<Shop/>}/>
       
       </Routes>
     </Router>
