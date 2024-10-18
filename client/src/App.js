@@ -18,7 +18,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 const App = ()  =>{
 let links = [["", "Home"],["Login","Login/Register"],["Shop","Shop"], ["aboutUs", "About/Contact Us"]];
 
-var user = "admin";
+var user = "admin"; // This is to see different roles
 
 if (user === "employee") {
   links = [["", "Home"], ["packagePortal", "Package Portal"], ["trackingHistory", "Tracking History"], ["Profile", "Profile"]];
