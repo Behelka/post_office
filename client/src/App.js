@@ -1,40 +1,40 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/navBar/navBar';
 import Home from './components/Home/Home';
-import Login from './components/Login/Loign';
+import Login from './components/Login/Login';
 import Shop from './components/Shop/Shop';
 import Profile from './components/Profile/Profile';
-import aboutUs from './components/aboutUs/aboutUs';
-import trackingHistory from './components/trackingHistory/trackingHistory';
-import packagePortal from './components/packagePortal/packagePortal';
-import managerPortal from './components/managerPortal/managerPortal';
+import AboutUs from './components/AboutUs/AboutUs';
+import TrackingHistory from './components/TrackingHistory/TrackingHistory';
+import PackagePortal from './components/PackagePortal/PackagePortal';
+import ManagerPortal from './components/ManagerPortal/ManagerPortal';
 import Reports from './components/Reports/Reports';
-import addDepartment from './components/addDepartment/addDepartment';
-import addLocation from './components/addLocation/addLocation';
+import AddDepartment from './components/AddDepartment/AddDepartment';
+import AddLocation from './components/AddLocation/AddLocation';
 import Dashboard from './components/Dashboard/Dashboard';
 
 
 
 const App = ()  =>{
-let links = [["", "Home"],["Login","Login/Register"],["Shop","Shop"], ["aboutUs", "About/Contact Us"]];
+let links = [["", "Home"],["Login","Login/Register"],["Shop","Shop"], ["AboutUs", "About/Contact Us"]];
 
 var user = "admin";
 
 if (user === "employee") {
-  links = [["", "Home"], ["packagePortal", "Package Portal"], ["trackingHistory", "Tracking History"], ["Profile", "Profile"]];
+  links = [["", "Home"], ["PackagePortal", "Package Portal"], ["TrackingHistory", "Tracking History"], ["Profile", "Profile"]];
 }
 
 if (user === "manager") {
-  links = [["", "Home"], ["packagePortal", "Package Portal"], ["trackingHistory", "Tracking History"], ["managerPortal", "Manager Portal"], ["Profile", "Profile"]];
+  links = [["", "Home"], ["PackagePortal", "Package Portal"], ["TrackingHistory", "Tracking History"], ["ManagerPortal", "Manager Portal"], ["Profile", "Profile"]];
 }
 
 if (user === "customer") {
-  links = [["", "Home"], ["Dashboard", "Dashboard"], ["trackingHistory", "Tracking History"], ["Reports", "Reports"], ["Shop","Shop"], ["aboutUs", "About/Contact Us"], ["Profile", "Profile"]];
+  links = [["", "Home"], ["Dashboard", "Dashboard"], ["TrackingHistory", "Tracking History"], ["Reports", "Reports"], ["Shop","Shop"], ["AboutUs", "About/Contact Us"], ["Profile", "Profile"]];
 }
 
 if (user === "admin") {
-  links = [["", "Home"], ["packagePortal", "Package Portal"], ["trackingHistory", "Tracking History"], ["Reports", "Reports"], ["managerPortal", "Manager Portal"], 
-           ["addDepartment", "Add Department"], ["addLocation", "Add Location"], ["Profile", "Profile"]];
+  links = [["", "Home"], ["PackagePortal", "Package Portal"], ["TrackingHistory", "Tracking History"], ["Reports", "Reports"], ["ManagerPortal", "Manager Portal"], 
+           ["AddDepartment", "Add Department"], ["AddLocation", "Add Location"], ["Profile", "Profile"]];
 }
 
 
@@ -46,15 +46,15 @@ if (user === "admin") {
       <Route path="/" element={<Home/>} />
       <Route path="Login" element={<Login/>}/>
       <Route path="Shop" element={<Shop/>}/>
-      <Route path="packagePortal" element={<packagePortal/>}/>
-      <Route path="aboutUs" element={<aboutUs/>}/>
-      <Route path="trackingHistory" element={<trackingHistory/>}/>
+      <Route path="PackagePortal" element={<PackagePortal/>}/>
+      <Route path="AboutUs" element={<AboutUs/>}/>
+      <Route path="TrackingHistory" element={<TrackingHistory/>}/>
       <Route path="Profile" element={<Profile/>}/>
-      <Route path="managerPortal" element={<managerPortal/>}/>
+      <Route path="ManagerPortal" element={<ManagerPortal/>}/>
       <Route path="Dashboard" element={<Dashboard/>}/>
       <Route path="Reports" element={<Reports/>}/>
-      <Route path="addDepartment" element={<addDepartment/>}/>
-      <Route path="addLocation" element={<addLocation/>}/>
+      <Route path="AddDepartment" element={<AddDepartment/>}/>
+      <Route path="AddLocation" element={<AddLocation/>}/>
       
       </Routes>
     </Router>

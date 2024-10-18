@@ -1,10 +1,10 @@
 import React from "react";
-import "./addDepartment.css"
+import "./AddDepartment.css"
 
-function addDepartment() {
+function AddDepartment() {
     return(
         <div/>
     );
 }
 
-export default addDepartment;
+export default AddDepartment;

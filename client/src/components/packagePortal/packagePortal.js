@@ -1,11 +1,11 @@
 import React from "react";
-import "./packagePortal.css"
+import "./PackagePortal.css"
 
-function packagePortal() {
+function PackagePortal() {
 
     return(
         <div/>
     );
 }
 
-export default packagePortal;
+export default PackagePortal;

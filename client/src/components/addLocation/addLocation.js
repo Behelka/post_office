@@ -1,10 +1,10 @@
 import React from "react";
-import "./addLocation.css"
+import "./AddLocation.css"
 
-function addLocation() {
+function AddLocation() {
     return(
         <div/>
     );
 }
 
-export default addLocation;
+export default AddLocation;

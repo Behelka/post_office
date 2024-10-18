@@ -1,10 +1,10 @@
 import React from "react";
-import "./managerPortal.css"
+import "./ManagerPortal.css"
 
-function managerPortal() {
+function ManagerPortal() {
     return(
         <div/>
     );
 }
 
-export default managerPortal;
+export default ManagerPortal;

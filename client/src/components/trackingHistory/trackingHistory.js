@@ -1,10 +1,10 @@
 import React from "react";
-import "./trackingHistory.css"
+import "./TrackingHistory.css"
 
-function trackingHistory() {
+function TrackingHistory() {
     return(
         <div/>
     );
 }
 
-export default trackingHistory;
+export default TrackingHistory;
