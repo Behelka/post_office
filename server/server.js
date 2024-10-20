@@ -15,7 +15,7 @@ app.use(cors(corsOptions));
 
 // Use routes
 const AddLocationRoute = require('./Routes/AddLocationRoute');
-app.use('/api', AddLocationRoute);
+app.use('/api', AddLocationRoute); // Copy this line and the one above for each page
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
