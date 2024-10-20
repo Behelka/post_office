@@ -142,7 +142,7 @@ const BasicTable = () => {
                 />
                 <button type="submit">Add Location</button>
             </form>
-            <h2>Current Locations</h2>
+            <h2>Current Locations - Click On Location ID To Edit An Existing Location</h2>
             <div className="table-scroll">
                 <table>
                     <thead>

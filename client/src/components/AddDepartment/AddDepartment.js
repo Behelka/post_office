@@ -92,7 +92,7 @@ const BasicTable = () => {
                 <button type="submit">Add Department</button>
             </form>
 
-            <h2>Current Departments</h2>
+            <h2>Current Departments - Click On Department ID To Edit An Existing Department</h2>
             <div className="table-scroll">
                 <table>
                     <thead>

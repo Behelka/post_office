@@ -198,7 +198,7 @@ const BasicTable = () => {
                 <button type="submit">Add Package</button>
             </form>
 
-            <h2>Current Packages</h2>
+            <h2>Current Packages - Click On Package ID To Edit An Existing Package</h2>
             <div className="table-scroll">
                 <table>
                     <thead>
