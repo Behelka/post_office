@@ -9,7 +9,7 @@ const db = mysql.createConnection({
     host: 'sqlmaster-24.mysql.database.azure.com',  // Replace with your Azure MySQL hostname
     user: 'postoffice_admin',        // Replace with your MySQL username
     password: 'DatabaseSystem@uh24',    // Replace with your MySQL password
-    database: 'team11_project_db', // Replace with your MySQL database name
+    database: 'post_office', // Replace with your MySQL database name
     port: 3306,
     ssl: {
         rejectUnauthorized: false
