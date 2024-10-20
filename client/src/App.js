@@ -3,7 +3,8 @@ import Navbar from './components/navBar/navBar';
 import Home from './components/Home/Home';
 import Login from './components/Login/Login';
 import Shop from './components/Shop/Shop';
-import Profile from './components/Profile/Profile';
+import CustomerProfile from './components/CustomerProfile/CustomerProfile';
+import EmployeeProfile from './components/EmployeeProfile/EmployeeProfile';
 import AboutUs from './components/AboutUs/AboutUs';
 import TrackingHistory from './components/TrackingHistory/TrackingHistory';
 import PackagePortal from './components/PackagePortal/PackagePortal';
@@ -18,23 +19,24 @@ import Dashboard from './components/Dashboard/Dashboard';
 const App = ()  =>{
 let links = [["", "Home"],["Login","Login/Register"],["Shop","Shop"], ["AboutUs", "About/Contact Us"]];
 
-var user = "admin"; // This is to see different roles
+var user = "customer"; // This is to see different roles
 
 if (user === "employee") {
-  links = [["", "Home"], ["PackagePortal", "Package Portal"], ["TrackingHistory", "Tracking History"], ["Profile", "Profile"]];
+  links = [["", "Home"], ["PackagePortal", "Package Portal"], ["TrackingHistory", "Tracking History"], ["EmployeeProfile", "Profile"]];
 }
 
 if (user === "manager") {
-  links = [["", "Home"], ["PackagePortal", "Package Portal"], ["TrackingHistory", "Tracking History"], ["ManagerPortal", "Manager Portal"], ["Profile", "Profile"]];
+  links = [["", "Home"], ["PackagePortal", "Package Portal"], ["TrackingHistory", "Tracking History"], ["ManagerPortal", "Manager Portal"], ["EmployeeProfile", "Profile"]];
 }
 
 if (user === "customer") {
-  links = [["", "Home"], ["Dashboard", "Dashboard"], ["TrackingHistory", "Tracking History"], ["Reports", "Reports"], ["Shop","Shop"], ["AboutUs", "About/Contact Us"], ["Profile", "Profile"]];
+  links = [["", "Home"], ["Dashboard", "Dashboard"], ["TrackingHistory", "Tracking History"], ["Reports", "Reports"], ["Shop","Shop"], ["AboutUs", "About/Contact Us"], 
+           ["CustomerProfile", "Profile"]];
 }
 
 if (user === "admin") {
   links = [["", "Home"], ["PackagePortal", "Package Portal"], ["TrackingHistory", "Tracking History"], ["Reports", "Reports"], ["ManagerPortal", "Manager Portal"], 
-           ["AddDepartment", "Add Department"], ["AddLocation", "Add Location"], ["Profile", "Profile"]];
+           ["AddDepartment", "Add Department"], ["AddLocation", "Add Location"], ["EmployeeProfile", "Profile"]];
 }
 
 
@@ -49,7 +51,8 @@ if (user === "admin") {
       <Route path="PackagePortal" element={<PackagePortal/>}/>
       <Route path="AboutUs" element={<AboutUs/>}/>
       <Route path="TrackingHistory" element={<TrackingHistory/>}/>
-      <Route path="Profile" element={<Profile/>}/>
+      <Route path="CustomerProfile" element={<CustomerProfile/>}/>
+      <Route path="EmployeeProfile" element={<EmployeeProfile/>}/>
       <Route path="ManagerPortal" element={<ManagerPortal/>}/>
       <Route path="Dashboard" element={<Dashboard/>}/>
       <Route path="Reports" element={<Reports/>}/>
