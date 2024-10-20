@@ -1,44 +1,22 @@
-// Its gonna hold our backend
 const express = require('express');
-const mysql = require('mysql2');
+const db = require('./db'); // Import db connection
 const app = express();
-const port = process.env.PORT || 3000;
+const cors = require('cors');
+const port = 3000; // Your server port
 
-// Database connection
-const db = mysql.createConnection({
-    host: 'sqlmaster-24.mysql.database.azure.com',  // Replace with your Azure MySQL hostname
-    user: 'postoffice_admin',        // Replace with your MySQL username
-    password: 'DatabaseSystem@uh24',    // Replace with your MySQL password
-    database: 'post_office', // Replace with your MySQL database name
-    port: 3306,
-    ssl: {
-        rejectUnauthorized: false
-    }
-})
+// Enable CORS for requests from your frontend (port 3001)
+const corsOptions = {
+    origin: 'http://localhost:3001', // Allow requests from this origin
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+};
 
-// Connect to the database
-db.connect((err) => {
-    if (err) {
-        console.error('Database connection error:', err.stack);
-        return;
-    }
-    console.log('Connected to the MySQL database.');
-});
+app.use(cors(corsOptions));
 
-// Define a basic route
-app.get('/', (req, res) => {
-    res.send('Welcome to the Azure-hosted Node.js server with MySQL!');
-});
+// Use routes
+const AddLocationRoute = require('./Routes/AddLocationRoute');
+app.use('/api', AddLocationRoute);
 
-// Example: Fetch data from the MySQL database
-app.get('/data', (req, res) => {
-    db.query('SELECT * FROM your_table', (err, results) => {
-        if (err) throw err;
-        res.json(results);
-    });
-});
-
-// Start the server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

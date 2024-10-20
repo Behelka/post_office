@@ -1,22 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AddLocation.css";
 
 const BasicTable = () => {
-    // Sample data to display in the table
-    const [data, setData] = useState([
-        { location_id: 1, address: "1000 Main St, Anytown, CA 90210, USA" },
-        { location_id: 2, address: "123 Elm St, Springfield, IL 62701, USA" },
-        { location_id: 3, address: "456 Oak St, Denver, CO 80203, USA" },
-        { location_id: 4, address: "789 Maple Ave, Miami, FL 33101, USA" },
-        { location_id: 5, address: "222 Walnut St, Portland, OR 97201, USA" },
-        { location_id: 6, address: "555 Ash St, Chicago, IL 60601, USA" },
-        { location_id: 7, address: "111 Spruce St, Boston, MA 02101, USA" },
-        { location_id: 8, address: "789 Pine St, Seattle, WA 98101, USA" },
-        { location_id: 9, address: "432 Cedar Ave, Los Angeles, CA 90001, USA" },
-        { location_id: 10, address: "654 Birch St, San Francisco, CA 94101, USA" },
-        { location_id: 11, address: "123 Fir St, Denver, CO 80205, USA" },
-    ]);
-
+    const [data, setData] = useState([]);
     const [houseNumber, setHouseNumber] = useState("");
     const [street, setStreet] = useState("");
     const [suffix, setSuffix] = useState("");
@@ -26,7 +12,7 @@ const BasicTable = () => {
     const [country, setCountry] = useState("");
 
     const [editMode, setEditMode] = useState(false);
-    const [editIndex, setEditIndex] = useState(null);  // To track which row is being edited
+    const [editIndex, setEditIndex] = useState(null);
     const [editHouseNumber, setEditHouseNumber] = useState("");
     const [editStreet, setEditStreet] = useState("");
     const [editSuffix, setEditSuffix] = useState("");
@@ -35,14 +21,53 @@ const BasicTable = () => {
     const [editZipCode, setEditZipCode] = useState("");
     const [editCountry, setEditCountry] = useState("");
 
+    // Fetch locations from the API
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/api/location');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+        
+                const result = await response.json();
+                console.log(result); // Log the result to see its structure
+                // Process the result as needed
+                const formattedData = result.map((item, index) => ({
+                    location_id: index + 1, // Or assign from DB if available
+                    address: `
+                    ${item.Location_Address_House_Number} 
+                    ${item.Location_Address_Street} 
+                    ${item.Location_Address_Suffix}, 
+                    ${item.Location_Address_City}, 
+                    ${item.Location_Address_State} 
+                    ${item.Location_Address_Zip_Code}, 
+                    ${item.Location_Address_Country}`
+                }));
+                setData(formattedData);
+
+            } catch (error) {
+                console.error('Error fetching locations:', error);
+            }
+        };
+        
+        
+        fetchLocations();
+    }, []); 
+
+    // Handle form submission to add a new location
     const handleSubmit = (e) => {
         e.preventDefault();
         const newLocation = {
-            location_id: data.length + 1, // Increment location_id
+            location_id: data.length + 1,
             address: `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`
         };
         setData([...data, newLocation]); // Add new location to the data
-        // Clear the input fields
+        clearInputFields();
+    };
+
+    const clearInputFields = () => {
         setHouseNumber("");
         setStreet("");
         setSuffix("");
@@ -83,7 +108,7 @@ const BasicTable = () => {
             index === editIndex ? { ...location, address: updatedAddress } : location
         );
 
-        setData(updatedData); // Update state with edited location
+        setData(updatedData); 
         setEditMode(false);
         setEditIndex(null);
     };
@@ -92,7 +117,7 @@ const BasicTable = () => {
         <div className="table-container">
             <h2>Add a new Location</h2>
             <form onSubmit={handleSubmit}>
-            <input
+                <input
                     type="text"
                     placeholder="House Number"
                     value={houseNumber}
@@ -155,9 +180,9 @@ const BasicTable = () => {
                         {data.map((item, index) => (
                             <tr key={item.location_id}>
                                 <td>
-                                    <a href="#" onClick={() => handleEdit(index)}>
+                                    <button onClick={() => handleEdit(index)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
                                         {item.location_id}
-                                    </a>
+                                    </button>
                                 </td>
                                 <td>{item.address}</td>
                             </tr>
@@ -227,7 +252,6 @@ const BasicTable = () => {
 };
 
 function AddLocation() {
-
     return (
         <div>
             <BasicTable />
