@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded request
 
 // Use routes
 const AddLocationRoute = require('./Routes/AddLocationRoute');
-app.use('/api', AddLocationRoute);
+app.use('/api', AddLocationRoute); // Copy this line and the one above for each page
 
 // Basic error handling middleware
 app.use((err, req, res, next) => {
