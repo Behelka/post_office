@@ -56,16 +56,40 @@ const BasicTable = () => {
         fetchLocations();
     }, []); 
 
-    // Handle form submission to add a new location
-    const handleSubmit = (e) => {
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
         const newLocation = {
-            location_id: data.length + 1,
             address: `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`
         };
-        setData([...data, newLocation]); // Add new location to the data
-        clearInputFields();
+       // console.log(newLocation);
+        try {
+            const response = await fetch('http://localhost:3000/api/location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                
+                body: JSON.stringify(newLocation),
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            setData([...data, {
+                location_id: data.length + 1,
+                address: `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`
+            }]);
+
+            console.log(result);
+            clearInputFields();
+        } catch (error) {
+            console.error('Error adding location:', error);
+        }
     };
+     
 
     const clearInputFields = () => {
         setHouseNumber("");
@@ -81,23 +105,33 @@ const BasicTable = () => {
         setEditMode(true);
         setEditIndex(index);
         const location = data[index];
-        const addressParts = location.address.split(", ");
-        const houseAndStreet = addressParts[0].split(" ");
-        const city = addressParts[1];
-        const stateZip = addressParts[2].split(" ");
-        const country = addressParts[3];
+    
+        // Trim and split the address properly
+        const addressParts = location.address.trim().split(", ");
+    
+        // Remove newline characters and filter out empty strings
+        const houseAndStreet = addressParts[0].trim().replace(/\n/g, '').split(" ").filter(Boolean);
+    
+        const city = addressParts[1].trim().replace(/\n/g, ''); // Trim and remove newline
+        const stateZip = addressParts[2].trim().replace(/\n/g, '').split(" ").filter(Boolean); // Trim, remove newline, and split
+        const country = addressParts[3].trim().replace(/\n/g, ''); // Trim and remove newline
+    
+        // Handle house number, street, and suffix
         const houseNumber = houseAndStreet[0];
         const street = houseAndStreet.slice(1, houseAndStreet.length - 1).join(" ");
         const suffix = houseAndStreet[houseAndStreet.length - 1];
-        const state = stateZip[0];
-        const zipCode = stateZip[1];
-
+    
+        // Handle state and zip code
+        const state = stateZip[0]; // First part as state
+        const zipCode = stateZip.length > 1 ? stateZip[1] : ''; // Safely assign zip code if exists
+    
+        // Set the state for the edit form
         setEditHouseNumber(houseNumber);
         setEditStreet(street);
         setEditSuffix(suffix);
         setEditCity(city);
         setEditState(state);
-        setEditZipCode(zipCode);
+        setEditZipCode(zipCode); // This should now populate correctly
         setEditCountry(country);
     };
 

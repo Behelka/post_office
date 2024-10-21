@@ -1,7 +1,8 @@
-const mysql = require('mysql2');
+// db.js
+const mysql = require('mysql2/promise'); // Use the promise-based MySQL2
 
-// Database connection
-const db = mysql.createConnection({
+// Create a connection pool
+const pool = mysql.createPool({
     host: 'sqlmaster-24.mysql.database.azure.com',  // Replace with your Azure MySQL hostname
     user: 'postoffice_admin',        // Replace with your MySQL username
     password: 'DatabaseSystem@uh24',    // Replace with your MySQL password
@@ -12,13 +13,5 @@ const db = mysql.createConnection({
     }
 });
 
-// Connect to the database
-db.connect(err => {
-    if (err) {
-        console.error('Database connection error:', err);
-    } else {
-        console.log('Connected to the database');
-    }
-});
-
-module.exports = db; // Exporting the db connection
+// Export the pool
+module.exports = pool; 
