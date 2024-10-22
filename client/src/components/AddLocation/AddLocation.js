@@ -113,7 +113,6 @@ const BasicTable = () => {
         e.preventDefault();
 
         const updatedLocation = {
-            location_id: data[editIndex].location_id,
             houseNumber: editHouseNumber,
             street: editStreet,
             suffix: editSuffix,

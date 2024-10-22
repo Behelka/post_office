@@ -1,0 +1,376 @@
+How to basic for our back-end Server
+
+If there are errors we can fix them later.
+
+if you haven't npm install in server folder
+
+Make sure you change filename to the
+name of the file your working on
+
+step #1 create related file in server/Routes/filenameRoute.json
+inside will have 
+
+const express = require('express');
+const db = require('../db'); // Import db connection
+const router = express.Router();
+
+//code here
+
+module.exports = router;
+
+step #2 go into server/server.js file copy the 2 lines
+and rename it to your file name and setup a name for it
+
+const filenameRoute = require('./Routes/filenameRoute');
+app.use('/api', filenameRoute);
+
+hard step: step #3 decide what the page needs
+
+this is the basic code to work with db 
+
+this is the query you write for the case you need
+const query = `
+        SELECT 
+            AttrubuteName,
+        FROM 
+            TableName 
+        WHERE 
+            Condition
+    `;
+
+    try {
+        const [results] = await db.query(query,[
+            //parameters
+        ]); // Use await with db.query
+        res.json(results);
+    } catch (err) {
+        console.error('Error fetching locations:', err);
+        return res.status(500).send('Error fetching locations');
+    }
+
+WARNING!! make sure the link here in Route.js doesn't start with /api
+examples based off of AddLocationRoute.js 
+
+case 1: If you want to grab data from db 
+in filenameRoute.js
+
+Back-end use .get to grab info
+//!!change link!!
+router.get('/filename', async (req, res) => {
+    const query = `
+        SELECT 
+            AttrubuteName,
+        FROM 
+            TableName 
+        WHERE 
+            Condition
+            Delete_Location != 1;
+    `;
+
+    try {
+        const [results] = await db.query(query); // Use await with db.query
+        res.json(results);
+    } catch (err) {
+        console.error('Error fetching locations:', err);
+        return res.status(500).send('Error fetching locations');
+    }
+});
+
+Front-end
+const fetchInfoname = async () => {
+        try {
+            //!!change link to target filename!!
+            const response = await fetch('http://localhost:3000/api/filename');
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            //result now stores the info you query from db
+            //ready to format for usage
+            //example from AddLocation
+
+            const formattedData = result.map((item) => ({
+                location_id: item.Location_ID,
+                address: `${item.Location_Address_House_Number} ${item.Location_Address_Street} ${item.Location_Address_Suffix || ''}, ${item.Location_Address_City}, ${item.Location_Address_State} ${item.Location_Address_Zip_Code}, ${item.Location_Address_Country}`
+            }));
+            setData(formattedData);
+
+        } catch (error) {
+            console.error('Error fetching locations:', error);
+        }
+    };
+
+case 2: adding new data to db
+this example we're using location as base
+Back-end - use .post to add data 
+
+//how much you pass through from the front end
+//you pull out of req.body from back end this case 7
+//!!change link!!
+
+router.post('/location', async (req, res) => {
+    const { 
+        houseNumber,
+        street,
+        suffix,
+        city,
+        state,
+        zipCode,
+        country
+        } = req.body;
+    // set up check Condition for requried fields
+    //here 5 are required
+    if (!houseNumber || !street || !city || !state || !zipCode || !country) {
+        return res.status(400).json({ message: 'All address fields are required' });
+    }
+
+    //again create your query to insert replace with your parameters
+    // for the amount of parameters is the ? = placeholders
+    const insertQuery = `
+        INSERT INTO location (
+            Location_Address_House_Number, 
+            Location_Address_Street, 
+            Location_Address_Suffix, 
+            Location_Address_City, 
+            Location_Address_State, 
+            Location_Address_Zip_Code, 
+            Location_Address_Country
+        ) VALUES (?, ?, ?, ?, ?, ?, ?);
+    `;
+    //execute query if all good then no errors
+    //replace with parameters to insert
+    try {
+        await db.query(insertQuery, [
+            houseNumber, 
+            street, 
+            suffix,
+            city, 
+            state, 
+            zipCode, 
+            country
+        ]);
+        //chage to names below to pull the newly made row
+        //to give to front-end so we can update website display
+        const [lastLocationQuery] = await db.query(`
+            SELECT * FROM location 
+            WHERE Location_ID = LAST_INSERT_ID();
+        `);
+
+        res.status(201).json(lastLocationQuery[0]); // Respond with the newly created location
+    } catch (error) {
+        console.error('Error inserting location:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+
+
+Front-end - call POST in method for adding
+const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        //here replace with info to add row for selected Table
+        //parameters for location
+        const newLocation = {
+        houseNumber: editHouseNumber || '',  // Default to empty string if undefined
+        street: editStreet || '',
+        suffix: editSuffix || '',  // Optional fields can remain empty
+        city: editCity || '',
+        state: editState || '',
+        zipCode: editZipCode || '',
+        country: editCountry || '',
+        };
+
+
+        try {
+            //!!change link!!
+            const response = await fetch('http://localhost:3000/api/location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newLocation),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            //this is to update replace with your set data stuff
+            setData([...data, {
+                location_id: data.length + 1, // Replace with ID from result if returned
+                address: `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`
+            }]);
+            console.log(result);
+            clearInputFields();
+        } catch (error) {
+            console.error('Error adding location:', error);
+        }
+};
+
+case 3: Update existing data
+
+back-end - use put to update multiple fields
+
+//here in this link we're passing Location_ID in link
+//example /Location/52
+//your passing every field that your changing
+//and primary key to look for the data
+//the primary key is a parameter in the link for this case
+
+router.put('/location/:Location_ID', async (req, res) => {
+    const { Location_ID } = req.params; // Get Location_ID from the URL parameters
+    const { houseNumber,
+            street,
+            suffix, 
+            city, 
+            state, 
+            zipCode, 
+            country 
+            } = req.body;
+
+    // Validate required address fields
+    if (!houseNumber || !street || !city || !state || !zipCode || !country) {
+        return res.status(400).json({ message: 'All address fields are required' });
+    }
+    //query to update row in table for location beleow
+    const updateQuery = `
+        UPDATE location
+        SET 
+            Location_Address_House_Number = ?,
+            Location_Address_Street = ?,
+            Location_Address_Suffix = ?,
+            Location_Address_City = ?,
+            Location_Address_State = ?,
+            Location_Address_Zip_Code = ?,
+            Location_Address_Country = ?
+        WHERE Location_ID = ?;
+    `;
+    
+    try {
+        await db.query(updateQuery, [
+            houseNumber, 
+            street, 
+            suffix,
+            city, 
+            state, 
+            zipCode, 
+            country,
+            Location_ID
+        ]);
+
+        console.log('Location updated:', houseNumber, street, suffix, city, state, zipCode, country, 'Location ID:', Location_ID);
+        res.status(200).json({ message: 'Location updated successfully' });
+    } catch (error) {
+        console.error('Error updating location:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+Front-end - using PUT edit base on update function
+
+const handleUpdate = async (e) => {
+        e.preventDefault();
+        // here are the fields
+        const updatedLocation = {
+            houseNumber: editHouseNumber || null,  // Default to empty string if undefined
+            street: editStreet || null,
+            suffix: editSuffix || null,  // Optional fields can remain empty
+            city: editCity || null,
+            state: editState || null,
+            zipCode: editZipCode || null,
+            country: editCountry || null,
+        };
+        //notice in link that we're passing the key location_id
+        try {
+            const response = await fetch(`http://localhost:3000/api/location/${data[editIndex].location_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedLocation),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            //this function to check if the edited area 
+            //is the right one modify for your case if needed
+            const updatedData = data.map((location, idx) =>
+                idx === editIndex ? { ...location, address: `${editHouseNumber} ${editStreet} ${editSuffix}, ${editCity}, ${editState} ${editZipCode}, ${editCountry}` } : location
+            );
+
+            //update data then close edit mode.
+            setData(updatedData);
+            setEditMode(false);
+            setEditIndex(null);
+        } catch (error) {
+            console.error('Error updating location:', error);
+        }
+};
+
+case 4: delete using flag system or single attribue modification
+
+Back-end - use pacth
+
+//same here as in update case we're passing location_id as link parameter
+router.patch('/location/:Location_ID', async (req, res) => {
+    //grabbing parameter to use from link
+    const { Location_ID } = req.params;
+    //set up query to update because we're not really deleteing but flagging
+    const updateQuery = `
+        UPDATE location
+        SET Delete_Location = 1
+        WHERE Location_ID = ?;`;
+
+    try {
+        // Execute the query
+        const [result] = await db.query(updateQuery, [Location_ID]);
+
+        // Check if any row was affected (i.e., updated)
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+
+        // Respond with success
+        res.json({ message: 'Location marked for deletion' });
+    } catch (error) {
+        console.error('Error updating location:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+Front-end - here we're not passing a json file 
+because the primary is all we need to flag as delete 
+if you want to modify one attribue instead you need 
+to do extra like pass praameters to back-end like above.
+
+//in this case we don't need to do extra if you pass the right value into the function
+//else you use e then we have to grab the data like above
+
+const handleDelete = async (location_id) => {
+        try {
+            //change link works if you only need one value to delete
+            const response = await fetch(`http://localhost:3000/api/location/${location_id}`, {
+                method: 'PATCH',
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            setData(data.map(location =>
+                location.location_id === location_id ? { ...location, Delete_Location: 1 } : location
+            ));
+
+            fetchLocations();
+        } catch (error) {
+            console.error('Error deleting location:', error);
+        }
+    };
+
+these are the basic function so far if any issues occure message me(Tommy/behelka) and i'll try to help
