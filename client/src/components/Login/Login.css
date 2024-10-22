@@ -1,4 +1,4 @@
-/* src/styles/login.css */
+/* src/styles/login.css
 .login-container {
     display: flex;
     justify-content: center;
@@ -49,4 +49,246 @@
     border-radius: 5px;
     cursor: pointer;
   }
-  
+   */
+
+   /* src/styles/login.css */
+/* .login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+  font-family: 'Roboto', sans-serif;
+}
+
+.login-container-box {
+  background-color: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  width: 350px;
+}
+
+.login-container-box h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.login-container-box form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-container-box input {
+  margin-bottom: 15px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.3s ease;
+}
+
+.login-container-box input:focus {
+  outline: none;
+  border: 1px solid #3498db;
+}
+
+.create {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.create:hover {
+  background-color: #2980b9;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.login-options button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.login-options button:hover {
+  background-color: #2980b9;
+  color: white;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+} */
+
+
+/* src/styles/login.css */
+/* Part 3 */
+/* .login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+
+.login-container-box {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 400px;
+}
+
+.login-container-box form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-container-box input {
+  margin-bottom: 15px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.login-container-box h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+.create {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.login-options button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 48%;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.required {
+  color: red;
+} */
+
+/* Part 4 */
+/* src/styles/login.css */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+  padding: 0 20px;
+}
+
+.login-container-box {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 500px;
+  max-width: 90%;
+}
+
+.login-container-box form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-container-box input {
+  margin-bottom: 15px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.login-container-box h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+.create {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.create:hover {
+  background-color: #45a049;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.toggle-text {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.toggle-link {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.required {
+  color: red;
+}
+
+
