@@ -6,6 +6,7 @@ const router = express.Router();
 router.get('/location', async (req, res) => {
     const query = `
         SELECT 
+            Location_ID,
             Location_Address_House_Number, 
             Location_Address_Street, 
             Location_Address_Suffix, 
@@ -29,7 +30,6 @@ router.get('/location', async (req, res) => {
 });
 
 // POST new location route
-// POST new location route
 router.post('/location', async (req, res) => {
     const { address } = req.body;
     console.log("address: ", address);
@@ -45,9 +45,12 @@ router.post('/location', async (req, res) => {
     const stateAndZip = addressParts[2].trim().split(' '); // ['TX', '67000']
     const country = addressParts[3].trim(); // 'USA'
     
-    // Validate house number and street
+    // Split house number and street
     const [houseNumber, ...streetArray] = houseNumberAndStreet.split(' ');
-    const street = streetArray.join(' '); // Join remaining parts as the street
+    const streetSuffix = streetArray.join(' ');
+    const [street, ...suffixArray] = streetSuffix.split(' ');
+    const suffix = suffixArray.join(' ');
+
     const state = stateAndZip[0]; // 'TX'
     const zipCode = stateAndZip[1]; // '67000'
 
@@ -69,11 +72,10 @@ router.post('/location', async (req, res) => {
     `;
 
     try {
-        // Execute the insert query
         await db.query(insertQuery, [
             houseNumber, 
             street, 
-            '', // Optional field for suffix
+            suffix,
             city, 
             state, 
             zipCode, 
@@ -93,5 +95,48 @@ router.post('/location', async (req, res) => {
     }
 });
 
+// PUT route to update location
+router.put('/location/:Location_ID', async (req, res) => {
+    const { Location_ID } = req.params; // Get Location_ID from the URL parameters
+    const { houseNumber, street, suffix, city, state, zipCode, country } = req.body;
+
+    // Validate required address fields
+    if (!houseNumber || !street || !city || !state || !zipCode || !country) {
+        return res.status(400).json({ message: 'All address fields are required' });
+    }
+
+    const updateQuery = `
+        UPDATE location
+        SET 
+            Location_Address_House_Number = ?,
+            Location_Address_Street = ?,
+            Location_Address_Suffix = ?,
+            Location_Address_City = ?,
+            Location_Address_State = ?,
+            Location_Address_Zip_Code = ?,
+            Location_Address_Country = ?
+        WHERE Location_ID = ?;
+    `;
+    
+    try {
+        await db.query(updateQuery, [
+            houseNumber, 
+            street, 
+            suffix,
+            city, 
+            state, 
+            zipCode, 
+            country,
+            Location_ID
+        ]);
+
+        console.log('Location updated:', houseNumber, street, suffix, city, state, zipCode, country, 'Location ID:', Location_ID);
+        res.status(200).json({ message: 'Location updated successfully' });
+    } catch (error) {
+        console.error('Error updating location:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 module.exports = router;
+

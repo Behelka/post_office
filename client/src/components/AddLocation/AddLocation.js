@@ -35,7 +35,7 @@ const BasicTable = () => {
                 console.log(result); // Log the result to see its structure
                 // Process the result as needed
                 const formattedData = result.map((item, index) => ({
-                    location_id: index + 1, // Or assign from DB if available
+                    location_id: `${item.Location_ID}`,
                     address: `
                     ${item.Location_Address_House_Number} 
                     ${item.Location_Address_Street} 
@@ -135,16 +135,48 @@ const BasicTable = () => {
         setEditCountry(country);
     };
 
-    const handleUpdate = (e) => {
+    const handleUpdate = async (e) => {
         e.preventDefault();
+        
         const updatedAddress = `${editHouseNumber} ${editStreet} ${editSuffix}, ${editCity}, ${editState} ${editZipCode}, ${editCountry}`;
-        const updatedData = data.map((location, index) => 
-            index === editIndex ? { ...location, address: updatedAddress } : location
-        );
-
-        setData(updatedData); 
-        setEditMode(false);
-        setEditIndex(null);
+        
+        const location_id = data[editIndex].location_id;
+        console.log(location_id);
+        const updatedLocation = {
+            location_id,
+            houseNumber: editHouseNumber,
+            street: editStreet,
+            suffix: editSuffix,
+            city: editCity,
+            state: editState,
+            zipCode: editZipCode,
+            country: editCountry,
+        };
+    
+        try {
+            const response = await fetch(`http://localhost:3000/api/location/${location_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedLocation),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            // Update local state with the new address
+            const updatedData = data.map((location, idx) => 
+                idx === editIndex ? { ...location, address: updatedAddress } : location
+            );
+    
+            setData(updatedData);
+            setEditMode(false);
+            setEditIndex(null);
+        } catch (error) {
+            console.error('Error updating location:', error);
+        }
     };
 
     return (
@@ -227,7 +259,7 @@ const BasicTable = () => {
 
             {editMode && (
                 <div>
-                    <h2>Edit Location {editIndex + 1}</h2>
+                    <h2>Edit Location {data[editIndex].location_id}</h2>
                     <form onSubmit={handleUpdate}>
                         <input
                             type="text"

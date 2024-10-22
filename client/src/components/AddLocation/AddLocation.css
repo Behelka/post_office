@@ -55,26 +55,29 @@ tr:hover {
 
 form {
     display: flex;             /* Use flexbox for layout */
-    flex-wrap: wrap;          /* Allow wrapping of inputs */
-    gap: 10px;                /* Space between input fields */
-    margin-bottom: 20px;      /* Space between form and table */
+    flex-wrap: nowrap;         /* Prevent wrapping, keep items on one line */
+    align-items: stretch;      /* Stretch items to the same height */
+    gap: 10px;                 /* Space between input fields and the button */
+    margin-bottom: 20px;       /* Space between form and table */
 }
 
 input {
-    flex: 1;                  /* Make inputs take equal space */
-    min-width: 150px;         /* Set a minimum width for the inputs */
-    padding: 8px;             /* Add padding for better spacing */
-    border: 1px solid #ddd;   /* Add border to inputs */
-    border-radius: 4px;       /* Rounded corners */
+    flex: 1;                   /* Make inputs take equal space */
+    min-width: 150px;          /* Set a minimum width for the inputs */
+    padding: 8px;              /* Add padding for better spacing */
+    border: 1px solid #ddd;    /* Add border to inputs */
+    border-radius: 4px;        /* Rounded corners */
+    height: 40px;              /* Set a fixed height for consistency */
 }
 
 button {
-    padding: 8px 12px;        /* Add padding to the button */
-    background-color: #4c85ff;/* Button background color */
-    color: white;             /* Button text color */
-    border: none;             /* Remove border */
-    border-radius: 4px;       /* Rounded corners */
-    cursor: pointer;          /* Change cursor on hover */
+    padding: 0 12px;           /* Horizontal padding for the button */
+    height: 40px;              /* Match button height with input fields */
+    background-color: #4c85ff; /* Button background color */
+    color: white;              /* Button text color */
+    border: none;              /* Remove border */
+    border-radius: 4px;        /* Rounded corners */
+    cursor: pointer;           /* Change cursor on hover */
 }
 
 button:hover {
