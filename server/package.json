@@ -4,7 +4,7 @@
   "description": "Node.js server hosted on Azure with MySQL",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "keywords": [
     "azure",
@@ -17,6 +17,7 @@
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "mysql2": "^3.1.0"
+    "mysql2": "^3.1.0",
+    "nodemon": "^3.1.7"
   }
 }
