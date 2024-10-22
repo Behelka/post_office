@@ -22,7 +22,7 @@ const App = () => {
     ["AboutUs", "About/Contact Us"],
   ];
 
-  var user = "admin"; // This is to see different roles
+  var user = "customer"; // This is to see different roles
 
   if (user === "employee") {
     links = [
