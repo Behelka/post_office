@@ -87,7 +87,7 @@ button {
     cursor: pointer;           /* Change cursor on hover */
 }
 
-clearButton {
+.button-red {
     padding: 0 12px;           /* Horizontal padding for the button */
     height: 40px;              /* Match button height with input fields */
     background-color: #ffffff00; /* Button background color */
