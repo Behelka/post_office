@@ -74,7 +74,7 @@ const products = [
   
     return (
       <div className="Shop">
-        <h1>Post Office Shop</h1>
+        
         {/* <img src={cartImg} alt="Shopping Cart" className="cartImg"></img> */}
         <ProductList products={products} addToCart={addToCart} />
         <Cart cart={cart} removeFromCart={removeFromCart} />

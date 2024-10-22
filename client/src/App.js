@@ -14,6 +14,7 @@ import Reports from "./components/Reports/Reports";
 import Shop from "./components/Shop/Shop";
 import SignUp from "./components/SignUp/SignUp";
 import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
+import EmployeeShop from "./components/Shop/EmployeeShop";
 
 const App = () => {
   let links = [
@@ -23,7 +24,7 @@ const App = () => {
     ["AboutUs", "About/Contact Us"],
   ];
 
-  var user = "customer"; // This is to see different roles
+  var user = "admin"; // This is to see different roles
 
   if (user === "employee") {
     links = [
@@ -31,6 +32,7 @@ const App = () => {
       ["PackagePortal", "Package Portal"],
       ["TrackingHistory", "Tracking History"],
       ["EmployeeProfile", "Profile"],
+      ["EmployeeShop", "Shop"]
     ];
   }
 
@@ -41,6 +43,7 @@ const App = () => {
       ["TrackingHistory", "Tracking History"],
       ["ManagerPortal", "Manager Portal"],
       ["EmployeeProfile", "Profile"],
+      ["EmployeeShop", "Shop"]
     ];
   }
 
@@ -66,6 +69,7 @@ const App = () => {
       ["AddDepartment", "Add Department"],
       ["AddLocation", "Add Location"],
       ["EmployeeProfile", "Profile"],
+      ["EmployeeShop", "Shop"]
     ];
   }
 
