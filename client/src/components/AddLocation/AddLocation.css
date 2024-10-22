@@ -15,6 +15,10 @@ html, body {
     overflow-y: auto;  /* Enable vertical scrolling */
 }
 
+.center-header {
+    text-align: center;  /* Center the text in the Actions header */
+}
+
 .table-container {
     position: absolute;  /* Positioning the container */
     top: 100px;
@@ -33,11 +37,14 @@ table {
 
 th, td {
     border: 1px solid #ddd;  /* Add borders to table cells */
-    padding: 8px;  /* Add some padding for better spacing */
+    padding: 10px;  /* Add some padding for better spacing */
     text-align: left;  /* Align text to the left */
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+.delete-column {
+    text-align: center;  /* Center the text in this column */
 }
 
 th {
@@ -74,6 +81,16 @@ button {
     padding: 0 12px;           /* Horizontal padding for the button */
     height: 40px;              /* Match button height with input fields */
     background-color: #4c85ff; /* Button background color */
+    color: white;              /* Button text color */
+    border: none;              /* Remove border */
+    border-radius: 4px;        /* Rounded corners */
+    cursor: pointer;           /* Change cursor on hover */
+}
+
+clearButton {
+    padding: 0 12px;           /* Horizontal padding for the button */
+    height: 40px;              /* Match button height with input fields */
+    background-color: #ffffff00; /* Button background color */
     color: white;              /* Button text color */
     border: none;              /* Remove border */
     border-radius: 4px;        /* Rounded corners */

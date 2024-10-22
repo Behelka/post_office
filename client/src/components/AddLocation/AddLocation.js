@@ -34,16 +34,9 @@ const BasicTable = () => {
                 const result = await response.json();
                 console.log(result); // Log the result to see its structure
                 // Process the result as needed
-                const formattedData = result.map((item, index) => ({
-                    location_id: `${item.Location_ID}`,
-                    address: `
-                    ${item.Location_Address_House_Number} 
-                    ${item.Location_Address_Street} 
-                    ${item.Location_Address_Suffix}, 
-                    ${item.Location_Address_City}, 
-                    ${item.Location_Address_State} 
-                    ${item.Location_Address_Zip_Code}, 
-                    ${item.Location_Address_Country}`
+                const formattedData = result.map((item) => ({
+                    location_id: item.Location_ID,
+                    address: `${item.Location_Address_House_Number} ${item.Location_Address_Street} ${item.Location_Address_Suffix}, ${item.Location_Address_City}, ${item.Location_Address_State} ${item.Location_Address_Zip_Code}, ${item.Location_Address_Country}`
                 }));
                 setData(formattedData);
 
@@ -52,10 +45,8 @@ const BasicTable = () => {
             }
         };
         
-        
         fetchLocations();
     }, []); 
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -63,14 +54,12 @@ const BasicTable = () => {
         const newLocation = {
             address: `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`
         };
-       // console.log(newLocation);
         try {
             const response = await fetch('http://localhost:3000/api/location', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                
                 body: JSON.stringify(newLocation),
             });
             if (!response.ok) {
@@ -89,7 +78,6 @@ const BasicTable = () => {
             console.error('Error adding location:', error);
         }
     };
-     
 
     const clearInputFields = () => {
         setHouseNumber("");
@@ -105,33 +93,27 @@ const BasicTable = () => {
         setEditMode(true);
         setEditIndex(index);
         const location = data[index];
-    
+
         // Trim and split the address properly
         const addressParts = location.address.trim().split(", ");
-    
-        // Remove newline characters and filter out empty strings
+
         const houseAndStreet = addressParts[0].trim().replace(/\n/g, '').split(" ").filter(Boolean);
-    
-        const city = addressParts[1].trim().replace(/\n/g, ''); // Trim and remove newline
-        const stateZip = addressParts[2].trim().replace(/\n/g, '').split(" ").filter(Boolean); // Trim, remove newline, and split
-        const country = addressParts[3].trim().replace(/\n/g, ''); // Trim and remove newline
-    
-        // Handle house number, street, and suffix
+        const city = addressParts[1].trim().replace(/\n/g, '');
+        const stateZip = addressParts[2].trim().replace(/\n/g, '').split(" ").filter(Boolean);
+        const country = addressParts[3].trim().replace(/\n/g, '');
+
         const houseNumber = houseAndStreet[0];
         const street = houseAndStreet.slice(1, houseAndStreet.length - 1).join(" ");
         const suffix = houseAndStreet[houseAndStreet.length - 1];
-    
-        // Handle state and zip code
-        const state = stateZip[0]; // First part as state
-        const zipCode = stateZip.length > 1 ? stateZip[1] : ''; // Safely assign zip code if exists
-    
-        // Set the state for the edit form
+        const state = stateZip[0];
+        const zipCode = stateZip.length > 1 ? stateZip[1] : '';
+
         setEditHouseNumber(houseNumber);
         setEditStreet(street);
         setEditSuffix(suffix);
         setEditCity(city);
         setEditState(state);
-        setEditZipCode(zipCode); // This should now populate correctly
+        setEditZipCode(zipCode);
         setEditCountry(country);
     };
 
@@ -141,7 +123,6 @@ const BasicTable = () => {
         const updatedAddress = `${editHouseNumber} ${editStreet} ${editSuffix}, ${editCity}, ${editState} ${editZipCode}, ${editCountry}`;
         
         const location_id = data[editIndex].location_id;
-        console.log(location_id);
         const updatedLocation = {
             location_id,
             houseNumber: editHouseNumber,
@@ -166,7 +147,6 @@ const BasicTable = () => {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
     
-            // Update local state with the new address
             const updatedData = data.map((location, idx) => 
                 idx === editIndex ? { ...location, address: updatedAddress } : location
             );
@@ -176,6 +156,23 @@ const BasicTable = () => {
             setEditIndex(null);
         } catch (error) {
             console.error('Error updating location:', error);
+        }
+    };
+
+    const handleDelete = async (location_id) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/location/${location_id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Update local state to remove the deleted location
+            setData(data.filter(location => location.location_id !== location_id));
+        } catch (error) {
+            console.error('Error deleting location:', error);
         }
     };
 
@@ -239,7 +236,8 @@ const BasicTable = () => {
                     <thead>
                         <tr>
                             <th>Location ID</th>
-                            <th>Address</th>
+                            <th>Location Address</th>
+                            <th className="center-header">Delete Location</th> {/* Add a class to the Actions header */}
                         </tr>
                     </thead>
                     <tbody>
@@ -251,6 +249,17 @@ const BasicTable = () => {
                                     </button>
                                 </td>
                                 <td>{item.address}</td>
+                                <td className="delete-column"> {/* Center the delete column */}
+                                    <clearButton 
+                                        onClick={(e) => {
+                                            e.preventDefault(); // Prevent default link behavior
+                                            handleDelete(item.location_id); // Call delete function
+                                        }}
+                                        style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}
+                                    >
+                                        Delete
+                                    </clearButton>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
