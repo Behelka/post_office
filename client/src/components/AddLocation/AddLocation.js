@@ -160,21 +160,28 @@ const BasicTable = () => {
     };
 
     const handleDelete = async (location_id) => {
+        
         try {
             const response = await fetch(`http://localhost:3000/api/location/${location_id}`, {
-                method: 'DELETE',
+                method: 'PATCH',
             });
-
+    
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-
-            // Update local state to remove the deleted location
-            setData(data.filter(location => location.location_id !== location_id));
+    
+            // Optional: If you still want to filter out the location locally after marking it as deleted
+            setData(data.map(location => 
+                location.location_id === location_id 
+                    ? { ...location, Delete_Location: 1 } 
+                    : location
+            ));
+            
         } catch (error) {
             console.error('Error deleting location:', error);
         }
     };
+    
 
     return (
         <div className="table-container">
@@ -250,7 +257,7 @@ const BasicTable = () => {
                                 </td>
                                 <td>{item.address}</td>
                                 <td className="delete-column"> {/* Center the delete column */}
-                                    <clearButton 
+                                    <button className="button-red" 
                                         onClick={(e) => {
                                             e.preventDefault(); // Prevent default link behavior
                                             handleDelete(item.location_id); // Call delete function
@@ -258,7 +265,7 @@ const BasicTable = () => {
                                         style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}
                                     >
                                         Delete
-                                    </clearButton>
+                                    </button>
                                 </td>
                             </tr>
                         ))}

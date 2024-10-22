@@ -138,28 +138,29 @@ router.put('/location/:Location_ID', async (req, res) => {
     }
 });
 
-router.delete('/api/location/:Location_ID', async (req, res) => {
+router.patch('/location/:Location_ID', async (req, res) => {
     const { Location_ID } = req.params;
 
-    const patchQuery = 
-        `UPDATE location
+    const updateQuery = `
+        UPDATE location
         SET Delete_Location = 1
         WHERE Location_ID = ?;`;
 
     try {
-        await db.query(patchQuery, [
-            Location_ID
-        ]);
+        // Execute the query
+        const [result] = await db.query(updateQuery, [Location_ID]);
+
+        // Check if any row was affected (i.e., updated)
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+
+        // Respond with success
+        res.json({ message: 'Location marked for deletion' });
     } catch (error) {
         console.error('Error updating location:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
-
-    if (!location) {
-        return res.status(404).json({ message: 'Location not found' });
-    }
-
-    res.json({ message: 'Location marked for deletion', location });
 });
 
 module.exports = router;
