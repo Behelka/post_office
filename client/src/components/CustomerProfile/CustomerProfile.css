@@ -1,0 +1,40 @@
+.customer-profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.customer-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.customer-profile h1 {
+    text-align: center;
+    color: #4c85ff;
+    margin-bottom: 20px;
+}
+
+.customer-profile div {
+    font-size: 18px;
+}
+
+.customer-profile div strong {
+    color: #333;
+    margin-right: 10px;
+}
+
+.customer-profile div {
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.customer-profile div:not(:last-child) {
+    margin-bottom: 10px;
+}

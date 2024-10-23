@@ -23,11 +23,8 @@ const BasicTable = () => {
 
     const fetchLocations = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/location');
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
+            const response = await fetch('http://localhost:3001/api/location');
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
 
             const formattedData = result.map((item) => ({
@@ -49,29 +46,30 @@ const BasicTable = () => {
         e.preventDefault();
 
         const newLocation = {
-            address: `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`
+            houseNumber: `${houseNumber}`,
+            street: `${street}`,
+            suffix:  `${suffix}`,
+            city: `${city}`,
+            state: `${state}`,
+            zipCode: `${zipCode}`,
+            country: `${country}`,
         };
 
         try {
-            const response = await fetch('http://localhost:3000/api/location', {
+            const response = await fetch('http://localhost:3001/api/location', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newLocation),
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const result = await response.json();
 
-            setData([...data, {
-                location_id: data.length + 1, // Replace with ID from result if returned
-                address: `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`
+            setData(prev => [...prev, {
+                location_id: result.Location_ID, // Use ID from the result
+                address: `${result.Location_Address_House_Number} ${result.Location_Address_Street} ${result.Location_Address_Suffix || ''}, ${result.Location_Address_City}, ${result.Location_Address_State} ${result.Location_Address_Zip_Code}, ${result.Location_Address_Country}`
             }]);
-            console.log(result);
             clearInputFields();
         } catch (error) {
             console.error('Error adding location:', error);
@@ -123,11 +121,9 @@ const BasicTable = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:3000/api/location/${data[editIndex].location_id}`, {
+            const response = await fetch(`http://localhost:3001/api/location/${data[editIndex].location_id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedLocation),
             });
 
@@ -149,19 +145,17 @@ const BasicTable = () => {
 
     const handleDelete = async (location_id) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/location/${location_id}`, {
+            const response = await fetch(`http://localhost:3001/api/location/${location_id}`, {
                 method: 'PATCH',
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+                headers: {
+                    'Content-Type': 'application/json',
+            }});
+            if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status}`) }
 
             setData(data.map(location =>
                 location.location_id === location_id ? { ...location, Delete_Location: 1 } : location
             ));
-
-            fetchLocations();
+            fetchLocations(); //update website display
         } catch (error) {
             console.error('Error deleting location:', error);
         }
