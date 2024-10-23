@@ -1,18 +1,20 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Navbar from "./components/navBar/navBar";
-import Home from "./components/Home/Home";
-import Login from "./components/Login/Login";
-import Shop from "./components/Shop/Shop";
-import CustomerProfile from "./components/CustomerProfile/CustomerProfile";
-import EmployeeProfile from "./components/EmployeeProfile/EmployeeProfile";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import AboutUs from "./components/AboutUs/AboutUs";
-import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
-import PackagePortal from "./components/PackagePortal/PackagePortal";
-import ManagerPortal from "./components/ManagerPortal/ManagerPortal";
-import Reports from "./components/Reports/Reports";
 import AddDepartment from "./components/AddDepartment/AddDepartment";
 import AddLocation from "./components/AddLocation/AddLocation";
+import CustomerProfile from "./components/CustomerProfile/CustomerProfile";
 import Dashboard from "./components/Dashboard/Dashboard";
+import EmployeeProfile from "./components/EmployeeProfile/EmployeeProfile";
+import Home from "./components/Home/Home";
+import Login from "./components/Login/Login";
+import ManagerPortal from "./components/ManagerPortal/ManagerPortal";
+import Navbar from "./components/navBar/navBar";
+import PackagePortal from "./components/PackagePortal/PackagePortal";
+import Reports from "./components/Reports/Reports";
+import Shop from "./components/Shop/Shop";
+import SignUp from "./components/SignUp/SignUp";
+import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
+import EmployeeShop from "./components/Shop/EmployeeShop";
 
 const App = () => {
   let links = [
@@ -30,6 +32,7 @@ const App = () => {
       ["PackagePortal", "Package Portal"],
       ["TrackingHistory", "Tracking History"],
       ["EmployeeProfile", "Profile"],
+      ["EmployeeShop", "Shop"]
     ];
   }
 
@@ -40,6 +43,7 @@ const App = () => {
       ["TrackingHistory", "Tracking History"],
       ["ManagerPortal", "Manager Portal"],
       ["EmployeeProfile", "Profile"],
+      ["EmployeeShop", "Shop"]
     ];
   }
 
@@ -65,6 +69,7 @@ const App = () => {
       ["AddDepartment", "Add Department"],
       ["AddLocation", "Add Location"],
       ["EmployeeProfile", "Profile"],
+      ["EmployeeShop", "Shop"]
     ];
   }
 
@@ -74,6 +79,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/SignUp" element={<SignUp />} />
         <Route path="/Shop" element={<Shop />} />
         <Route path="/PackagePortal" element={<PackagePortal />} />
         <Route path="/AboutUs" element={<AboutUs />} />
