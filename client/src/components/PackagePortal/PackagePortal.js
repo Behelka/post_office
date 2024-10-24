@@ -1,25 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./PackagePortal.css";
 
 const BasicTable = () => {
     // Sample data to display in the table
-    const [data, setData] = useState([
-        { package_id: 1, sender_id: 1, recipient_id: 1, destination_address: "123 Maple St, Chicago, IL 60601, USA", package_status: "Recieved" },
-        { package_id: 2, sender_id: 2, recipient_id: 1, destination_address: "456 Oak Ave, Denver, CO 80203, USA", package_status: "Recieved" },
-        { package_id: 3, sender_id: 3, recipient_id: 1, destination_address: "789 Pine Rd, Miami, FL 33101, USA", package_status: "Shipped" },
-        { package_id: 4, sender_id: 4, recipient_id: 1, destination_address: "321 Elm Blvd, Dallas, TX 75201, USA", package_status: "Recieved" },
-        { package_id: 5, sender_id: 5, recipient_id: 1, destination_address: "654 Cedar Ln, Seattle, WA 98101, USA", package_status: "Shipped" },
-        { package_id: 6, sender_id: 6, recipient_id: 1, destination_address: "987 Birch Dr, Boston, MA 02108, USA", package_status: "Shipped" },
-        { package_id: 7, sender_id: 7, recipient_id: 1, destination_address: "159 Walnut St, San Francisco, CA 94102, USA", package_status: "Recieved" },
-        { package_id: 8, sender_id: 8, recipient_id: 1, destination_address: "753 Aspen Ct, Atlanta, GA 30301, USA", package_status: "Recieved" },
-        { package_id: 9, sender_id: 9, recipient_id: 1, destination_address: "246 Willow Way, Portland, OR 97201, USA", package_status: "Shipped" },
-        { package_id: 10, sender_id: 10, recipient_id: 1, destination_address: "864 Sycamore Cir, New York, NY 10001, USA", package_status: "Shipped" },
-        { package_id: 11, sender_id: 11, recipient_id: 1, destination_address: "135 Palm Ave, Los Angeles, CA 90001, USA", package_status: "Shipped" },
-        { package_id: 12, sender_id: 12, recipient_id: 1, destination_address: "468 Hickory St, Phoenix, AZ 85001, USA", package_status: "Recieved" },
-        { package_id: 13, sender_id: 13, recipient_id: 1, destination_address: "579 Redwood Ter, Minneapolis, MN 55401, USA", package_status: "Shipped" },
-        { package_id: 14, sender_id: 14, recipient_id: 1, destination_address: "702 Magnolia Dr, Houston, TX 77002, USA", package_status: "Shipped" },
-        { package_id: 15, sender_id: 15, recipient_id: 1, destination_address: "190 Chestnut Blvd, Las Vegas, NV 89101, USA", package_status: "Shipped" },
-    ]);
+    const [data, setData] = useState([]);
 
     // State for form inputs
     const [senderId, setSenderId] = useState("");
@@ -31,6 +15,11 @@ const BasicTable = () => {
     const [state, setState] = useState("");
     const [zipCode, setZipCode] = useState("");
     const [country, setCountry] = useState("");
+    const [length, setLength] = useState("");
+    const [width, setWidth] = useState("");
+    const [height, setHeight] = useState("");
+    const [weight, setWeight] = useState("");  // Added weight state
+    const [shippingMethod, setShippingMethod] = useState("Ground");
     const [packageStatus, setPackageStatus] = useState("Received");
 
     const [editMode, setEditMode] = useState(false);
@@ -44,18 +33,88 @@ const BasicTable = () => {
     const [editState, setEditState] = useState("");
     const [editZipCode, setEditZipCode] = useState("");
     const [editCountry, setEditCountry] = useState("");
+    const [editLength, setEditLength] = useState("");
+    const [editWidth, setEditWidth] = useState("");
+    const [editHeight, setEditHeight] = useState("");
+    const [editWeight, setEditWeight] = useState(""); // Added weight edit state
+    const [editShippingMethod, setEditShippingMethod] = useState("Ground");
+    //const [editShippingCost, setEditShippingCost] = useState("");
     const [editPackageStatus, setEditPackageStatus] = useState("Received");
 
-    const handleSubmit = (e) => {
+    function formatPackageItem(item) {
+        return {
+            package_id: item.Package_ID,
+            sender_id: item.Sender_ID, // Assuming this is the ID you want to display
+            sender_name: `${item.Sender_First_Name} ${item.Sender_Last_Name}`, // Combined sender name
+            recipient_id: item.Recipient_ID, // Assuming this is the ID you want to display
+            recipient_name: `${item.Recipient_First_Name} ${item.Recipient_Last_Name}`, // Combined recipient name
+            destination_address: `${item.Package_House_Number} ${item.Package_Street} ${item.Package_Suffix || ''}, ${item.Package_City}, ${item.Package_State} ${item.Package_Zip_Code}, ${item.Package_Country}`, // Combined destination address
+            package_status: item.Package_Status,
+            length: item.Package_Length,
+            width: item.Package_Width,
+            height: item.Package_Height,
+            weight: item.Package_Weight, // Added weight field
+            shipping_method: item.Package_Shipping_Method,
+            shipping_cost: item.Package_Shipping_Cost,
+        };
+    }
+    
+
+    const fetchPackage = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/PackagePortal');
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const result = await response.json();
+    
+            const formattedData = result.map(formatPackageItem);
+
+            setData(formattedData);
+        } catch (error) {
+            console.error('Error fetching packages:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchPackage();
+    });
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
         const newPackage = {
-            package_id: data.length + 1,
             sender_id: senderId,
             recipient_id: recipientId,
-            destination_address: `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`,
-            package_status: packageStatus
+            packageHouseNumber: houseNumber,
+            packageStreet: street,
+            packageSuffix: suffix,
+            packageCity: city,
+            packageState: state,
+            packageZipCode: zipCode,
+            packageCountry: country,
+            packageStatus: packageStatus,
+            packageLength: length,
+            packageWidth: width,
+            packageHeight: height,
+            packageWeight: weight,
+            packageShippingMethod: shippingMethod,
         };
-        setData([...data, newPackage]);
+
+        try {
+            const response = await fetch('http://localhost:3001/api/PackagePortal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newPackage),
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            const result = await response.json();
+
+            setData(prev => [...prev, formatPackageItem(result)]);
+
+        } catch (error) {
+            console.error('Error adding package:', error);
+        }
 
         // Clear input fields
         setSenderId("");
@@ -67,6 +126,11 @@ const BasicTable = () => {
         setState("");
         setZipCode("");
         setCountry("");
+        setLength("");
+        setWidth("");
+        setHeight("");
+        setWeight(""); // Clear weight
+        setShippingMethod("Ground");
         setPackageStatus("Received");
     };
 
@@ -78,6 +142,12 @@ const BasicTable = () => {
         setEditSenderId(pkg.sender_id);
         setEditRecipientId(pkg.recipient_id);
         setEditPackageStatus(pkg.package_status);
+        setEditLength(pkg.length);
+        setEditWidth(pkg.width);
+        setEditHeight(pkg.height);
+        setEditWeight(pkg.weight); // Set edit weight
+        setEditShippingMethod(pkg.shipping_method);
+        //setEditShippingCost(pkg.shipping_cost);
         
         // Parse the destination address
         const addressParts = pkg.destination_address.split(", ");
@@ -101,25 +171,78 @@ const BasicTable = () => {
         setEditCountry(country);
     };
 
-    const handleUpdate = (e) => {
+    const handleUpdate = async (e) => {
         e.preventDefault();
-
+    
         const updatedPackage = {
             package_id: data[editIndex].package_id,
             sender_id: editSenderId,
             recipient_id: editRecipientId,
-            destination_address: `${editHouseNumber} ${editStreet} ${editSuffix}, ${editCity}, ${editState} ${editZipCode}, ${editCountry}`,
-            package_status: editPackageStatus
+            packageHouseNumber: editHouseNumber,
+            packageStreet: editStreet,
+            packageSuffix: editSuffix,
+            packageCity: editCity,
+            packageState: editState,
+            packageZipCode: editZipCode,
+            packageCountry: editCountry,
+            packageStatus: editPackageStatus,
+            packageLength: editLength,
+            packageWidth: editWidth,
+            packageHeight: editHeight,
+            packageWeight: editWeight,
+            packageShippingMethod: editShippingMethod, // Corrected this
+
         };
+    
+        try {
+            const response = await fetch('http://localhost:3001/api/PackagePortal', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedPackage),
+            });
+    
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    
+            const result = await response.json();
+    
+            // Update the data array with the updated package info
+            const updatedData = data.map(item => formatPackageItem(item, result));
 
-        const updatedData = data.map((pkg, index) =>
-            index === editIndex ? updatedPackage : pkg
-        );
-
-        setData(updatedData);
-        setEditMode(false);
-        setEditIndex(null);
+    
+            setData(updatedData); // Set the updated data
+            setEditMode(false); // Turn off edit mode
+            setEditIndex(null); // Reset edit index
+        } catch (error) {
+            console.error('Error updating package:', error);
+        }
     };
+    
+
+    const handleDelete = async (package_id) => {
+    
+        try {
+            const response = await fetch(`http://localhost:3001/api/PackagePortal/${package_id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            // Update the local state to reflect deletion without reloading the page
+            setData(data.map(packageItem =>
+                packageItem.Package_ID === package_id ? { ...packageItem, Delete_Location: 1 } : packageItem
+            ));
+    
+            fetchPackage(); // Update the website display
+        } catch (error) {
+            console.error('Error deleting package:', error);
+        }
+    };
+    
 
     return (
         <div className="table-container">
@@ -187,13 +310,41 @@ const BasicTable = () => {
                     onChange={(e) => setCountry(e.target.value)}
                     required
                 />
+                <input
+                    type="number"
+                    placeholder="Package Length (In)"
+                    value={length}
+                    onChange={(e) => setLength(e.target.value)}
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="Package Width (In)"
+                    value={width}
+                    onChange={(e) => setWidth(e.target.value)}
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="Package Height (In)"
+                    value={height}
+                    onChange={(e) => setHeight(e.target.value)}
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="Package Weight (Lbs)"
+                    value={weight} // Updated weight field
+                    onChange={(e) => setWeight(e.target.value)}
+                    required
+                />
                 <select
-                    value={packageStatus}
-                    onChange={(e) => setPackageStatus(e.target.value)}
+                    value={shippingMethod}
+                    onChange={(e) => setShippingMethod(e.target.value)}
                 >
-                    <option value="Received">Received</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Delivered">Delivered</option>
+                    <option value="Ground">Ground</option>
+                    <option value="Air">Air</option>
+                    <option value="Express">Overnight</option>
                 </select>
                 <button type="submit">Add Package</button>
             </form>
@@ -204,33 +355,49 @@ const BasicTable = () => {
                     <thead>
                         <tr>
                             <th>Package ID</th>
-                            <th>Sender ID</th>
-                            <th>Recipient ID</th>
+                            <th>Sender</th>
+                            <th>Recipient</th>
                             <th>Destination Address</th>
                             <th>Package Status</th>
+                            <th>Length (In)</th>
+                            <th>Width (In)</th>
+                            <th>Height (In)</th>
+                            <th>Weight (Lbs)</th>
+                            <th>Shipping Method</th>
+                            <th>Shipping Cost</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((item, index) => (
-                            <tr key={item.package_id}>
-                                <td>
-                                    <a href="#" onClick={() => handleEdit(index)}>
+                    {data.map((item, index) => (
+                        <tr key={item.package_id}>
+                            <td>
+                            <button onClick={() => handleEdit(index)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
                                         {item.package_id}
-                                    </a>
-                                </td>
-                                <td>{item.sender_id}</td>
-                                <td>{item.recipient_id}</td>
-                                <td>{item.destination_address}</td>
-                                <td>{item.package_status}</td>
-                            </tr>
-                        ))}
-                    </tbody>
+                                    </button>
+                            </td>
+                            <td>{item.sender_name}</td> {/* Updated to display sender name */}
+                            <td>{item.recipient_name}</td> {/* Updated to display recipient name */}
+                            <td>{item.destination_address}</td>
+                            <td>{item.package_status}</td>
+                            <td>{item.length}</td>
+                            <td>{item.width}</td>
+                            <td>{item.height}</td>
+                            <td>{item.weight}</td>
+                            <td>{item.shipping_method}</td>
+                            <td>{item.shipping_cost}</td>
+                            <td>
+                                <button className="button-red" onClick={() => handleDelete(item.package_id)}>Delete</button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
                 </table>
             </div>
 
             {editMode && (
-                <div>
-                    <h2>Edit Package {editIndex + 1}</h2>
+                <div className="edit-form">
+                    <h2>Edit Package {data[editIndex].package_id}</h2>
                     <form onSubmit={handleUpdate}>
                         <input
                             type="number"
@@ -294,10 +461,43 @@ const BasicTable = () => {
                             onChange={(e) => setEditCountry(e.target.value)}
                             required
                         />
+                        <input
+                            type="number"
+                            placeholder="Length"
+                            value={editLength}
+                            onChange={(e) => setEditLength(e.target.value)}
+                            required
+                        />
+                        <input
+                            type="number"
+                            placeholder="Width"
+                            value={editWidth}
+                            onChange={(e) => setEditWidth(e.target.value)}
+                            required
+                        />
+                        <input
+                            type="number"
+                            placeholder="Height"
+                            value={editHeight}
+                            onChange={(e) => setEditHeight(e.target.value)}
+                            required
+                        />
+                        <input
+                            type="number"
+                            placeholder="Weight"
+                            value={editWeight} // Update weight in edit form
+                            onChange={(e) => setEditWeight(e.target.value)}
+                            required
+                        />
                         <select
-                            value={editPackageStatus}
-                            onChange={(e) => setEditPackageStatus(e.target.value)}
+                            value={editShippingMethod}
+                            onChange={(e) => setEditShippingMethod(e.target.value)}
                         >
+                            <option value="Ground">Ground</option>
+                            <option value="Air">Air</option>
+                            <option value="Express">Express</option>
+                        </select>
+                        <select value={editPackageStatus} onChange={(e) => setEditPackageStatus(e.target.value)}>
                             <option value="Received">Received</option>
                             <option value="Shipped">Shipped</option>
                             <option value="Delivered">Delivered</option>
@@ -310,12 +510,4 @@ const BasicTable = () => {
     );
 };
 
-function PackagePortal() {
-    return (
-        <div>
-            <BasicTable />
-        </div>
-    );
-}
-
-export default PackagePortal;
+export default BasicTable;

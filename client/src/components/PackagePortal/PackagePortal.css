@@ -1,82 +1,34 @@
-/* General reset for margin and padding */
-* {
-    box-sizing: border-box;  /* Include padding and border in element's total width and height */
-}
-
 html, body {
-    height: 100%;  /* Set height for the html and body to cover the full viewport */
-    margin: 0;     /* Remove default margin */
-    overflow: hidden;  /* Prevent scrolling on the entire page */
-    font-family: Arial, sans-serif;  /* Set a default font */
-}
-  
-  .table-scroll {
-    max-height: 400px;  /* Set a fixed height for the scrollable area */
-    overflow-y: auto;  /* Enable vertical scrolling */
+    overflow-y: auto;
+    margin: 0; /* Remove default margin */
+    display: flex; /** Use flexbox for centering */
+    justify-content: center; /* Center horizontally /*/
+    align-items: center; /*/* Center vertically /*/
+    height: 100vh; /*/* Full viewport height /*/
 }
 
 .table-container {
-    position: absolute;  /* Positioning the container */
-    top: 100px;
-    left: 50%;
-    transform: translateX(-50%);  /* Adjust to center the container horizontally */
-    width: 80%;          /* Set a width for the table container */
-    padding: 20px;      /* Adjust padding as needed */
-    background-color: white;  /* Optional: background color to differentiate the table */
+    max-width: 1200px; /*/* Set a maximum width for the container /*/
+    width: 100%; /*/* Allow it to be responsive /*/
+    padding: 20px; /*/* Add padding around the container /*/
 }
 
 table {
-    width: 100%;  /* Make the table take full width */
-    border-collapse: collapse;  /* Remove spacing between cells */
-    margin-top: -5px
+    width: 100%;
+    border-collapse: collapse; /*/* Optional: for cleaner borders /*/
+    margin-top: 20px; /*/* Space above the table /*/
 }
 
-th, td {
-    border: 1px solid #ddd;  /* Add borders to table cells */
-    padding: 8px;  /* Add some padding for better spacing */
-    text-align: left;  /* Align text to the left */
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-th {
-    background-color: #4c85ff;  /* Add a background color for headers */
-    color: white;  /* Set text color for headers */
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;  /* Add a light gray background to even rows */
-}
-
-tr:hover {
-    background-color: #ddd;  /* Change background on row hover */
-}
-
-form {
-    display: flex;             /* Use flexbox for layout */
-    flex-wrap: wrap;          /* Allow wrapping of inputs */
-    gap: 10px;                /* Space between input fields */
-    margin-bottom: 20px;      /* Space between form and table */
-}
-
-input {
-    flex: 1;                  /* Make inputs take equal space */
-    min-width: 150px;         /* Set a minimum width for the inputs */
-    padding: 8px;             /* Add padding for better spacing */
-    border: 1px solid #ddd;   /* Add border to inputs */
-    border-radius: 4px;       /* Rounded corners */
-}
-
-button {
-    padding: 8px 12px;        /* Add padding to the button */
-    background-color: #4c85ff;/* Button background color */
-    color: white;             /* Button text color */
-    border: none;             /* Remove border */
-    border-radius: 4px;       /* Rounded corners */
-    cursor: pointer;          /* Change cursor on hover */
+.button-red {
+    padding: 0 12px; /*/* Horizontal padding for the button /*/
+    height: 40px; /*/* Match button height with input fields /*/
+    background-color: #ffffff00; /*/* Button background color /*/
+    color: rgb(237, 86, 86); /*/* Button text color /*/
+    border: none; /*/* Remove border /*/
+    border-radius: 4px; /*/* Rounded corners /*/
+    cursor: pointer; /*/* Change cursor on hover /*/
 }
 
 button:hover {
-    background-color: #3a6cd9; /* Darken button on hover */
+    background-color: #3a6cd9; /*/* Darken button on hover */
 }
