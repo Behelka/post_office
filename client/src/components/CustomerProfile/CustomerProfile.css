@@ -5,6 +5,7 @@
     background-color: #f9f9f9;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
 }
 
 .customer-profile {
@@ -38,3 +39,18 @@
 .customer-profile div:not(:last-child) {
     margin-bottom: 10px;
 }
+
+.number-input {
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    height: 38px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+  }
