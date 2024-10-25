@@ -15,6 +15,7 @@ import Shop from "./components/Shop/Shop";
 import SignUp from "./components/SignUp/SignUp";
 import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
 import EmployeeShop from "./components/Shop/EmployeeShop";
+import Stops from "./components/PackagePortal/Stops";
 
 const App = () => {
   let links = [
@@ -92,6 +93,7 @@ const App = () => {
         <Route path="/AddDepartment" element={<AddDepartment />} />
         <Route path="/AddLocation" element={<AddLocation />} />
         <Route path="/EmployeeShop" element={<EmployeeShop />} />
+        <Route path="/stops/:packageId" element={<Stops />} />
       </Routes>
     </Router>
   );
