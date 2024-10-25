@@ -1,52 +1,67 @@
-//incomplete
 const db = require('../db'); // Import your db connection
 const url = require('url');
-const parseBody = require('../Parsebody');
+
+const parseBody = require('../Parsebody'); 
+
 const reportsRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
+    const path = parsedUrl.pathname;
 
-    if (req.method === 'GET') {
-        
-        db.query('SELECT * FROM reports', (err, result) => {
-            if (err) {
-                res.statusCode = 500;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ message: 'Error fetching reports' }));
+    if (req.method === 'GET' && parsedUrl.pathname === '/api/reports'){
+      const Query =  `SELECT *
+                      FROM package`;
+          db.query(Query)
+          .then(([results]) => {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(results));
+          })
+          .catch(error => {
+              console.error('Error querying locations:', error);
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ message: 'Internal Server Error' }));
+          });
+  }
+
+    if (path.startsWith('/api/reports') && req.method === 'POST') {
+        // Parse JSON body
+        parseBody(req, (body) => {
+            const { reportType } = body;
+            
+            // Handle invalid or missing report type
+            if (!reportType) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Report type is required' }));
                 return;
             }
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));
-        });
-    } else if (req.method === 'POST') {
-        // Handle POST request 
-        let body = '';
 
-        req.on('data', (chunk) => {
-            body += chunk;
-        });
+            let query = '';
+            if (reportType === 'employee-department') {
+                query = 'SELECT * FROM Employee';
+            } else if (reportType === 'package-delivery') {
+                query = 'SELECT * FROM Package';
+            } else if (reportType === 'financial-transactions') {
+                query = 'SELECT * FROM Package';
+            } else {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid report type' }));
+                return;
+            }
 
-        req.on('end', () => {
-            const parsedBody = parseBody(body); 
-            const { title, content } = parsedBody;
-
-            db.query('INSERT INTO reports (title, content) VALUES (?, ?)', [title, content], (err, result) => {
-                if (err) {
-                    res.statusCode = 500;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.end(JSON.stringify({ message: 'Error creating report' }));
-                    return;
+            db.query(query, (error, results) => {
+                if (error) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Database query failed' }));
+                } else {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(results));
                 }
-                res.statusCode = 201;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ message: 'Report created successfully' }));
             });
         });
     } else {
-        res.statusCode = 405;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ message: 'Method not allowed' }));
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Route not found' }));
     }
 };
 
 module.exports = reportsRoute;
+
