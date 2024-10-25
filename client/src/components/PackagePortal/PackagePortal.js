@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./PackagePortal.css";
 
 const BasicTable = () => {
+    const navigate = useNavigate();
     // Sample data to display in the table
     const [data, setData] = useState([]);
 
@@ -132,6 +134,11 @@ const BasicTable = () => {
         setWeight(""); // Clear weight
         setShippingMethod("Ground");
         setPackageStatus("Received");
+    };
+
+    const handleAddStop = () => {
+        const packageId = data[editIndex].package_id;
+        navigate(`/stops/${packageId}`);
     };
 
     const handleEdit = (index) => {
@@ -372,9 +379,9 @@ const BasicTable = () => {
                     {data.map((item, index) => (
                         <tr key={item.package_id}>
                             <td>
-                            <button onClick={() => handleEdit(index)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
-                                        {item.package_id}
-                                    </button>
+                                <button onClick={() => handleEdit(index)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
+                                    {item.package_id}
+                                </button>
                             </td>
                             <td>{item.sender_name}</td> {/* Updated to display sender name */}
                             <td>{item.recipient_name}</td> {/* Updated to display recipient name */}
@@ -503,6 +510,9 @@ const BasicTable = () => {
                             <option value="Delivered">Delivered</option>
                         </select>
                         <button type="submit">Update Package</button>
+                        <button type="button" onClick={handleAddStop} style={{ marginLeft: '10px' }}>
+                            Add Stop
+                        </button>
                     </form>
                 </div>
             )}

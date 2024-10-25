@@ -1,33 +1,33 @@
 html, body {
     overflow-y: auto;
     margin: 0; /* Remove default margin */
-    display: flex; /** Use flexbox for centering */
+    display: flex; /* Use flexbox for centering */
     justify-content: center; /* Center horizontally /*/
-    height: 100vh; /* Full viewport height /*/
+    height: 100vh; /* Full viewport height */
 }
 
 .table-container {
-    max-width: 1200px; /*/* Set a maximum width for the container /*/
-    width: 100%; /*/* Allow it to be responsive /*/
-    padding: 20px; /*/* Add padding around the container /*/
+    max-width: 1200px; /* Set a maximum width for the container */
+    width: 100%; /* Allow it to be responsive */
+    padding: 20px; /* Add padding around the container */
 }
 
 table {
     width: 100%;
-    border-collapse: collapse; /*/* Optional: for cleaner borders /*/
-    margin-top: 20px; /*/* Space above the table /*/
+    border-collapse: collapse; /* Optional: for cleaner borders */
+    margin-top: 20px; /* Space above the table */
 }
 
 .button-red {
-    padding: 0 12px; /*/* Horizontal padding for the button /*/
-    height: 40px; /*/* Match button height with input fields /*/
-    background-color: #ffffff00; /*/* Button background color /*/
-    color: rgb(237, 86, 86); /*/* Button text color /*/
-    border: none; /*/* Remove border /*/
-    border-radius: 4px; /*/* Rounded corners /*/
-    cursor: pointer; /*/* Change cursor on hover /*/
+    padding: 0 12px; /* Horizontal padding for the button */
+    height: 40px; /* Match button height with input fields */
+    background-color: #ffffff00; /* Button background color */
+    color: rgb(237, 86, 86); /* Button text color */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Change cursor on hover */
 }
 
 button:hover {
-    background-color: #3a6cd9; /*/* Darken button on hover */
+    background-color: #3a6cd9; /* Darken button on hover */
 }
