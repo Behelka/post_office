@@ -16,7 +16,7 @@ const reportsRoute = (req, res) => {
               res.end(JSON.stringify(results));
           })
           .catch(error => {
-              console.error('Error querying locations:', error);
+              console.error('Error querying lpackages:', error);
               res.writeHead(500, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify({ message: 'Internal Server Error' }));
           });

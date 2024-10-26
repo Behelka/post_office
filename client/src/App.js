@@ -32,7 +32,8 @@ const App = () => {
       ["PackagePortal", "Package Portal"],
       ["TrackingHistory", "Tracking History"],
       ["EmployeeProfile", "Profile"],
-      ["EmployeeShop", "Shop"]
+      ["EmployeeShop", "Shop"],
+      ["Reports", "Reports"]
     ];
   }
 
@@ -43,7 +44,8 @@ const App = () => {
       ["TrackingHistory", "Tracking History"],
       ["ManagerPortal", "Manager Portal"],
       ["EmployeeProfile", "Profile"],
-      ["EmployeeShop", "Shop"]
+      ["EmployeeShop", "Shop"],
+      ["Reports", "Reports"]
     ];
   }
 
@@ -52,7 +54,6 @@ const App = () => {
       ["", "Home"],
       ["Dashboard", "Dashboard"],
       ["TrackingHistory", "Tracking History"],
-      ["Reports", "Reports"],
       ["Shop", "Shop"],
       ["AboutUs", "About/Contact Us"],
       ["CustomerProfile", "Profile"],
