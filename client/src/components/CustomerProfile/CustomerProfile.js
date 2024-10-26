@@ -10,9 +10,10 @@ const CustomerExample=()=>{
         {CustomerID:3,FirstName:"C", Midname:"J", Lastname:"GAG", PhoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
     ])
 
-    const [searchCustomer,setSearchCustomer]=useState(null);
+   
+    const [customerID, setcustomerID]= useState(2);
 
-    const [customerID, setcustomerID]= useState('');
+    const [searchCustomer,setSearchCustomer]=useState(null);
     const [firstName, setFirstName]=useState('');
     const [midName, setMidName]=useState('');
     const [lastName, setLastName]=useState('');
@@ -27,21 +28,26 @@ const CustomerExample=()=>{
     const [Country, setCountry] = useState("");
     const [Balance, setBalance] = useState("");
 
-
     const [mergedCustomer,setmergedCustomer]=useState([]);
-    useEffect(()=>{
-        const filtered=customerinfo.filter((customer)=>customer.CustomerID===2);
-        const merged = filtered.map((customer) =>({
+
+    useEffect(() => {
+        const filtered = customerinfo.filter(
+            (customer) => customer.CustomerID === customerID
+        );
+    
+        const merged = filtered.map((customer) => ({
             ID: customer.CustomerID,
             NAME: `${customer.FirstName} ${customer.Midname} ${customer.Lastname}`.trim(),
-            ADDRESS: `${customer.HouseNumber} ${customer.Street} ${customer.Suffix}, ${customer.City}, ${customer.State} ${customer.ZipCode}, ${customer.Country}`,
+            ADDRESS: `${customer.HouseNumber} ${customer.Street} ${customer.Suffix}, 
+                      ${customer.City}, ${customer.State} ${customer.ZipCode}, ${customer.Country}`,
             PHONENUMBER: customer.PhoneNumber,
             EMAIL: customer.Email,
             BALANCE: customer.Balance,
         }));
+    
         setmergedCustomer(merged);
-    },[customerinfo]);
-
+    }, [customerID, customerinfo]);
+    
     //Edit
 
     const [editInfo,setEditInfo]=useState("");
@@ -62,54 +68,59 @@ const CustomerExample=()=>{
     const [editCountry, setEditCountry] = useState("");
     const [editBalance, setEditBalance] = useState("");
 
-    const handleEdit=(index)=>{
+    const handleEdit = (id) => {
         setEditInfo(true);
-        setEditIndex(index);
-        const Info=customerinfo[index];
-        setEditFirstName(Info.FirstName);
-        setEditMidName(Info.Midname);
-        setEditLastName(Info.Lastname);
-        setEditPhoneNumber(Info.PhoneNumber);
-        setEditEmail(Info.Email);
-        setEditHouseNumber(Info.HouseNumber);
-        setEditStreet(Info.Street);
-        setEditSuffix(Info.Suffix);
-        setEditCity(Info.City);
-        setEditState(Info.State);
-        setEditZipCode(Info.ZipCode);
-        setEditCountry(Info.Country);
-        setEditBalance(Info.Balance);
+    
 
+        const Info = customerinfo.find((customer) => customer.CustomerID === id);
+    
+        if (Info) {
+            setcustomerID(Info.CustomerID);
+            setEditFirstName(Info.FirstName);
+            setEditMidName(Info.Midname);
+            setEditLastName(Info.Lastname);
+            setEditPhoneNumber(Info.PhoneNumber);
+            setEditEmail(Info.Email);
+            setEditHouseNumber(Info.HouseNumber);
+            setEditStreet(Info.Street);
+            setEditSuffix(Info.Suffix);
+            setEditCity(Info.City);
+            setEditState(Info.State);
+            setEditZipCode(Info.ZipCode);
+            setEditCountry(Info.Country);
+            setEditBalance(Info.Balance);
+        }
     };
 
     //Update
 
-    const handleUpdate=(e)=>{
+    const handleUpdate = (e) => {
         e.preventDefault();
-        const updateInfo={
-            CustomerID:Number(customerinfo[editIndex].CustomerID),
-            FirstName:editFirstName,
-            Midname:editMidName,
-            Lastname:editLastName,
-            PhoneNumber:editPhoneNumber,
-            Email:editEmail,
-            HouseNumber:editHouseNumber,
-            Street:editStreet,
-            Suffix:editSuffix,
-            City:editCity,
-            State:editState,
-            ZipCode:editZipCode,
-            Country:editCountry,
-            Balance:editBalance,
-        }
+    
+        const updateInfo = {
+            CustomerID: customerID,
+            FirstName: editFirstName,
+            Midname: editMidName,
+            Lastname: editLastName,
+            PhoneNumber: editPhoneNumber,
+            Email: editEmail,
+            HouseNumber: editHouseNumber,
+            Street: editStreet,
+            Suffix: editSuffix,
+            City: editCity,
+            State: editState,
+            ZipCode: editZipCode,
+            Country: editCountry,
+            Balance: editBalance,
+        };
+    
 
-        const updateCustomerInfo=customerinfo.map((customer,index)=>
-            index===editIndex? updateInfo:customer
-
+        const updatedCustomerInfo = customerinfo.map((customer) =>
+            customer.CustomerID === customerID ? updateInfo : customer
         );
-
-        setcustomerinfo(updateCustomerInfo);
-
+    
+        setcustomerinfo(updatedCustomerInfo);
+    
         const mergedCustomer = {
             ID: updateInfo.CustomerID,
             NAME: `${updateInfo.FirstName} ${updateInfo.Midname} ${updateInfo.Lastname}`.trim(),
@@ -118,15 +129,13 @@ const CustomerExample=()=>{
             PHONENUMBER: updateInfo.PhoneNumber,
             EMAIL: updateInfo.Email,
             BALANCE: updateInfo.Balance,
-          };
-
-          setSearchCustomer([mergedCustomer]);
-
+        };
+    
+        setSearchCustomer([mergedCustomer]);
+    
         setEditInfo(false);
-        setEditIndex(null);
-
     };
-
+    
 
     return (
         <div>
@@ -139,7 +148,7 @@ const CustomerExample=()=>{
                     <p><strong>Phone Number: </strong>{customer.PHONENUMBER}</p>
                     <p><strong>Email: </strong>{customer.EMAIL}</p>
                     <p><strong>Balance: </strong>${customer.BALANCE}</p>
-                    <p><button onClick={() => handleEdit(index)}>Edit</button></p>
+                    <p><button onClick={() => handleEdit(customer.ID)}>Edit</button></p>
                 </div>
             ))}
 
@@ -239,26 +248,7 @@ const CustomerExample=()=>{
         </div>
     );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
-
 
 
 /*
