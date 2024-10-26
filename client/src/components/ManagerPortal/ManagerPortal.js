@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./ManagerPortal.css"; // Ensure this CSS file is created for styles
+import "./ManagerPortal.css";
 
 const ManagerPortal = () => {
     const [employees, setEmployees] = useState([]);
+    const [locations, setLocations] = useState({}); // To store location data
     const [formData, setFormData] = useState({
         firstName: "",
         middleName: "",
@@ -19,15 +20,45 @@ const ManagerPortal = () => {
     const [editIndex, setEditIndex] = useState(null);
     const [editData, setEditData] = useState({ ...formData });
 
+    const temporaryData = [ // This was added just to test the UI, feel free to remove when you want to populate real data from the back end
+        {
+            id: 1,
+            firstName: "John",
+            middleName: "A.",
+            lastName: "Doe",
+            email: "john.doe@example.com",
+            phoneNumber: "123-456-7890",
+            dateOfBirth: "1990-01-01",
+            locationId: "1",
+            departmentId: "HR",
+            supervisorId: "2"
+        },
+        {
+            id: 2,
+            firstName: "Jane",
+            middleName: "",
+            lastName: "Smith",
+            email: "jane.smith@example.com",
+            phoneNumber: "098-765-4321",
+            dateOfBirth: "1992-02-02",
+            locationId: "2",
+            departmentId: "Finance",
+            supervisorId: "1"
+        }
+    ]; // This was added just to test the UI, feel free to remove when you want to populate real data from the back end
+
     const fetchEmployees = async () => {
-        try {
+        /*try {
             const response = await fetch('http://localhost:3001/api/employees');
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            if (!response.ok) throw new Error(HTTP error! Status: ${response.status});
             const result = await response.json();
             setEmployees(result);
         } catch (error) {
             console.error('Error fetching employees:', error);
-        }
+        }*/ //Uncomment this stuff when connecting to back end
+
+        // For now, set employees to temporary data. Remove this line when you want to remove the dummy data
+        setEmployees(temporaryData);
     };
 
     const fetchLocation = async (locationId) => {
@@ -44,6 +75,24 @@ const ManagerPortal = () => {
     useEffect(() => {
         fetchEmployees();
     }, []);
+
+    useEffect(() => {
+        const loadLocations = async () => {
+            const locationPromises = employees.map(employee => fetchLocation(employee.locationId));
+            const locationsData = await Promise.all(locationPromises);
+            const locationsMap = locationsData.reduce((acc, location, index) => {
+                if (location) {
+                    acc[employees[index].locationId] = location;
+                }
+                return acc;
+            }, {});
+            setLocations(locationsMap);
+        };
+
+        if (employees.length > 0) {
+            loadLocations();
+        }
+    }, [employees]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -129,7 +178,7 @@ const ManagerPortal = () => {
     const handleCancelEdit = () => {
         setEditMode(false);
         setEditIndex(null);
-        setEditData({ ...formData }); // Reset the edit data to empty state
+        setEditData({ ...formData });
     };
 
     return (
@@ -157,7 +206,7 @@ const ManagerPortal = () => {
                             <th>Name</th>
                             <th>Phone Number</th>
                             <th>Location</th>
-                            <th className="center-header">Delete Employee</th>
+                            <th className="center-header">Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -168,17 +217,15 @@ const ManagerPortal = () => {
                                         {employee.id}
                                     </button>
                                 </td>
-                                <td>{employee.email}</td>
                                 <td>{`${employee.firstName} ${employee.middleName ? employee.middleName + ' ' : ''}${employee.lastName}`}</td>
                                 <td>{employee.phoneNumber}</td>
-                                <td>{new Date(employee.dateOfBirth).toLocaleDateString()}</td>
                                 <td>
-                                    {fetchLocation(employee.locationId).then(location => (
-                                        location ? `${location.houseNumber} ${location.street} ${location.suffix}, ${location.city}, ${location.state} ${location.zipCode}, ${location.country}` : 'Loading...'
-                                    ))}
+                                    {locations[employee.locationId] ? 
+                                        `${locations[employee.locationId].houseNumber} ${locations[employee.locationId].street}, ${locations[employee.locationId].city}` : 
+                                        'Loading...'}
                                 </td>
                                 <td className="delete-column">
-                                    <button className="button-red" onClick={() => handleDelete(employee.id)} style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}>
+                                    <button onClick={() => handleDelete(employee.id)} style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}>
                                         Delete
                                     </button>
                                 </td>
@@ -211,4 +258,3 @@ const ManagerPortal = () => {
 };
 
 export default ManagerPortal;
-
