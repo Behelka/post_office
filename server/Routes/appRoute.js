@@ -13,7 +13,7 @@ const appRoute = (req, res) => {
     } else if (parsedUrl.pathname.startsWith('/api/customer')) {
         handleCustomerRoutes(req, res);
     } else if (parsedUrl.pathname.startsWith('/api/reports')) {
-        handleCustomerRoutes(req, res);
+        handleReportRoutes(req, res);
     } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Not Found' }));

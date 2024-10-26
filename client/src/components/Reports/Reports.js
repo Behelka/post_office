@@ -20,12 +20,11 @@ const Reports = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3001/api/reports', {
-                method: 'POST',
+            const response = await fetch(`http://localhost:3001/api/reports/${formData.reportType}`, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+                }
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -40,13 +39,12 @@ const Reports = () => {
         }
     };
 
-    // Function to format data based on report type
     const formatData = (result, reportType) => {
         if (reportType === 'employee-department') {
             return result.map((item) => ({
-                id: item.id,
-                // department: item.department_name,
-                employees: item.employee_count,
+                id: item.Employee_ID,
+                name: `${item.First_Name} ${item.Middle_Name || ''} ${item.Last_Name}`,
+                department: item.Employee_Department_ID
             }));
         } else if (reportType === 'package-delivery') {
             return result.map((item) => ({
@@ -80,16 +78,16 @@ const Reports = () => {
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Name</th>
                             <th>Department</th>
-                            <th>Employees</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data.map((item) => (
                             <tr key={item.id}>
                                 <td>{item.id}</td>
+                                <td>{item.name}</td>
                                 <td>{item.department}</td>
-                                <td>{item.employees}</td>
                             </tr>
                         ))}
                     </tbody>
