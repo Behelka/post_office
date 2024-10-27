@@ -17,13 +17,14 @@ import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
 import EmployeeShop from "./components/Shop/EmployeeShop";
 import Stops from "./components/PackagePortal/Stops";
 
-const App = () => {
-  let links = [
-    ["", "Home"],
-    ["Login", "Login/Register"],
-    ["Shop", "Shop"],
-    ["AboutUs", "About/Contact Us"],
-  ];
+  const App = () => {
+    let links = [
+      ["", "Home"],
+      ["Login", "Login/Register"],
+      ["Shop", "Shop"],
+      ["AboutUs", "About Us"],
+      ["Contact","Contact Us"]
+    ];
 
   var user = "manager"; // This is to see different roles
 
@@ -48,17 +49,18 @@ const App = () => {
     ];
   }
 
-  if (user === "customer") {
-    links = [
-      ["", "Home"],
-      ["Dashboard", "Dashboard"],
-      ["TrackingHistory", "Tracking History"],
-      ["Reports", "Reports"],
-      ["Shop", "Shop"],
-      ["AboutUs", "About/Contact Us"],
-      ["CustomerProfile", "Profile"],
-    ];
-  }
+    if (user === "customer") {
+      links = [
+        ["", "Home"],
+        ["Dashboard", "Dashboard"],
+        ["TrackingHistory", "Tracking History"],
+        ["Reports", "Reports"],
+        ["Shop", "Shop"],
+        ["AboutUs", "About"],
+        ["Contact", "Contact Us"], 
+        ["CustomerProfile", "Profile"],
+      ];
+    }
 
   if (user === "admin") {
     links = [
@@ -99,4 +101,4 @@ const App = () => {
   );
 };
 
-export default App;
+  export default App;
