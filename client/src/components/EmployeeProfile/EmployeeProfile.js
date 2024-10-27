@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import "./EmployeeProfile.css";
 
 const EmployeeProfile = () => {
-    const [customerID, setCustomerID] = useState(''); // 输入框中的客户ID
-    const [customerInfo, setCustomerInfo] = useState(null); // 客户数据
-    const [loading, setLoading] = useState(false); // 加载状态
-    const [error, setError] = useState(null); // 错误状态
-    const [editMode, setEditMode] = useState(false); // 编辑模式
+    const [customerID, setCustomerID] = useState(''); 
+    const [customerInfo, setCustomerInfo] = useState(null); 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null); 
+    const [editMode, setEditMode] = useState(false);
 
-    // 获取客户数据的函数
+ 
     const fetchCustomerData = async () => {
         setLoading(true);
         setError(null);
@@ -33,7 +33,7 @@ const EmployeeProfile = () => {
         }
     };
 
-    // 提交客户ID的处理函数
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (customerID) {
@@ -41,12 +41,12 @@ const EmployeeProfile = () => {
         }
     };
 
-    // 编辑客户信息
+
     const handleEdit = () => {
         setEditMode(true);
     };
 
-    // 保存编辑后的客户信息
+
     const handleSave = async () => {
         setLoading(true);
         setError(null);
@@ -72,7 +72,7 @@ const EmployeeProfile = () => {
         }
     };
 
-    // 更新客户信息状态
+ 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCustomerInfo({ ...customerInfo, [name]: value });
@@ -82,7 +82,7 @@ const EmployeeProfile = () => {
         <div className="employee-profile-container">
             <h1>Employee Profile</h1>
 
-            {/* 输入客户ID的表单 */}
+
             <form onSubmit={handleSubmit} className="search-form">
                 <input
                     type="text"
@@ -94,7 +94,7 @@ const EmployeeProfile = () => {
                 <button type="submit">Search</button>
             </form>
 
-            {/* 显示加载、错误或客户数据 */}
+
             {loading && <p>Loading...</p >}
             {error && <p style={{ color: 'red' }}>{error}</p >}
             {customerInfo && (
@@ -196,7 +196,7 @@ const EmployeeProfile = () => {
                                 onChange={handleChange}
                                 placeholder="Country"
                             />
-                            {/* 其他字段的输入框 */}
+
                             <button type="button" onClick={handleSave}>Save</button>
                             <button type="button" onClick={() => setEditMode(false)}>Cancel</button>
                         </form>
