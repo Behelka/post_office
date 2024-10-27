@@ -6,7 +6,7 @@ const CustomerProfileRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const customerId = parsedUrl.query.customerId;
 
-    // 处理GET请求，获取客户信息
+
     if (req.method === 'GET' && parsedUrl.pathname === '/api/customer') {
         if (!customerId) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -30,7 +30,7 @@ const CustomerProfileRoute = (req, res) => {
                 res.end(JSON.stringify({ message: 'Internal Server Error' }));
             });
 
-    // 处理PUT请求，更新客户信息
+
     } else if (req.method === 'PUT' && parsedUrl.pathname === '/api/customer') {
         parseBody(req, async (body) => {
             const {
