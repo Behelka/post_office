@@ -5,16 +5,29 @@ const parseBody = require('../Parsebody'); // Parse JSON body
 const CustomerProfileRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const customerId = parsedUrl.query.customerId;
-
+    const email = parsedUrl.query.email; // 从查询参数中获取 email
 
     if (req.method === 'GET' && parsedUrl.pathname === '/api/customer') {
-        if (!customerId) {
+        if (!customerId && !email) {
+            // 如果没有提供 customerId 或 email，返回 400 错误
             res.writeHead(400, { 'Content-Type': 'application/json' });
-            return res.end(JSON.stringify({ message: 'Customer ID is required' }));
+            return res.end(JSON.stringify({ message: 'Customer ID or Email is required' }));
         }
 
-        const infoQuery = `SELECT * FROM customer WHERE Customer_ID = ?;`;
-        db.query(infoQuery, [customerId])
+        // 根据是否提供了 email 或 customerId 构建查询
+        let query = '';
+        let param = '';
+
+        if (email) {
+            query = `SELECT * FROM customer WHERE Customer_Email_Address = ?;`;
+            param = email;
+        } else if (customerId) {
+            query = `SELECT * FROM customer WHERE Customer_ID = ?;`;
+            param = customerId;
+        }
+
+        // 执行数据库查询
+        db.query(query, [param])
             .then(([results]) => {
                 if (results.length > 0) {
                     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -29,7 +42,6 @@ const CustomerProfileRoute = (req, res) => {
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ message: 'Internal Server Error' }));
             });
-
 
     } else if (req.method === 'PUT' && parsedUrl.pathname === '/api/customer') {
         parseBody(req, async (body) => {

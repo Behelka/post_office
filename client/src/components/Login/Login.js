@@ -42,6 +42,7 @@ const Login = () => {
     if (response.ok) {
       localStorage.setItem("token", result.token);
       localStorage.setItem("role", result.role);
+      localStorage.setItem("customerEmail", formData.email);
       console.log("Login successful");
     } else {
       setLoginError(result.message || "Login failed");
