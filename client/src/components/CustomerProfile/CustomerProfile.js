@@ -1,17 +1,19 @@
 //doesn't work yet
-import React, { useState, useEffect } from "react";
-import "./CustomerProfile.css";
+//import React, { useState, useEffect } from "react";
+//import "./CustomerProfile.css";
 
+/*
 
 const CustomerExample=()=>{
+    const navigate = useNavigate();
     const [customerinfo, setcustomerinfo]=useState([
-        {CustomerID:1,FirstName:"Alex", Midname:"J", Lastname:"Smith", PhoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
-        {CustomerID:2,FirstName:"B", Midname:"J", Lastname:"FF", PhoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
-        {CustomerID:3,FirstName:"C", Midname:"J", Lastname:"GAG", PhoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
+        {CustomerID:1,firstName:"Alex", midName:"J", lastName:"Smith", phoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
+        {CustomerID:2,firstName:"B", midName:"J", lastName:"FF", phoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
+        {CustomerID:3,firstName:"C", midName:"J", lastName:"GAG", phoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
     ])
 
    
-    const [customerID, setcustomerID]= useState(2);
+    const [customerID, setcustomerID]= useState(1);
 
     const [searchCustomer,setSearchCustomer]=useState(null);
     const [firstName, setFirstName]=useState('');
@@ -27,38 +29,17 @@ const CustomerExample=()=>{
     const [ZipCode, setZipCode] = useState("");
     const [Country, setCountry] = useState("");
     const [Balance, setBalance] = useState("");
-
     const [mergedCustomer,setmergedCustomer]=useState([]);
 
-    useEffect(() => {
-        const filtered = customerinfo.filter(
-            (customer) => customer.CustomerID === customerID
-        );
-    
-        const merged = filtered.map((customer) => ({
-            ID: customer.CustomerID,
-            NAME: `${customer.FirstName} ${customer.Midname} ${customer.Lastname}`.trim(),
-            ADDRESS: `${customer.HouseNumber} ${customer.Street} ${customer.Suffix}, 
-                      ${customer.City}, ${customer.State} ${customer.ZipCode}, ${customer.Country}`,
-            PHONENUMBER: customer.PhoneNumber,
-            EMAIL: customer.Email,
-            BALANCE: customer.Balance,
-        }));
-    
-        setmergedCustomer(merged);
-    }, [customerID, customerinfo]);
-    
-    //Edit
+
 
     const [editInfo,setEditInfo]=useState("");
     const [editIndex,setEditIndex]=useState("");
-
     const [editFirstName,setEditFirstName]=useState("");
     const [editMidName, setEditMidName]=useState("");
     const [editLastName, setEditLastName]=useState("");
     const [editPhoneNumber, setEditPhoneNumber]=useState("");
     const [editEmail, setEditEmail]=useState("");
-
     const [editHouseNumber, setEditHouseNumber] = useState("");
     const [editStreet, setEditStreet] = useState("");
     const [editSuffix, setEditSuffix] = useState("");
@@ -68,6 +49,29 @@ const CustomerExample=()=>{
     const [editCountry, setEditCountry] = useState("");
     const [editBalance, setEditBalance] = useState("");
 
+
+    useEffect(() => {
+        const filtered = customerinfo.filter(
+            (customer) => customer.CustomerID === customerID
+        );
+    
+        const merged = filtered.map((customer) => ({
+            ID: customer.CustomerID,
+            NAME: `${customer.firstName} ${customer.midName} ${customer.lastName}`.trim(),
+            ADDRESS: `${customer.HouseNumber} ${customer.Street} ${customer.Suffix}, 
+                      ${customer.City}, ${customer.State} ${customer.ZipCode}, ${customer.Country}`,
+            PHONENUMBER: customer.phoneNumber,
+            EMAIL: customer.Email,
+            BALANCE: customer.Balance,
+        }));
+    
+        setmergedCustomer(merged);
+    }, [customerID, customerinfo]);
+    
+    //Edit
+
+    
+
     const handleEdit = (id) => {
         setEditInfo(true);
     
@@ -76,10 +80,10 @@ const CustomerExample=()=>{
     
         if (Info) {
             setcustomerID(Info.CustomerID);
-            setEditFirstName(Info.FirstName);
-            setEditMidName(Info.Midname);
-            setEditLastName(Info.Lastname);
-            setEditPhoneNumber(Info.PhoneNumber);
+            setEditFirstName(Info.firstName);
+            setEditMidName(Info.midName);
+            setEditLastName(Info.lastName);
+            setEditPhoneNumber(Info.phoneNumber);
             setEditEmail(Info.Email);
             setEditHouseNumber(Info.HouseNumber);
             setEditStreet(Info.Street);
@@ -99,10 +103,10 @@ const CustomerExample=()=>{
     
         const updateInfo = {
             CustomerID: customerID,
-            FirstName: editFirstName,
-            Midname: editMidName,
-            Lastname: editLastName,
-            PhoneNumber: editPhoneNumber,
+            firstName: editFirstName,
+            midName: editMidName,
+            lastName: editLastName,
+            phoneNumber: editPhoneNumber,
             Email: editEmail,
             HouseNumber: editHouseNumber,
             Street: editStreet,
@@ -123,10 +127,10 @@ const CustomerExample=()=>{
     
         const mergedCustomer = {
             ID: updateInfo.CustomerID,
-            NAME: `${updateInfo.FirstName} ${updateInfo.Midname} ${updateInfo.Lastname}`.trim(),
+            NAME: `${updateInfo.firstName} ${updateInfo.midName} ${updateInfo.lastName}`.trim(),
             ADDRESS: `${updateInfo.HouseNumber} ${updateInfo.Street} ${updateInfo.Suffix}, 
                       ${updateInfo.City}, ${updateInfo.State} ${updateInfo.ZipCode}, ${updateInfo.Country}`,
-            PHONENUMBER: updateInfo.PhoneNumber,
+            PHONENUMBER: updateInfo.phoneNumber,
             EMAIL: updateInfo.Email,
             BALANCE: updateInfo.Balance,
         };
@@ -157,28 +161,28 @@ const CustomerExample=()=>{
                     <form onSubmit={handleUpdate}>
                         <input
                             type="text"
-                            placeholder="FirstName"
+                            placeholder="firstName"
                             value={editFirstName}
                             onChange={(e) => setEditFirstName(e.target.value)}
                             required
                         />
                         <input
                             type="text"
-                            placeholder="Midname"
+                            placeholder="midName"
                             value={editMidName}
                             onChange={(e) => setEditMidName(e.target.value)}
                             required
                         />
                         <input
                             type="text"
-                            placeholder="Lastname"
+                            placeholder="lastName"
                             value={editLastName}
                             onChange={(e) => setEditLastName(e.target.value)}
                             required
                         />
                         <input
                             type="number"
-                            placeholder="PhoneNumber"
+                            placeholder="phoneNumber"
                             value={editPhoneNumber}
                             onChange={(e) => setEditPhoneNumber(e.target.value)}
                             className="number-input"
@@ -249,7 +253,7 @@ const CustomerExample=()=>{
     );
 
 }
-
+*/
 
 /*
 function CustomerProfile() {
@@ -296,12 +300,12 @@ function CustomerProfile() {
 
 */
 
-function CustomerProfile() {
-    return(
-        <div>
-            <CustomerExample/>
-        </div>
-    );
-}
+//function CustomerProfile() {
+    //return(
+        //<div>
+            //<CustomerExample/>
+        //</div>
+    //);
+//}
 
-export default CustomerProfile;
+//export default CustomerProfile;
