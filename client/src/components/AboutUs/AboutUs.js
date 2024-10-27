@@ -1,52 +1,52 @@
 import React from "react";
-import "./AboutUs.css";
+import "./AboutUs.css"; // Importing the CSS file for styling
 
-const AboutUs = () => {
+const About = () => {
   return (
     <div className="about-container">
-      <div className="about-header">
-        <h1>About Us</h1>
-        <hr className="header-line" />
-      </div>
       <div className="about-content">
-        <p className="intro-paragraph">
-          Welcome to the Post Office Service! We are dedicated to providing
-          fast, reliable, and secure mailing and shipping services to meet your
-          personal and business needs. Whether you're sending letters, packages,
-          or important documents, our platform ensures timely deliveries and
-          easy tracking of your items.
+        <h1>About Us</h1>
+        <p>
+          Welcome to the Post Office Service, your trusted partner in reliable
+          and secure mailing and shipping. We are dedicated to providing fast,
+          efficient, and user-friendly services, whether you are sending
+          letters, parcels, or important documents.
         </p>
-
-        <p className="mission-paragraph">
-          Our commitment to quality service stems from decades of experience in
-          logistics and communication. We strive to bring cutting-edge
-          technology and traditional postal values together, allowing customers
-          to enjoy a seamless experience in all their postal interactions.
+        <p>
+          At Post Office Service, we combine traditional postal values with
+          modern technology to deliver an exceptional experience for our
+          customers. With a broad network of local and international partners,
+          we ensure timely deliveries and efficient handling of all your postal
+          needs.
         </p>
-
-        <p className="values-paragraph">
-          At the Post Office Service, we value trust, efficiency, and customer
-          satisfaction. With our broad network of local and international
-          shipping partners, you can send parcels to any part of the world with
-          confidence.
+        <p>
+          Our mission is to bridge distances, ensuring that communication and
+          deliveries are never hindered. We believe in trust, efficiency, and
+          customer satisfaction.
         </p>
-
+        <h2>Our Vision</h2>
+        <p>
+          We aim to be a leading provider of global mailing and shipping
+          solutions, continuously enhancing our services to meet evolving
+          customer needs. We strive to innovate and adapt, ensuring the best
+          possible experience.
+        </p>
         <h2>Why Choose Us?</h2>
-        <ul className="features-list">
-          <li>Secure and reliable delivery service</li>
+        <ul>
+          <li>Secure and reliable delivery services.</li>
+          <li>Timely and efficient international and domestic shipping.</li>
           <li>
-            User friendly tracking and management tools for all deliveries
+            User-friendly tracking and management tools for all deliveries.
           </li>
-          <li>Dedicated Customer Support and fast resolution of issues</li>
-          <li>Timely and efficient domestic shipping</li>
+          <li>Dedicated customer support with fast issue resolution.</li>
         </ul>
-
-        <div className="thank-you-section">
-          <p>Thank you for choosing Cougar</p>
-        </div>
+        <p>
+          Thank you for choosing Post Office Service. We look forward to serving
+          you!
+        </p>
       </div>
     </div>
   );
 };
 
-export default AboutUs;
+export default About;

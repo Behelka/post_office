@@ -1,104 +1,47 @@
-/* Container for the entire page */
 .about-container {
-    width: 100%; /* Full width */
-    padding: 60px 40px; /* Increased padding for spacing */
-    background-color: #f4f7fc;
-    border-radius: 10px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Header styling */
-  .about-header h1 {
-    font-size: 48px; /* Increased font size */
-    font-weight: bold;
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .header-line {
-    width: 100px; /* Wider line under header */
-    height: 4px;
-    background-color: #3498db;
-    margin: 10px auto 40px;
-  }
-  
-  /* Content styling */
-  .about-content {
-    font-size: 22px; /* Increased font size */
-    line-height: 1.8; /* More spacing between lines */
-    color: #34495e;
-    max-width: 1600px; /* Increased width to fit screen */
-    margin: 0 auto; /* Center the content */
-  }
-  
-  .about-content p {
-    margin-bottom: 25px; /* Increased bottom margin */
-  }
-  
-  .intro-paragraph,
-  .mission-paragraph,
-  .values-paragraph {
-    margin-bottom: 40px;
-  }
-  
-  h2 {
-    font-size: 32px; /* Larger font size */
-    color: #2980b9;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-  
-  /* Features list styling */
-  .features-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .features-list li {
-    font-size: 22px; /* Increased font size */
-    margin-bottom: 15px; /* More space between items */
-    padding-left: 30px;
-    background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="%232980b9" viewBox="0 0 24 24"%3E%3Cpath d="M9 16.17L4.83 12 3.41 13.41 9 19l12-12-1.41-1.41z"/%3E%3C/svg%3E') no-repeat left center;
-    background-size: 25px;
-  }
-  
-  /* Thank you section */
-  .thank-you-section {
-    text-align: center;
-    margin-top: 50px;
-  }
-  
-  .thank-you-section p {
-    font-size: 28px; /* Increased font size */
-    color: #e74c3c;
-    font-weight: bold;
-  }
-  
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .about-container {
-      padding: 30px 20px; /* Reduced padding on mobile */
-    }
-  
-    .about-header h1 {
-      font-size: 36px; /* Adjusted for mobile */
-    }
-  
-    h2 {
-      font-size: 26px;
-    }
-  
-    .about-content {
-      font-size: 20px;
-    }
-  
-    .features-list li {
-      font-size: 20px;
-    }
-  
-    .thank-you-section p {
-      font-size: 24px;
-    }
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  min-height: 100vh; /* This makes the page fit the full screen vertically */
+  background-color: #f4f7fc;
+}
+
+.about-content {
+  max-width: 1200px;
+  width: 100%;
+  background-color: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.about-content h1 {
+  font-size: 48px;
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+}
+
+.about-content p {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #34495e;
+  margin-bottom: 20px;
+}
+
+.about-content ul {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #34495e;
+}
+
+.about-content li {
+  margin-bottom: 10px;
+}
+
+.about-content h2 {
+  font-size: 36px;
+  margin-top: 40px;
+  color: #2980b9;
+}
