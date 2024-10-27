@@ -4,9 +4,9 @@ import cougarlogo from "../../assets/cougarlogo.jpg"
 
 function Home() {
     return(
-      <div className="container">
-        <div className="color-bar"/>
-        <div className="image-container">
+      <div className="Home-container">
+        <div className="Home-color-bar"/>
+        <div className="Home-image-container">
           <img src={cougarlogo} alt="logo"/>
         </div>
       </div>
