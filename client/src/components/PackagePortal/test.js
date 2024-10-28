@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Modal from '../Modal/Modal';
 
 const url = process.env.REACT_APP_SERVER_URL;
 
@@ -12,26 +11,22 @@ const Stops = () => {
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [arrivalDate, setArrivalDate] = useState("");
     const [departureDate, setDepartureDate] = useState("");
-
-    const [editStopId, setEditStopId] = useState(null);
-    const [editArrivalDate, setEditArrivalDate] = useState("");
-    const [editDepartureDate, setEditDepartureDate] = useState("");
-    const [stopToDelete, setStopToDelete] = useState(null);
-
     const [currentPage, setCurrentPage] = useState(1);
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
-
     const stopsPerPage = 20;
 
+    useEffect(() => {
+        fetchStops();
+    }, [packageId]);
 
-    const fetchStops = useCallback(async () => {
-        const formatStopItem = (item) => ({
-            stop_id: item.Stop_ID,
-            stop_location: `${item.Location_Address_House_Number} ${item.Location_Address_Street} ${item.Location_Address_Suffix || ''}, ${item.Location_Address_City}, 
-                            ${item.Location_Address_State} ${item.Location_Address_Zip_Code}, ${item.Location_Address_Country}`,
-            arrival_date: formatDate(item.Stop_Arrival_Date),
-            departure_date: item.Stop_Departure_Date ? formatDate(item.Stop_Departure_Date) : "Not Departed",
-        });
+    useEffect(() => {
+        if (searchTerm) {
+            fetchLocations();
+        } else {
+            setLocations([]); // Clear locations if search term is empty
+        }
+    }, [searchTerm]);
+
+    const fetchStops = async () => {
         try {
             const response = await fetch(`${url}/Stops/${packageId}`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -41,15 +36,15 @@ const Stops = () => {
         } catch (error) {
             console.error('Error fetching stops:', error);
         }
-    }, [packageId]);
+    };
 
-    const fetchLocations = useCallback(async () => {
+    const fetchLocations = async () => {
         try {
             const response = await fetch(`${url}/api/location`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             const filteredLocations = result.filter(location =>
-                `${location.Location_ID} ${location.Location_Address_House_Number} ${location.Location_Address_Street} ${location.Location_Address_Suffix || ''}, ${location.Location_Address_City}, 
+                `${location.Location_Address_House_Number} ${location.Location_Address_Street} ${location.Location_Address_Suffix || ''}, ${location.Location_Address_City}, 
                         ${location.Location_Address_State} ${location.Location_Address_Zip_Code}, ${location.Location_Address_Country}`
                     .toLowerCase()
                     .includes(searchTerm.toLowerCase())
@@ -58,19 +53,7 @@ const Stops = () => {
         } catch (error) {
             console.error('Error fetching locations:', error);
         }
-    },[searchTerm]);
-
-    useEffect(() => {
-        fetchStops();
-    }, [fetchStops,packageId]);
-
-    useEffect(() => {
-        if (searchTerm) {
-            fetchLocations();
-        } else {
-            setLocations([]); // Clear locations if search term is empty
-        }
-    }, [fetchLocations,searchTerm]);
+    };
 
     const handleAddStop = async (e) => {
         e.preventDefault();
@@ -81,8 +64,8 @@ const Stops = () => {
 
         const newStop = {
             location: selectedLocation.Location_ID,
-            arrival_date: formatDate(arrivalDate),
-            departure_date: formatDate(departureDate),
+            arrival_date: arrivalDate,
+            departure_date: departureDate,
             Stop_Package_ID: packageId,
         };
 
@@ -94,70 +77,13 @@ const Stops = () => {
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            await fetchStops();
+            const result = await response.json();
+            setStops((prev) => [...prev, formatStopItem(result)]);
             resetFormFields();
         } catch (error) {
             console.error("Error adding stop:", error);
         }
     };
-
-    const handleEditStop = (stop) => {
-        setEditStopId(stop.stop_id);
-        setEditArrivalDate(stop.arrival_date);
-        setEditDepartureDate(stop.departure_date === "Not Departed" ? "" : stop.departure_date);
-    };
-
-    const handleUpdateStop = async (e) => {
-        e.preventDefault();
-
-        const updatedStop = {
-            arrival_date: formatDate(editArrivalDate),
-            departure_date: formatDate(editDepartureDate),
-        };
-
-        try {
-            const response = await fetch(`${url}/Stops/${editStopId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedStop),
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-            await fetchStops();
-            resetEditFields();
-        } catch (error) {
-            console.error("Error updating stop:", error);
-        }
-    };
-
-
-
-
-    const handleDelete = (stop_id) => {
-        setStopToDelete(stop_id); // Set the stop to delete
-        setIsModalOpen(true); // Open the modal
-    };
-
-    const confirmDelete = async () => {
-        if (!stopToDelete) return;
-
-        try {
-            const response = await fetch(`${url}/Stops/${stopToDelete}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-            });
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-            // Fetch updated stops after deletion
-            await fetchStops();
-            setIsModalOpen(false); // Close modal after deletion
-            setStopToDelete(null); // Clear stop to delete
-        } catch (error) {
-            console.error('Error deleting stop:', error);
-        }
-    };
-
 
     const resetFormFields = () => {
         setSelectedLocation(null);
@@ -165,12 +91,13 @@ const Stops = () => {
         setDepartureDate(""); // Clear departure date after adding
     };
 
-    const resetEditFields = () => {
-        setEditStopId(null);
-        setEditArrivalDate("");
-        setEditDepartureDate("");
-        setSelectedLocation(null); // Clear selected location for edit
-    };
+    const formatStopItem = (item) => ({
+        stop_id: item.Stop_ID,
+        stop_location: `${item.Location_Address_House_Number} ${item.Location_Address_Street} ${item.Location_Address_Suffix || ''}, ${item.Location_Address_City}, 
+                        ${item.Location_Address_State} ${item.Location_Address_Zip_Code}, ${item.Location_Address_Country}`,
+        arrival_date: formatDate(item.Stop_Arrival_Date),
+        departure_date: item.Stop_Departure_Date ? formatDate(item.Stop_Departure_Date) : "Not Departed",
+    });
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -202,7 +129,6 @@ const Stops = () => {
                             <th>Location</th>
                             <th>Arrival Date</th>
                             <th>Departure Date</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -213,24 +139,19 @@ const Stops = () => {
                                 <td>{stop.arrival_date}</td>
                                 <td>{stop.departure_date}</td>
                                 <td>
-                                    <button onClick={() => handleEditStop(stop)}>Edit</button>
-                                    <button onClick={() => handleDelete(stop.stop_id)}>Delete</button>
-                                </td>
+                                <button onClick={() => handleEdit(index)}>Edit</button>
+                                <button onClick={() => handleDelete(pkg.package_id)}>Delete</button>
+                            </td>
                             </tr>
                         ))}
                     </tbody>
-                    <Modal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)} // Close modal
-                        onConfirm={confirmDelete} // Confirm deletion
-                    />
                 </table>
             ) : (
                 <p>No stops available</p>
             )}
 
             {/* Pagination Controls */}
-            <div style={{ marginTop: '20px' }}>
+            <div>
                 {Array.from({ length: totalPages }, (_, index) => (
                     <button
                         key={index}
@@ -243,18 +164,18 @@ const Stops = () => {
             </div>
 
             {/* Adding Fields */}
-            <div style={{ marginTop: '20px' }}>
+            <div style={{ marginTop: '20px' }}> {/* Added margin for spacing */}
                 <h3>Add New Stop</h3>
                 <form onSubmit={handleAddStop}>
                     <input
-                        type="datetime-local"
+                        type="date"
                         placeholder="Arrival Date"
                         value={arrivalDate}
                         onChange={(e) => setArrivalDate(e.target.value)}
                         required
                     />
                     <input
-                        type="datetime-local"
+                        type="date"
                         placeholder="Departure Date"
                         value={departureDate}
                         onChange={(e) => {
@@ -278,17 +199,15 @@ const Stops = () => {
                             <thead>
                                 <tr>
                                     <th>Location ID</th>
-                                    <th>Location</th>
+                                    <th>Address</th>
                                     <th>Select</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {locations.map(location => (
+                                {locations.map((location) => (
                                     <tr key={location.Location_ID}>
                                         <td>{location.Location_ID}</td>
-                                        <td>{`${location.Location_Address_House_Number} ${location.Location_Address_Street} ${location.Location_Address_Suffix || ''}, 
-                                        ${location.Location_Address_City}, ${location.Location_Address_State} ${location.Location_Address_Zip_Code}, 
-                                        ${location.Location_Address_Country}`}</td>
+                                        <td>{`${location.Location_Address_House_Number} ${location.Location_Address_Street}, ${location.Location_Address_City}`}</td>
                                         <td>
                                             <button type="button" onClick={() => setSelectedLocation(location)}>
                                                 Select
@@ -299,44 +218,16 @@ const Stops = () => {
                             </tbody>
                         </table>
                     )}
+                    {selectedLocation && (
+                        <div>
+                            <p>Selected Location: {`${selectedLocation.Location_Address_House_Number} ${selectedLocation.Location_Address_Street}, ${selectedLocation.Location_Address_City}`}</p>
+                        </div>
+                    )}
                     <button type="submit">Add Stop</button>
                 </form>
             </div>
-
-            {/* Editing Fields */}
-            {editStopId && (
-                <div style={{ marginTop: '20px' }}>
-                    <h3>Edit Stop</h3>
-                    <form onSubmit={handleUpdateStop}>
-                        <input
-                            type="datetime-local"
-                            placeholder="Edit Arrival Date"
-                            value={stops.arrival_date}
-                            onChange={(e) => setEditArrivalDate(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="datetime-local"
-                            placeholder="Edit Departure Date"
-                            value={stops.departure_date}
-                            onChange={(e) => {
-                                const depDate = e.target.value;
-                                if (depDate && depDate < editArrivalDate) {
-                                    alert("Departure date cannot be before arrival date.");
-                                } else {
-                                    setEditDepartureDate(depDate);
-                                }
-                            }}
-                        />
-
-                        <button type="submit">Update Stop</button>
-                        <button type="button" onClick={resetEditFields}>Cancel</button>
-                    </form>
-                </div>
-            )}
         </div>
     );
 };
 
 export default Stops;
-

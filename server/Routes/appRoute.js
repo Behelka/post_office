@@ -3,7 +3,9 @@ const handleLocationRoutes = require('./AddLocationRoute'); // Adjust the path a
 const handleCustomerRoutes = require('./CustomerProfileRoute'); // Add other routes as necessary
 const handlePackagePortalRoutes = require('./PackagePortalRoute');
 const handleStopRoutes = require('./StopRoute');
-const handlePackagePortalRoutes = require('./PackagePortalRoute');
+const handleReportsRoute = require('./ReportsRoute');
+const handleShopRoute = require('./ShopRoute');
+
 
 const appRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
@@ -16,11 +18,13 @@ const appRoute = (req, res) => {
         handleCustomerRoutes(req, res);
     } else if (parsedUrl.pathname.startsWith('/api/PackagePortal')){
         handlePackagePortalRoutes(req, res);
-    } else if (parsedUrl.pathname.startsWith('/api/Stops')) {
+    } else if (parsedUrl.pathname.startsWith('/Stops')) {
         handleStopRoutes(req, res);
-    } else if (parsedUrl.pathname.startsWith('/api/PackagePortal')){
-        handlePackagePortalRoutes(req, res);
-    } else {
+    } else if (parsedUrl.pathname.startsWith('/api/Reports')) {
+        handleReportsRoute(req, res);
+    } else if (parsedUrl.pathname.startsWith('/shop')) {
+        handleShopRoute(req, res);
+     }  else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Not Found' }));
     } 

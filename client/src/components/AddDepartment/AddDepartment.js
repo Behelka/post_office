@@ -107,9 +107,9 @@ const BasicTable = () => {
                         {data.map((item, index) => (
                             <tr key={item.department_id}>
                                 <td>
-                                    <a href="#" onClick={() => handleEdit(index)}>
+                                    <button onClick={() => handleEdit(index)}>
                                         {item.department_id}
-                                    </a>
+                                    </button>
                                 </td>
                                 <td>{item.department_name}</td>
                                 <td>{item.department_manager}</td>
