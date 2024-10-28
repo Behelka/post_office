@@ -1,106 +1,80 @@
-import React, { useState } from "react";
-import "./TrackingHistory.css"
+import React, { useState, useEffect } from "react";
+import "./TrackingHistory.css";
 
-const TrackingExample= () => {
-    const [trackinginfo, setTrackingInfo]=useState([
-    {TrackingID : 1234,Datetime : "2024-10-9  15:05", Location: "Arrive Houston", Status:"Shipping"},
-    {TrackingID : 1234,Datetime : "2024-10-10  19:51", Location: "Left Houston", Status:"Shipping"},
-    {TrackingID : 1234,Datetime : "2024-10-11  03:18", Location: "Arrive Austin", Status:"Out of dilivery"},
-    {TrackingID : 1234,Datetime : "2024-10-12  11:30", Location: "Package delivered", Status:"Delivered"},
-    {TrackingID : 5678,Datetime : "2020-11-01  07:42", Location: "Arrive Dallas", Status:"Shipping"},
+const TrackingPage = () => {
+    const [trackingID, setTrackingID] = useState('');
+    const [trackingData, setTrackingData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-  ]);
-
-    const [trackingID,setTrackingID]=useState('');
-
-    const [trackingResult,setTrackingResult]=useState(null);
-
-    const [isFocused,setIsFocused]=useState(false);
-    const handleFocus=()=>setIsFocused(true);
-    const handleBlur=()=>setIsFocused(false);
-
-
-    const handleSubmit=(e)=>{
-        e.preventDefault();
-
-        const result=trackinginfo.filter((item)=>item.TrackingID===Number(trackingID));
-
-        if (result.length>0){
-            setTrackingResult(result);
-
-            setTrackingID('');
+    const fetchTrackingData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(`http://localhost:3001/api/tracking?trackingId=${trackingID}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch tracking data');
+            }
+            const data = await response.json();
+            setTrackingData(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-        else {
-            setTrackingResult([{error:'Tracking ID not found'}]);
-            setTrackingID('');
-        }
-
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (trackingID) {
+            fetchTrackingData();
+        }
+    };
 
-
-    return(
-        <div className="main_div">
-            <form onSubmit={handleSubmit}>
+    return (
+        <div className="tracking-page-container">
+            <h1>Tracking Information</h1>
+            <form onSubmit={handleSubmit} className="search-form">
                 <input
                     type="text"
                     value={trackingID}
-                     onChange={(e)=>setTrackingID(e.target.value)}
-                     onFocus={handleFocus}
-                     onBlur={handleBlur}
-                     placeholder={!isFocused && trackingID===""?"Enter Tracking ID":""}
-                     required
+                    onChange={(e) => setTrackingID(e.target.value)}
+                    placeholder="Enter Tracking ID"
+                    required
                 />
-
-                <button type="submit">Track</button>
-
+                <button type="submit">Search</button>
             </form>
 
-            {trackingResult && (
-        <div>
-          {trackingResult[0].error ? (
-            <p>{trackingResult[0].error}</p>
-          ) : (
-            <table border="1" cellPadding="10" cellSpacing="0">
-              <thead>
-                <tr>
-                  <th>Date & Time</th>
-                  <th>Location</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trackingResult.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.Datetime}</td>
-                    <td>{item.Location}</td>
-                    <td>{item.Status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      )}
-
-
-           
-        </div>
-    )
-
-}
-
-
-
-
-
-function TrackingHistory() {
-
-    return(
-        <div>
-            <TrackingExample />
+            {loading && <p>Loading...</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {trackingData.length > 0 && (
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tracking ID</th>
+                            <th>Package ID</th>
+                            <th>Stop ID</th>
+                            <th>Arrival Date</th>
+                            <th>Departure Date</th>
+                            <th>City</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {trackingData.map((entry) => (
+                            <tr key={entry.Stop_ID}>
+                                <td>{entry.Tracking_ID}</td>
+                                <td>{entry.Package_ID}</td>
+                                <td>{entry.Stop_ID}</td>
+                                <td>{entry.Stop_Arrival_Date}</td>
+                                <td>{entry.Stop_Departure_Date}</td>
+                                <td>{entry.Location_Address_City}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
-}
+};
 
-export default TrackingHistory;
+export default TrackingPage;
