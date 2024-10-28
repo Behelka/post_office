@@ -1,6 +1,6 @@
-const db = require('../db'); // Import your db connection
+const db = require('../db');
 const url = require('url');
-const parseBody = require('../Parsebody'); // Parse JSON body
+const parseBody = require('../Parsebody');
 
 const CustomerProfileRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
