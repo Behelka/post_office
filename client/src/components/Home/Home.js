@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Home.css";
 import cougarlogo from "../../assets/cougarlogo.jpg";
+import { useNavigate } from "react-router-dom";
 
 // ServiceCard Component
 const ServiceCard = ({ icon, title, description }) => (
@@ -12,6 +13,7 @@ const ServiceCard = ({ icon, title, description }) => (
   </div>
 );
 
+
 // FeatureCard Component
 const FeatureCard = ({ icon, title, description }) => (
   <div className="feature-card">
@@ -22,6 +24,17 @@ const FeatureCard = ({ icon, title, description }) => (
 );
 
 function Home() {
+
+  const [trackingID,setTrackingID]=useState("");
+  const navigate=useNavigate();
+  const handleButtonClick=()=>{
+    if(trackingID){
+      navigate(`/TrackingHistory?trackingId=${trackingID}`);
+    } else {
+      navigate("/TrackingHistory");
+    }
+  };
+  
   const services = [
     {
       icon: "📦",
@@ -67,7 +80,7 @@ function Home() {
           <h1>Welcome to Post Office Services</h1>
           <p>Your trusted partner for reliable shipping and postal services</p>
           <div className="hero-cta">
-            <button className="primary-button">Track Package</button>
+            <button className="primary-button" onClick={handleButtonClick}>Track Package</button>
             <button className="secondary-button">Ship Now</button>
           </div>
         </div>
@@ -102,8 +115,10 @@ function Home() {
               placeholder="Enter your tracking number"
               className="tracking-input"
               aria-label="Tracking number input"
+              onChange={(e)=>setTrackingID(e.target.value)}
+              value={trackingID}
             />
-            <button className="tracking-button">Track</button>
+            <button className="tracking-button" onClick={handleButtonClick}>Track</button>
           </div>
         </div>
       </section>

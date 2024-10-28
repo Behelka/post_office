@@ -13,7 +13,7 @@ const CustomerProfile = () => {
         const fetchCustomerData = async () => {
             const email = localStorage.getItem("customerEmail");
             if (!email) {
-                alert("No email found. Please log in again.");
+                alert("Account not found, Please log in again.");
                 window.location.replace("/login");
                 return;
             }

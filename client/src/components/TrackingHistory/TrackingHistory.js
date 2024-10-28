@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./TrackingHistory.css";
+import { useLocation } from "react-router-dom";
+
+
 
 const TrackingPage = () => {
     const [trackingID, setTrackingID] = useState('');
@@ -7,11 +10,22 @@ const TrackingPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const fetchTrackingData = async () => {
+    const location=useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const id = params.get("trackingId");
+        if (id) {
+            setTrackingID(id);
+            fetchTrackingData(id);
+        }
+    }, [location]);
+
+    const fetchTrackingData = async (id) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`http://localhost:3001/api/tracking?trackingId=${trackingID}`);
+            const response = await fetch(`http://localhost:3001/api/tracking?trackingId=${id}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch tracking data');
             }
@@ -27,7 +41,7 @@ const TrackingPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (trackingID) {
-            fetchTrackingData();
+            fetchTrackingData(trackingID);
         }
     };
 
