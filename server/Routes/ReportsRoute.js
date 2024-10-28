@@ -1,51 +1,42 @@
-//incomplete
-const db = require('../db'); // Import your db connection
+const db = require('../db');
 const url = require('url');
-const parseBody = require('../Parsebody');
+
 const reportsRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
+    const pathParts = parsedUrl.pathname.split('/');
 
-    if (req.method === 'GET') {
-        
-        db.query('SELECT * FROM reports', (err, result) => {
-            if (err) {
-                res.statusCode = 500;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ message: 'Error fetching reports' }));
-                return;
-            }
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));
-        });
-    } else if (req.method === 'POST') {
-        // Handle POST request 
-        let body = '';
+    if (req.method === 'GET' && pathParts[2] === 'reports') {
+        const reportType = pathParts[3]; // Retrieves the specific report type after /api/Reports/
 
-        req.on('data', (chunk) => {
-            body += chunk;
-        });
+        let query;
+        switch (reportType) {
+            case 'employee-department':
+                query = 'SELECT * FROM Employee WHERE Delete_Employee != 1';
+                break;
+            case 'package-delivery':
+                query = 'SELECT * FROM Package WHERE Delete_Package != 1';
+                break;
+            case 'financial-transactions':
+                query = 'SELECT * FROM Transactions';
+                break;
+            default:
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ message: 'Report type not found' }));
+        }
 
-        req.on('end', () => {
-            const parsedBody = parseBody(body); 
-            const { title, content } = parsedBody;
-
-            db.query('INSERT INTO reports (title, content) VALUES (?, ?)', [title, content], (err, result) => {
-                if (err) {
-                    res.statusCode = 500;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.end(JSON.stringify({ message: 'Error creating report' }));
-                    return;
-                }
-                res.statusCode = 201;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ message: 'Report created successfully' }));
+        db.query(query)
+            .then(([results]) => {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(results));
+            })
+            .catch(error => {
+                console.error('Error querying packages:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Internal Server Error' }));
             });
-        });
     } else {
-        res.statusCode = 405;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ message: 'Method not allowed' }));
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Not Found' }));
     }
 };
 

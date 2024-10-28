@@ -5,6 +5,8 @@ const handlePackagePortalRoutes = require('./PackagePortalRoute');
 const handleStopRoutes = require('./StopRoute');
 const handleTrackingRoutes = require('./TrackingHistoryRoute');
 
+const handleReportRoutes = require('./ReportsRoute')
+const handleShopRoutes = require('./EmployeeShopRoute')
 
 const appRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
@@ -21,6 +23,10 @@ const appRoute = (req, res) => {
         handleStopRoutes(req, res);
     } else if (parsedUrl.pathname.startsWith('/api/tracking')) {
         handleTrackingRoutes(req, res);
+    } else if (parsedUrl.pathname.startsWith('/api/reports')) {
+        handleReportRoutes(req, res);
+    } else if (parsedUrl.pathname.startsWith('/shop')) {
+        handleShopRoutes(req, res);
     } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Not Found' }));

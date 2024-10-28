@@ -34,7 +34,8 @@ import Stops from "./components/PackagePortal/Stops";
       ["PackagePortal", "Package Portal"],
       ["TrackingHistory", "Tracking History"],
       ["EmployeeProfile", "Profile"],
-      ["EmployeeShop", "Shop"]
+      ["EmployeeShop", "Shop"],
+      ["Reports", "Reports"]
     ];
   }
 
@@ -45,7 +46,8 @@ import Stops from "./components/PackagePortal/Stops";
       ["TrackingHistory", "Tracking History"],
       ["ManagerPortal", "Manager Portal"],
       ["EmployeeProfile", "Profile"],
-      ["EmployeeShop", "Shop"]
+      ["EmployeeShop", "Shop"],
+      ["Reports", "Reports"]
     ];
   }
 
