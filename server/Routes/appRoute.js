@@ -2,7 +2,7 @@ const url = require('url');
 const handleLocationRoutes = require('./AddLocationRoute'); // Adjust the path as necessary
 const handleCustomerRoutes = require('./CustomerProfileRoute'); // Add other routes as necessary
 const handleReportRoutes = require('./ReportsRoute')
-const handleShopRoutes = require('./ShopRoute')
+const handleShopRoutes = require('./EmployeeShopRoute')
 
 const appRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
