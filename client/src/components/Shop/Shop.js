@@ -1,86 +1,107 @@
-import React, { useState } from 'react';
-import "./Shop.css"
-import cartImg from '../../assets/cart.jpg'
+import React, { useState, useEffect } from 'react';
+import "./Shop.css";
 
-/*still need to work on making the images in the shop display right*/
-const products = [
-    { id: 1, name: 'Stamp', price: 0.5 },
-    { id: 2, name: 'Envelope', price: 1 },
-    { id: 3, name: 'Postcard', price: 0.75 },
-    { id: 4, name: 'Small Package', price: 5 },
-    { id: 5, name: 'Medium Package', price: 7},
-    { id: 6, name: 'Large Package', price: 10}
-  ];
+const ProductList = ({ products, addToCart }) => {
+  return (
+    <div className="product-list">
+      {products.map(product => (
+        <div key={product.Product_ID} className="product-box">
+          <h3>{product.Product_Name}</h3>
+          <p>${parseFloat(product.Product_Price).toFixed(2)}</p>
+          <button onClick={() => addToCart(product)}>Add to Cart</button>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-  const ProductList = ({ products, addToCart }) => {
-    return (
-      <div className="product-list">
-        {products.map(product => (
-          <div key={product.id} className="product-box">
-            <h3>{product.name}</h3>
-            <p>${product.price.toFixed(2)}</p>
-            <button onClick={() => addToCart(product)}>Add to Cart</button>
-          </div>
+const Cart = ({ cart, removeFromCart }) => {
+  const totalPrice = cart.reduce((total, item) => total + parseFloat(item.Product_Price), 0);
+
+  return (
+    <div>
+      <h2>Shopping Cart</h2>
+      <ul>
+        {cart.map((item, index) => (
+          <li key={index}>
+            {item.Product_Name} - ${parseFloat(item.Product_Price).toFixed(2)}
+            <button onClick={() => removeFromCart(item.Product_ID)}>Remove</button>
+          </li>
         ))}
-      </div>
-    );
-  };
+      </ul>
+      <h3>Total: ${totalPrice.toFixed(2)}</h3>
+    </div>
+  );
+};
 
-  const Cart = ({ cart, removeFromCart }) => {
-    const totalPrice = cart.reduce((total, item) => total + item.price, 0);
-  
-    return (
-      <div>
-        <h2>Shopping Cart</h2>
-        <ul>
-          {cart.map((item, index) => (
-            <li key={index}>
-              {item.name} - ${item.price.toFixed(2)}
-              <button onClick={() => removeFromCart(item.id)}>Remove</button>
-            </li>
-          ))}
-        </ul>
-        <h3>Total: ${totalPrice.toFixed(2)}</h3>
-      </div>
-    );
-  };
+const Checkout = ({ cart, clearCart }) => {
+  const handleCheckout = async () => {
+    if (cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
 
-  const Checkout = ({ cart }) => {
-    const handleCheckout = () => {
-      if (cart.length === 0) {
-        alert("Your cart is empty!");
-      } else {
+    try {
+      const response = await fetch('/api/shop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cart)
+      });
+      if (response.ok) {
         alert("Payment success!");
+        clearCart();
+      } else {
+        alert("Payment failed.");
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      alert("Error processing your payment.");
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleCheckout}>Checkout</button>
+    </div>
+  );
+};
+
+function Shop() {
+  const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/shop');
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
       }
     };
-  
-    return (
-      <div>
-        <button onClick={handleCheckout}>Checkout</button>
-      </div>
-    );
-  };  
-  
-  function Shop() {
-    const [cart, setCart] = useState([]);
-  
-    const addToCart = (product) => {
-      setCart([...cart, product]);
-    };
-  
-    const removeFromCart = (productId) => {
-      setCart(cart.filter(item => item.id !== productId));
-    };
-  
-    return (
-      <div className="Shop">
-        
-        {/* <img src={cartImg} alt="Shopping Cart" className="cartImg"></img> */}
-        <ProductList products={products} addToCart={addToCart} />
-        <Cart cart={cart} removeFromCart={removeFromCart} />
-        <Checkout cart={cart} />
-      </div>
-    );
-  }
+    fetchProducts();
+  }, []);
+
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+  };
+
+  const removeFromCart = (productId) => {
+    setCart(cart.filter(item => item.Product_ID !== productId));
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  return (
+    <div className="Shop">
+      <ProductList products={products} addToCart={addToCart} />
+      <Cart cart={cart} removeFromCart={removeFromCart} />
+      <Checkout cart={cart} clearCart={clearCart} />
+    </div>
+  );
+}
 
 export default Shop;

@@ -26,7 +26,7 @@ import Stops from "./components/PackagePortal/Stops";
       ["Contact","Contact Us"]
     ];
 
-  var user = "manager"; // This is to see different roles
+  var user = "customer"; // This is to see different roles
 
   if (user === "employee") {
     links = [
