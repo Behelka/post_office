@@ -17,7 +17,7 @@ const reportsRoute = (req, res) => {
                 query = 'SELECT * FROM Package WHERE Delete_Package != 1';
                 break;
             case 'financial-transactions':
-                query = 'SELECT * FROM Package WHERE Delete_Package != 1';
+                query = 'SELECT * FROM Transactions';
                 break;
             default:
                 res.writeHead(404, { 'Content-Type': 'application/json' });

@@ -48,21 +48,20 @@ const Reports = () => {
             }));
         } else if (reportType === 'package-delivery') {
             return result.map((item) => ({
-                package_id: item.package_id,
-                package: `
-                ${item.Package_ID} 
-                ${item.Sender_ID} 
-                ${item.Recipient_ID || ''}, 
-                ${item.Package_House_Number}, 
+                package_id: item.Package_ID,
+                sender_id: item.Sender_ID,
+                recipient_id: item.Recipient_ID,
+                address: ` 
+                ${item.Package_House_Number} 
                 ${item.Package_Street} 
                 ${item.Package_Suffix}, 
                 ${item.Package_City}`.trim(),
             }));
         } else if (reportType === 'financial-transactions') {
             return result.map((item) => ({
-                transaction_id: item.transaction_id,
-                amount: item.amount,
-                date: item.transaction_date,
+                transaction_id: item.Transaction_ID,
+                amount: item.Amount_Deducted,
+                date: item.Transaction_Date,
             }));
         }
         return [];
@@ -99,6 +98,8 @@ const Reports = () => {
                     <thead>
                         <tr>
                             <th>Package ID</th>
+                            <th>Sender ID</th>
+                            <th>Recipient ID</th>
                             <th>Package Address</th>
                         </tr>
                     </thead>
@@ -106,7 +107,9 @@ const Reports = () => {
                         {data.map((item) => (
                             <tr key={item.package_id}>
                                 <td>{item.package_id}</td>
-                                <td>{item.package}</td>
+                                <td>{item.sender_id}</td>
+                                <td>{item.recipient_id}</td>
+                                <td>{item.address}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -127,7 +130,14 @@ const Reports = () => {
                             <tr key={item.transaction_id}>
                                 <td>{item.transaction_id}</td>
                                 <td>{item.amount}</td>
-                                <td>{new Date(item.date).toLocaleDateString()}</td>
+                                <td>{new Date(item.date).toLocaleString('en-US', { 
+                                        year: 'numeric', 
+                                        month: '2-digit', 
+                                        day: '2-digit', 
+                                        hour: '2-digit', 
+                                        minute: '2-digit', 
+                                        second: '2-digit' 
+                                    })}</td>
                             </tr>
                         ))}
                     </tbody>
