@@ -16,6 +16,8 @@ import SignUp from "./components/SignUp/SignUp";
 import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
 import EmployeeShop from "./components/Shop/EmployeeShop";
 import Stops from "./components/PackagePortal/Stops";
+import Contact from "./components/ContactUS/contact";
+
 
   const App = () => {
     let links = [
@@ -98,7 +100,8 @@ import Stops from "./components/PackagePortal/Stops";
         <Route path="/AddLocation" element={<AddLocation />} />
         <Route path="/EmployeeShop" element={<EmployeeShop />} />
         <Route path="/stops/:packageId" element={<Stops />} />
-      </Routes>
+        <Route path="/ContactUS" element={<Contact />} />
+        </Routes>
     </Router>
   );
 };
