@@ -1,121 +1,86 @@
 import React, { useState, useEffect } from 'react';
-import "./Shop.css";
-
-/* product array */
-const initialProducts = [
-  { id: 1, name: 'Stamp', price: 0.5 },
-  { id: 2, name: 'Envelope', price: 1 },
-  { id: 3, name: 'Postcard', price: 0.75 },
-  { id: 4, name: 'Small Package', price: 5 },
-  { id: 5, name: 'Medium Package', price: 7 },
-  { id: 6, name: 'Large Package', price: 10 }
-];
-
-const AdminControls = ({ addProduct, editProduct, editingProduct, setEditingProduct }) => {
-  const [productData, setProductData] = useState({ name: '', price: '' });
-
-  useEffect(() => {
-    if (editingProduct) {
-      setProductData(editingProduct);
-    } else {
-      setProductData({ name: '', price: '' });
-    }
-  }, [editingProduct]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editingProduct) {
-      editProduct(productData);
-      setEditingProduct(null);
-    } else {
-      addProduct(productData);
-    }
-    setProductData({ name: '', price: '' });
-  };
-
-  const handleChange = (e) => {
-    setProductData({ ...productData, [e.target.name]: e.target.value });
-  };
-
-  return (
-    <div className="admin-controls">
-      <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={productData.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Product Price"
-          value={productData.price}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">{editingProduct ? 'Update Product' : 'Add Product'}</button>
-        {editingProduct && (
-          <button type="button" onClick={() => setEditingProduct(null)}>
-            Cancel Edit
-          </button>
-        )}
-      </form>
-    </div>
-  );
-};
-
-const ProductList = ({ products, deleteProduct, setEditingProduct }) => {
-  return (
-    <div className="product-list">
-      {products.map((product) => (
-        <div key={product.id} className="product-box">
-          <h3>{product.name}</h3>
-          <p>${product.price.toFixed(2)}</p>
-          <button onClick={() => setEditingProduct(product)}>Edit</button>
-          <button onClick={() => deleteProduct(product.id)}>Delete</button>
-        </div>
-      ))}
-    </div>
-  );
-};
+import ProductList from './ProductList';
+import AdminControls from './AdminControls';
+import './Shop.css';
 
 const EmployeeShop = () => {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const addProduct = (newProduct) => {
-    setProducts([...products, { ...newProduct, id: Date.now() }]);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:3001/shop', {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        },
+      });
+      const data = await response.json();
+      setProducts(data);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err.message || 'Failed to load products');
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const editProduct = (updatedProduct) => {
-    setProducts(
-      products.map((product) =>
-        product.id === updatedProduct.id ? updatedProduct : product
-      )
-    );
+  const addProduct = async (newProduct) => {
+    try {
+      await fetch('http://localhost:3001/shop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProduct),
+      });
+      fetchProducts(); // Refresh the product list
+    } catch (err) {
+      console.error('Error adding product:', err);
+      setError('Failed to add product');
+    }
   };
 
-  const deleteProduct = (id) => {
-    setProducts(products.filter((product) => product.id !== id)); 
+  const editProduct = async (updatedProduct) => {
+    try {
+      await fetch('http://localhost:3001/shop', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProduct),
+      });
+      fetchProducts(); // Refresh the product list
+    } catch (err) {
+      console.error('Error updating product:', err);
+      setError('Failed to update product');
+    }
+  };
+
+  const deleteProduct = async (id) => {
+    try {
+    await fetch(`http://localhost:3001/shop/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Product_ID: id }),
+      });
+      fetchProducts(); // Refresh the product list
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      setError('Failed to delete product');
+    }
   };
 
   return (
     <div className="Shop">
-      <ProductList
-        products={products}
-        deleteProduct={deleteProduct}
-        setEditingProduct={setEditingProduct}
-      />
-      <AdminControls
-        addProduct={addProduct}
-        editProduct={editProduct}
-        editingProduct={editingProduct}
-        setEditingProduct={setEditingProduct}
-      />
+      {error && <div className="error-message">{error}</div>}
+      <ProductList products={products} deleteProduct={deleteProduct} setEditingProduct={setEditingProduct} />
+      <AdminControls addProduct={addProduct} editProduct={editProduct} editingProduct={editingProduct} setEditingProduct={setEditingProduct} />
     </div>
   );
 };

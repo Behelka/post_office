@@ -1,311 +1,190 @@
-//doesn't work yet
-//import React, { useState, useEffect } from "react";
-//import "./CustomerProfile.css";
+import React, { useState, useEffect } from "react";
+import "./CustomerProfile.css";
 
-/*
+const CustomerProfile = () => {
+    const [customerInfo, setCustomerInfo] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [editMode, setEditMode] = useState(false);
 
-const CustomerExample=()=>{
-    const navigate = useNavigate();
-    const [customerinfo, setcustomerinfo]=useState([
-        {CustomerID:1,firstName:"Alex", midName:"J", lastName:"Smith", phoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
-        {CustomerID:2,firstName:"B", midName:"J", lastName:"FF", phoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
-        {CustomerID:3,firstName:"C", midName:"J", lastName:"GAG", phoneNumber:"987654321" , HouseNumber:"558", Street:"shadow", Suffix:"Blvd" , City:"Houston", State:"TX" , ZipCode:"77524" , Country:"USA", Email:"Smith@gmail.com", Balance:98},
-    ])
-
-   
-    const [customerID, setcustomerID]= useState(1);
-
-    const [searchCustomer,setSearchCustomer]=useState(null);
-    const [firstName, setFirstName]=useState('');
-    const [midName, setMidName]=useState('');
-    const [lastName, setLastName]=useState('');
-    const [phoneNumber, setPhoneNumber]=useState('');
-    const [email, setEmail]=useState('');
-    const [HouseNumber, setHouseNumber] = useState("");
-    const [Street, setStreet] = useState("");
-    const [Suffix, setSuffix] = useState("");
-    const [City, setCity] = useState("");
-    const [State, setState] = useState("");
-    const [ZipCode, setZipCode] = useState("");
-    const [Country, setCountry] = useState("");
-    const [Balance, setBalance] = useState("");
-    const [mergedCustomer,setmergedCustomer]=useState([]);
-
-
-
-    const [editInfo,setEditInfo]=useState("");
-    const [editIndex,setEditIndex]=useState("");
-    const [editFirstName,setEditFirstName]=useState("");
-    const [editMidName, setEditMidName]=useState("");
-    const [editLastName, setEditLastName]=useState("");
-    const [editPhoneNumber, setEditPhoneNumber]=useState("");
-    const [editEmail, setEditEmail]=useState("");
-    const [editHouseNumber, setEditHouseNumber] = useState("");
-    const [editStreet, setEditStreet] = useState("");
-    const [editSuffix, setEditSuffix] = useState("");
-    const [editCity, setEditCity] = useState("");
-    const [editState, setEditState] = useState("");
-    const [editZipCode, setEditZipCode] = useState("");
-    const [editCountry, setEditCountry] = useState("");
-    const [editBalance, setEditBalance] = useState("");
-
-
+    // Fetch customer data based on the email from localStorage
     useEffect(() => {
-        const filtered = customerinfo.filter(
-            (customer) => customer.CustomerID === customerID
-        );
-    
-        const merged = filtered.map((customer) => ({
-            ID: customer.CustomerID,
-            NAME: `${customer.firstName} ${customer.midName} ${customer.lastName}`.trim(),
-            ADDRESS: `${customer.HouseNumber} ${customer.Street} ${customer.Suffix}, 
-                      ${customer.City}, ${customer.State} ${customer.ZipCode}, ${customer.Country}`,
-            PHONENUMBER: customer.phoneNumber,
-            EMAIL: customer.Email,
-            BALANCE: customer.Balance,
-        }));
-    
-        setmergedCustomer(merged);
-    }, [customerID, customerinfo]);
-    
-    //Edit
-
-    
-
-    const handleEdit = (id) => {
-        setEditInfo(true);
-    
-
-        const Info = customerinfo.find((customer) => customer.CustomerID === id);
-    
-        if (Info) {
-            setcustomerID(Info.CustomerID);
-            setEditFirstName(Info.firstName);
-            setEditMidName(Info.midName);
-            setEditLastName(Info.lastName);
-            setEditPhoneNumber(Info.phoneNumber);
-            setEditEmail(Info.Email);
-            setEditHouseNumber(Info.HouseNumber);
-            setEditStreet(Info.Street);
-            setEditSuffix(Info.Suffix);
-            setEditCity(Info.City);
-            setEditState(Info.State);
-            setEditZipCode(Info.ZipCode);
-            setEditCountry(Info.Country);
-            setEditBalance(Info.Balance);
-        }
-    };
-
-    //Update
-
-    const handleUpdate = (e) => {
-        e.preventDefault();
-    
-        const updateInfo = {
-            CustomerID: customerID,
-            firstName: editFirstName,
-            midName: editMidName,
-            lastName: editLastName,
-            phoneNumber: editPhoneNumber,
-            Email: editEmail,
-            HouseNumber: editHouseNumber,
-            Street: editStreet,
-            Suffix: editSuffix,
-            City: editCity,
-            State: editState,
-            ZipCode: editZipCode,
-            Country: editCountry,
-            Balance: editBalance,
-        };
-    
-
-        const updatedCustomerInfo = customerinfo.map((customer) =>
-            customer.CustomerID === customerID ? updateInfo : customer
-        );
-    
-        setcustomerinfo(updatedCustomerInfo);
-    
-        const mergedCustomer = {
-            ID: updateInfo.CustomerID,
-            NAME: `${updateInfo.firstName} ${updateInfo.midName} ${updateInfo.lastName}`.trim(),
-            ADDRESS: `${updateInfo.HouseNumber} ${updateInfo.Street} ${updateInfo.Suffix}, 
-                      ${updateInfo.City}, ${updateInfo.State} ${updateInfo.ZipCode}, ${updateInfo.Country}`,
-            PHONENUMBER: updateInfo.phoneNumber,
-            EMAIL: updateInfo.Email,
-            BALANCE: updateInfo.Balance,
-        };
-    
-        setSearchCustomer([mergedCustomer]);
-    
-        setEditInfo(false);
-    };
-    
-
-    return (
-        <div>
-            <h1>Customer Information</h1>
-            {mergedCustomer.map((customer,index) => (
-                <div key={index}>
-                    <p><strong>ID: </strong>{customer.ID}</p>
-                    <p><strong>Name: </strong>{customer.NAME}</p>
-                    <p><strong>Address: </strong>{customer.ADDRESS}</p>
-                    <p><strong>Phone Number: </strong>{customer.PHONENUMBER}</p>
-                    <p><strong>Email: </strong>{customer.EMAIL}</p>
-                    <p><strong>Balance: </strong>${customer.BALANCE}</p>
-                    <p><button onClick={() => handleEdit(customer.ID)}>Edit</button></p>
-                </div>
-            ))}
-
-            {editInfo && (
-                <div>
-                    <form onSubmit={handleUpdate}>
-                        <input
-                            type="text"
-                            placeholder="firstName"
-                            value={editFirstName}
-                            onChange={(e) => setEditFirstName(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="midName"
-                            value={editMidName}
-                            onChange={(e) => setEditMidName(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="lastName"
-                            value={editLastName}
-                            onChange={(e) => setEditLastName(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="number"
-                            placeholder="phoneNumber"
-                            value={editPhoneNumber}
-                            onChange={(e) => setEditPhoneNumber(e.target.value)}
-                            className="number-input"
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Email"
-                            value={editEmail}
-                            onChange={(e) => setEditEmail(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="House Number"
-                            value={editHouseNumber}
-                            onChange={(e) => setEditHouseNumber(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Street"
-                            value={editStreet}
-                            onChange={(e) => setEditStreet(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Suffix"
-                            value={editSuffix}
-                            onChange={(e) => setEditSuffix(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="City"
-                            value={editCity}
-                            onChange={(e) => setEditCity(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="State"
-                            value={editState}
-                            onChange={(e) => setEditState(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Zip Code"
-                            value={editZipCode}
-                            onChange={(e) => setEditZipCode(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Country"
-                            value={editCountry}
-                            onChange={(e) => setEditCountry(e.target.value)}
-                            required
-                        />
-                        <button type="submit">Save</button>
-                        <button onClick={() => setEditInfo(false)}>Cancel</button>
-                    </form>
-                </div>
-            )}
-        </div>
-    );
-
-}
-*/
-
-/*
-function CustomerProfile() {
-    const [customer, setCustomer] = useState(null);
-
-    useEffect(() => {
-        // Fetch customer data from backend
+        console.log("CustomerProfile mounted");
         const fetchCustomerData = async () => {
+            const email = localStorage.getItem("customerEmail");
+            if (!email) {
+                alert("Account not found, Please log in again.");
+                window.location.replace("/login");
+                return;
+            }
+
+            setLoading(true);
+            setError(null);
+
             try {
-                const response = await fetch('/api/customer');  // Change this route as needed
+                const response = await fetch(`http://localhost:3001/api/customer?email=${email}`);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    if (response.status === 404) {
+                        throw new Error("Customer not found.");
+                    }
+                    throw new Error("Failed to fetch customer data. Please try again later.");
                 }
-                const result = await response.json();
-                setCustomer(result); // Assuming a single customer is returned
-            } catch (error) {
-                console.error("Error fetching customer data:", error);
+                const data = await response.json();
+                setCustomerInfo(data);
+            } catch (err) {
+                setError(err.message);
+                setCustomerInfo(null);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchCustomerData();
     }, []);
 
-    if (!customer) {
-        return <div>Loading...</div>;
-    }
+    const handleEdit = () => setEditMode(true);
 
+    const handleSave = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch('http://localhost:3001/api/customer', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customerInfo),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update customer data. Please try again later.");
+            }
+
+            const result = await response.json();
+            alert(result.message);
+            setEditMode(false);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setCustomerInfo((prev) => ({ ...prev, [name]: value }));
+    };
+
+    if (loading) return <p>Loading customer data...</p>;
+    if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return (
         <div className="customer-profile-container">
             <h1>Customer Profile</h1>
-            <div className="customer-profile">
-                <div><strong>First Name:</strong> {customer.Customer_First_Name}</div>
-                <div><strong>Middle Name:</strong> {customer.Customer_Middle_Name || 'N/A'}</div>
-                <div><strong>Last Name:</strong> {customer.Customer_Last_Name}</div>
-                <div><strong>Email:</strong> {customer.Customer_Email_Address}</div>
-                <div><strong>Phone Number:</strong> {customer.Customer_Phone_Number}</div>
-                <div><strong>Address:</strong> {`${customer.Customer_Address_House_Number} ${customer.Customer_Address_Street} ${customer.Customer_Address_Suffix}, ${customer.Customer_Address_City}, ${customer.Customer_Address_State} ${customer.Customer_Address_Zip_Code}, ${customer.Customer_Address_Country}`}</div>
-                <div><strong>Balance:</strong> ${customer.Customer_Balance}</div>
-            </div>
+            {customerInfo && (
+                <div className="customer-info">
+                    {!editMode ? (
+                        <div>
+                            <p><strong>Name:</strong> {`${customerInfo.Customer_First_Name} ${customerInfo.Customer_Middle_Name || ''} ${customerInfo.Customer_Last_Name}`}</p>
+                            <p><strong>Phone Number:</strong> {customerInfo.Customer_Phone_Number}</p>
+                            <p><strong>Email:</strong> {customerInfo.Customer_Email_Address}</p>
+                            <p><strong>Address:</strong> {`${customerInfo.Customer_Address_House_Number} ${customerInfo.Customer_Address_Street} ${customerInfo.Customer_Address_Suffix || ''}, ${customerInfo.Customer_Address_City}, ${customerInfo.Customer_Address_State} ${customerInfo.Customer_Address_Zip_Code}, ${customerInfo.Customer_Address_Country}`}</p>
+                            <p><strong>Balance:</strong> ${customerInfo.Customer_Balance}</p>
+                            <button onClick={handleEdit}>Edit</button>
+                        </div>
+                    ) : (
+                        <form>
+                            <input
+                                type="text"
+                                name="Customer_First_Name"
+                                value={customerInfo.Customer_First_Name}
+                                onChange={handleChange}
+                                placeholder="First Name"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Middle_Name"
+                                value={customerInfo.Customer_Middle_Name}
+                                onChange={handleChange}
+                                placeholder="Middle Name"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Last_Name"
+                                value={customerInfo.Customer_Last_Name}
+                                onChange={handleChange}
+                                placeholder="Last Name"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Phone_Number"
+                                value={customerInfo.Customer_Phone_Number}
+                                onChange={handleChange}
+                                placeholder="Phone Number"
+                            />
+                            <input
+                                type="email"
+                                name="Customer_Email_Address"
+                                value={customerInfo.Customer_Email_Address}
+                                onChange={handleChange}
+                                placeholder="Email"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Address_House_Number"
+                                value={customerInfo.Customer_Address_House_Number}
+                                onChange={handleChange}
+                                placeholder="House Number"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Address_Street"
+                                value={customerInfo.Customer_Address_Street}
+                                onChange={handleChange}
+                                placeholder="Street"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Address_Suffix"
+                                value={customerInfo.Customer_Address_Suffix}
+                                onChange={handleChange}
+                                placeholder="Suffix"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Address_City"
+                                value={customerInfo.Customer_Address_City}
+                                onChange={handleChange}
+                                placeholder="City"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Address_State"
+                                value={customerInfo.Customer_Address_State}
+                                onChange={handleChange}
+                                placeholder="State/Province"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Address_Zip_Code"
+                                value={customerInfo.Customer_Address_Zip_Code}
+                                onChange={handleChange}
+                                placeholder="Zip Code"
+                            />
+                            <input
+                                type="text"
+                                name="Customer_Address_Country"
+                                value={customerInfo.Customer_Address_Country}
+                                onChange={handleChange}
+                                placeholder="Country"
+                            />
+                            <button type="button" onClick={handleSave}>Save</button>
+                            <button type="button" onClick={() => setEditMode(false)}>Cancel</button>
+                        </form>
+                    )}
+                </div>
+            )}
         </div>
     );
-}
+};
 
-*/
-
-//function CustomerProfile() {
-    //return(
-        //<div>
-            //<CustomerExample/>
-        //</div>
-    //);
-//}
-
-//export default CustomerProfile;
+export default CustomerProfile;
