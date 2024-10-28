@@ -38,6 +38,8 @@ const EmployeeProfile = () => {
         e.preventDefault();
         if (customerID) {
             fetchCustomerData();
+            setCustomerID('');
+            setEditMode(false)
         }
     };
 
@@ -79,127 +81,191 @@ const EmployeeProfile = () => {
     };
 
     return (
-        <div className="employee-profile-container">
-            <h1>Employee Profile</h1>
+        <div className="main_div">
+            <h1 className="h">Customer Search</h1>
 
 
             <form onSubmit={handleSubmit} className="search-form">
+
                 <input
-                    type="text"
+                    className="input"
+                    type="number"
                     value={customerID}
                     onChange={(e) => setCustomerID(e.target.value)}
                     placeholder="Enter Customer ID"
                     required
                 />
-                <button type="submit">Search</button>
+                <button type="submit" className="searchButton">Search</button>
             </form>
 
 
             {loading && <p>Loading...</p >}
-            {error && <p style={{ color: 'red' }}>{error}</p >}
+            {error && <p className="error-message">{error}</p >}
             {customerInfo && (
                 <div className="customer-info">
-                    <h2>Customer Information</h2>
+                    <h1 className="h">Customer Information</h1>
                     {!editMode ? (
                         <div>
-                            <p><strong>ID:</strong> {customerInfo.Customer_ID}</p >
-                            <p><strong>Name:</strong> {`${customerInfo.Customer_First_Name} ${customerInfo.Customer_Middle_Name || ''} ${customerInfo.Customer_Last_Name}`}</p >
-                            <p><strong>Phone Number:</strong> {customerInfo.Customer_Phone_Number}</p >
-                            <p><strong>Email:</strong> {customerInfo.Customer_Email_Address}</p >
-                            <p><strong>Address:</strong> {`${customerInfo.Customer_Address_House_Number} ${customerInfo.Customer_Address_Street} ${customerInfo.Customer_Address_Suffix || ''}, ${customerInfo.Customer_Address_City}, ${customerInfo.Customer_Address_State} ${customerInfo.Customer_Address_Zip_Code}, ${customerInfo.Customer_Address_Country}`}</p >
-                            <p><strong>Balance:</strong> ${customerInfo.Customer_Balance}</p >
-                            <button onClick={handleEdit}>Edit</button>
+                            <p className="Information"><strong>Customer ID:</strong> {customerInfo.Customer_ID}</p >
+                            <p className="Information"><strong>Customer Name:</strong> {`${customerInfo.Customer_First_Name} ${customerInfo.Customer_Middle_Name || ''} ${customerInfo.Customer_Last_Name}`}</p >
+                            <p className="Information"><strong>Phone Number:</strong> {customerInfo.Customer_Phone_Number}</p >
+                            <p className="Information"><strong>Email:</strong> {customerInfo.Customer_Email_Address}</p >
+                            <p className="Information"><strong>Address:</strong> {`${customerInfo.Customer_Address_House_Number} ${customerInfo.Customer_Address_Street} ${customerInfo.Customer_Address_Suffix || ''}, ${customerInfo.Customer_Address_City}, ${customerInfo.Customer_Address_State} ${customerInfo.Customer_Address_Zip_Code}, ${customerInfo.Customer_Address_Country}`}</p >
+                            <p className="Information"><strong>Balance:</strong> ${customerInfo.Customer_Balance}</p >
+                            <button onClick={handleEdit} className="updateButton">Edit</button>
                         </div>
                     ) : (
-                        <form>
-                            <input
+                        <form class="form-container">
+                        <table class="form-table">
+                            <tr>
+                            <td class="label">Customer Name:</td>
+                            <td>
+                                <input
                                 type="text"
                                 name="Customer_First_Name"
                                 value={customerInfo.Customer_First_Name}
                                 onChange={handleChange}
                                 placeholder="First Name"
-                            />
-                            <input
+                                />
+                            </td>
+                            <td>
+                                <input
                                 type="text"
                                 name="Customer_Middle_Name"
                                 value={customerInfo.Customer_Middle_Name}
                                 onChange={handleChange}
                                 placeholder="Middle Name"
-                            />
-                            <input
+                                />
+                            </td>
+                            <td>
+                                <input
                                 type="text"
                                 name="Customer_Last_Name"
                                 value={customerInfo.Customer_Last_Name}
                                 onChange={handleChange}
                                 placeholder="Last Name"
-                            />
-                            <input
+                                />
+                            </td>
+                            </tr>
+
+                            <tr>
+                            <td class="label">Phone Number:</td>
+                            <td colspan="3">
+                                <input
                                 type="text"
                                 name="Customer_Phone_Number"
                                 value={customerInfo.Customer_Phone_Number}
                                 onChange={handleChange}
                                 placeholder="Phone Number"
-                            />
-                            <input
+                                />
+                            </td>
+                            </tr>
+
+                            <tr>
+                            <td class="label">Email:</td>
+                            <td colspan="3">
+                                <input
                                 type="email"
                                 name="Customer_Email_Address"
                                 value={customerInfo.Customer_Email_Address}
                                 onChange={handleChange}
                                 placeholder="Email"
-                            />
-                            <input
+                                />
+                            </td>
+                            </tr>
+
+                            <tr>
+                            <td class="label">Address:</td>
+                            <td>
+                                <input
                                 type="text"
                                 name="Customer_Address_House_Number"
                                 value={customerInfo.Customer_Address_House_Number}
                                 onChange={handleChange}
                                 placeholder="House Number"
-                            />
-                            <input
+                                />
+                            </td>
+                            <td>
+                                <input
                                 type="text"
                                 name="Customer_Address_Street"
                                 value={customerInfo.Customer_Address_Street}
                                 onChange={handleChange}
                                 placeholder="Street"
-                            />
-                            <input
+                                />
+                            </td>
+                            <td>
+                                <input
                                 type="text"
                                 name="Customer_Address_Suffix"
                                 value={customerInfo.Customer_Address_Suffix}
                                 onChange={handleChange}
                                 placeholder="Suffix"
-                            />
-                            <input
+                                />
+                            </td>
+                            </tr>
+
+                            <tr>
+                            <td class="label">City:</td>
+                            <td colspan="3">
+                                <input
                                 type="text"
                                 name="Customer_Address_City"
                                 value={customerInfo.Customer_Address_City}
                                 onChange={handleChange}
                                 placeholder="City"
-                            />
-                            <input
+                                />
+                            </td>
+                            </tr>
+
+                            <tr>
+                            <td class="label">State:</td>
+                            <td colspan="3">
+                                <input
                                 type="text"
                                 name="Customer_Address_State"
                                 value={customerInfo.Customer_Address_State}
                                 onChange={handleChange}
                                 placeholder="State"
-                            />
-                            <input
+                                />
+                            </td>
+                            </tr>
+
+                            <tr>
+                            <td class="label">Zip Code:</td>
+                            <td colspan="3">
+                                <input
                                 type="text"
                                 name="Customer_Address_Zip_Code"
                                 value={customerInfo.Customer_Address_Zip_Code}
                                 onChange={handleChange}
                                 placeholder="Zip Code"
-                            />
-                            <input
+                                />
+                            </td>
+                            </tr>
+
+                            <tr>
+                            <td class="label">Country:</td>
+                            <td colspan="3">
+                                <input
                                 type="text"
                                 name="Customer_Address_Country"
                                 value={customerInfo.Customer_Address_Country}
                                 onChange={handleChange}
                                 placeholder="Country"
-                            />
+                                />
+                            </td>
+                            </tr>
 
-                            <button type="button" onClick={handleSave}>Save</button>
-                            <button type="button" onClick={() => setEditMode(false)}>Cancel</button>
+                            <tr>
+                            <td colspan="4" class="button-container">
+                                <button type="button" onClick={handleSave} class="updateButton">Save</button>
+                                <button type="button" onClick={() => setEditMode(false)} class="updateButton">Cancel</button>
+                            </td>
+                            </tr>
+                        </table>
                         </form>
+
                     )}
                 </div>
             )}
