@@ -1,44 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;700&family=Montserrat:wght@400;700&display=swap');
+
+
 .customer-profile-container {
+
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    top: 200px;
+    transform: translateY(100px); 
 
 }
 
-.customer-profile {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.Information{
+    font-size: 20px;
+    color: #101d0e;
+    margin-top: 35px;
+    flex: 0 0 150px;
+  
+  }
+
+.h{
+    color: rgb(85, 84, 84);
+    font-size: 40px;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 1%;
+    margin-bottom: 1%;
 }
 
-.customer-profile h1 {
-    text-align: center;
-    color: #4c85ff;
-    margin-bottom: 20px;
-}
+.updateButton{
+    padding: 10px 20px;
+    width: 20%;
+    font-size: 22px;
+    color: black;
+    background-color: rgb(126, 181, 197);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 25px;
+  
+  }
 
-.customer-profile div {
-    font-size: 18px;
+.updateButton:hover {
+    background-color: #0056b3;
 }
-
-.customer-profile div strong {
-    color: #333;
-    margin-right: 10px;
-}
-
-.customer-profile div {
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.customer-profile div:not(:last-child) {
-    margin-bottom: 10px;
-}
+  
 
 .number-input {
     font-family: inherit;
