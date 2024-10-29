@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 // ProductList.js
-=======
->>>>>>> a6bfd33420bf5ff922dd4944bd827f9201a20530
 import React from 'react';
 
 const ProductList = ({ products, deleteProduct, setEditingProduct }) => {
@@ -24,8 +21,4 @@ const ProductList = ({ products, deleteProduct, setEditingProduct }) => {
   );
 };
 
-<<<<<<< HEAD
 export default ProductList;
-=======
-export default ProductList;
->>>>>>> a6bfd33420bf5ff922dd4944bd827f9201a20530
