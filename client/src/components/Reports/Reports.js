@@ -208,4 +208,4 @@ const Reports = () => {
     );
 };
 
-export default App;
+export default Reports;
