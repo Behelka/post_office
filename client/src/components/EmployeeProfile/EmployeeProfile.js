@@ -81,7 +81,7 @@ const EmployeeProfile = () => {
     };
 
     return (
-        <div className="main_div">
+        <div className="ep_main_div">
             <h1 className="h">Customer Search</h1>
 
 
@@ -95,7 +95,7 @@ const EmployeeProfile = () => {
                     placeholder="Enter Customer ID"
                     required
                 />
-                <button type="submit" className="searchButton">Search</button>
+                <button type="submit" className="ep_searchButton">Search</button>
             </form>
 
 
