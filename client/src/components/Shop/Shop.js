@@ -42,7 +42,7 @@ const Checkout = ({ cart, clearCart }) => {
     }
 
     try {
-      const response = await fetch('/api/shop', {
+      const response = await fetch('http://localhost:3001/api/shop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cart)
@@ -73,7 +73,7 @@ function Shop() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/shop');
+        const response = await fetch('http://localhost:3001/api/shop');
         const data = await response.json();
         setProducts(data);
       } catch (error) {
