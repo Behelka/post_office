@@ -4,10 +4,10 @@ import './Reports.css';
 const Reports = () => {
     const [formData, setFormData] = useState({
         reportType: '',
-        comments: '',
+        startDate: '',
+        endDate: '',
     });
     const [data, setData] = useState([]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -19,8 +19,16 @@ const Reports = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const { reportType, startDate, endDate } = formData;
+        const url = new URL(`http://localhost:3001/api/reports/${reportType}`);
+
+        // Only append startDate and endDate if the report type is financial-transactions
+        if (reportType === 'financial-transactions') {
+            if (startDate) url.searchParams.append("startDate", startDate);
+            if (endDate) url.searchParams.append("endDate", endDate);
+        } 
         try {
-            const response = await fetch(`http://localhost:3001/api/reports/${formData.reportType}`, {
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -30,9 +38,7 @@ const Reports = () => {
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const result = await response.json();
-
-            // Format the data based on report type
-            const formattedData = formatData(result, formData.reportType);
+            const formattedData = formatData(result, reportType);
             setData(formattedData);
         } catch (error) {
             console.error('Error fetching report data:', error);
@@ -44,14 +50,15 @@ const Reports = () => {
             return result.map((item) => ({
                 id: item.Employee_ID,
                 name: `${item.First_Name} ${item.Middle_Name || ''} ${item.Last_Name}`,
-                department: item.Employee_Department_ID
+                department: item.Employee_Department_ID,
+                department_name: item.Department_Name,
             }));
         } else if (reportType === 'package-delivery') {
             return result.map((item) => ({
                 package_id: item.Package_ID,
                 sender_id: item.Sender_ID,
                 recipient_id: item.Recipient_ID,
-                address: ` 
+                address: `
                 ${item.Package_House_Number} 
                 ${item.Package_Street} 
                 ${item.Package_Suffix}, 
@@ -76,7 +83,6 @@ const Reports = () => {
                 <table className="report-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Name</th>
                             <th>Department</th>
                         </tr>
@@ -84,9 +90,8 @@ const Reports = () => {
                     <tbody>
                         {data.map((item) => (
                             <tr key={item.id}>
-                                <td>{item.id}</td>
                                 <td>{item.name}</td>
-                                <td>{item.department}</td>
+                                <td>{item.department_name}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -97,18 +102,12 @@ const Reports = () => {
                 <table className="report-table">
                     <thead>
                         <tr>
-                            <th>Package ID</th>
-                            <th>Sender ID</th>
-                            <th>Recipient ID</th>
                             <th>Package Address</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data.map((item) => (
                             <tr key={item.package_id}>
-                                <td>{item.package_id}</td>
-                                <td>{item.sender_id}</td>
-                                <td>{item.recipient_id}</td>
                                 <td>{item.address}</td>
                             </tr>
                         ))}
@@ -120,7 +119,6 @@ const Reports = () => {
                 <table className="report-table">
                     <thead>
                         <tr>
-                            <th>Transaction ID</th>
                             <th>Amount</th>
                             <th>Date</th>
                         </tr>
@@ -128,16 +126,15 @@ const Reports = () => {
                     <tbody>
                         {data.map((item) => (
                             <tr key={item.transaction_id}>
-                                <td>{item.transaction_id}</td>
                                 <td>{item.amount}</td>
-                                <td>{new Date(item.date).toLocaleString('en-US', { 
-                                        year: 'numeric', 
-                                        month: '2-digit', 
-                                        day: '2-digit', 
-                                        hour: '2-digit', 
-                                        minute: '2-digit', 
-                                        second: '2-digit' 
-                                    })}</td>
+                                <td>{new Date(item.date).toLocaleString('en-US', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                })}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -166,18 +163,34 @@ const Reports = () => {
                             <option value="financial-transactions">Financial Transactions Report</option>
                         </select>
                     </div>
+                    {/* date filtering for financial transaction reports */}
+                    {formData.reportType === 'financial-transactions' && (
+                        <>
+                            <div className="form-group">
+                                <label htmlFor="startDate">Start Date</label>
+                                <input
+                                    type="date"
+                                    id="startDate"
+                                    name="startDate"
+                                    value={formData.startDate}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
 
-                    <div className="form-group">
-                        <label htmlFor="comments">Additional Comments</label>
-                        <textarea
-                            id="comments"
-                            name="comments"
-                            rows="4"
-                            value={formData.comments}
-                            onChange={handleChange}
-                            placeholder="Enter any specific requests or comments..."
-                        ></textarea>
-                    </div>
+                            <div className="form-group">
+                                <label htmlFor="endDate">End Date</label>
+                                <input
+                                    type="date"
+                                    id="endDate"
+                                    name="endDate"
+                                    value={formData.endDate}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        </>
+                    )}
 
                     <div className="form-group">
                         <button type="submit">Submit Request</button>
@@ -187,7 +200,7 @@ const Reports = () => {
                 {data.length > 0 && (
                     <div>
                         <h3>Report Results:</h3>
-                        {renderTable()} {/* Render the report results as a table */}
+                        {renderTable()}
                     </div>
                 )}
             </main>
