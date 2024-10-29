@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./AddLocation.css";
 
+const url = process.env.REACT_APP_SERVER_URL; // Environment variable for base URL
+
 const BasicTable = () => {
     const [data, setData] = useState([]);
     const [locationFields, setLocationFields] = useState({
@@ -12,25 +14,25 @@ const BasicTable = () => {
         zipCode: "",
         country: ""
     });
-    
     const [editMode, setEditMode] = useState(false);
     const [editIndex, setEditIndex] = useState(null);
     const [editFields, setEditFields] = useState({ ...locationFields });
+    const [searchQuery, setSearchQuery] = useState(""); // State for search query
 
     // Fetch locations from the API
     const fetchLocations = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/location');
+            const response = await fetch(`${url}/api/location`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
-            
+
             const formattedData = result.map((item) => ({
                 location_id: item.Location_ID,
                 address: `${item.Location_Address_House_Number} ${item.Location_Address_Street} ${item.Location_Address_Suffix || ''}, ${item.Location_Address_City}, ${item.Location_Address_State} ${item.Location_Address_Zip_Code}, ${item.Location_Address_Country}`
             }));
             setData(formattedData);
         } catch (error) {
-            console.error('Error fetching locations:', error);
+            console.error("Error fetching locations:", error);
         }
     };
 
@@ -60,22 +62,25 @@ const BasicTable = () => {
         const newLocation = { ...locationFields };
 
         try {
-            const response = await fetch('http://localhost:3001/api/location', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+            const response = await fetch(`${url}/api/location`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newLocation),
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
 
-            setData((prev) => [...prev, {
-                location_id: result.Location_ID,
-                address: `${result.Location_Address_House_Number} ${result.Location_Address_Street} ${result.Location_Address_Suffix || ''}, ${result.Location_Address_City}, ${result.Location_Address_State} ${result.Location_Address_Zip_Code}, ${result.Location_Address_Country}`
-            }]);
+            setData((prev) => [
+                ...prev,
+                {
+                    location_id: result.Location_ID,
+                    address: `${result.Location_Address_House_Number} ${result.Location_Address_Street} ${result.Location_Address_Suffix || ''}, ${result.Location_Address_City}, ${result.Location_Address_State} ${result.Location_Address_Zip_Code}, ${result.Location_Address_Country}`
+                },
+            ]);
             clearInputFields();
         } catch (error) {
-            console.error('Error adding location:', error);
+            console.error("Error adding location:", error);
         }
     };
 
@@ -83,7 +88,6 @@ const BasicTable = () => {
         setEditMode(true);
         setEditIndex(index);
         const location = data[index];
-        
         const addressParts = location.address.trim().split(", ");
         const houseAndStreet = addressParts[0].trim().split(" ");
         const city = addressParts[1];
@@ -106,64 +110,85 @@ const BasicTable = () => {
         const updatedLocation = { ...editFields };
 
         try {
-            const response = await fetch(`http://localhost:3001/api/location/${data[editIndex].location_id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+            const response = await fetch(`${url}/api/location/${data[editIndex].location_id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedLocation),
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const updatedData = data.map((location, idx) =>
-                idx === editIndex ? { ...location, address: `${editFields.houseNumber} ${editFields.street} ${editFields.suffix}, ${editFields.city}, ${editFields.state} ${editFields.zipCode}, ${editFields.country}` } : location
+                idx === editIndex
+                    ? {
+                        ...location,
+                        address: `${editFields.houseNumber} ${editFields.street} ${editFields.suffix}, ${editFields.city}, ${editFields.state} ${editFields.zipCode}, ${editFields.country}`,
+                    }
+                    : location
             );
 
             setData(updatedData);
             setEditMode(false);
             setEditIndex(null);
         } catch (error) {
-            console.error('Error updating location:', error);
+            console.error("Error updating location:", error);
         }
     };
 
     const handleDelete = async (location_id) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/location/${location_id}`, {
-                method: 'PATCH',
+            const response = await fetch(`${url}/api/location/${location_id}`, {
+                method: "PATCH",
                 headers: {
-                    'Content-Type': 'application/json',
-                }
+                    "Content-Type": "application/json",
+                },
             });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             setData((prev) =>
-                prev.map(location =>
+                prev.map((location) =>
                     location.location_id === location_id ? { ...location, Delete_Location: 1 } : location
                 )
             );
             fetchLocations(); // Update website display
         } catch (error) {
-            console.error('Error deleting location:', error);
+            console.error("Error deleting location:", error);
         }
     };
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value.toLowerCase());
+    };
+
+    const filteredData = data.filter((item) =>
+        item.address.toLowerCase().includes(searchQuery)
+    );
 
     return (
         <div className="table-container">
             <h2>Add a new Location</h2>
             <form onSubmit={handleSubmit}>
                 {Object.keys(locationFields).map((key) => (
-                    <input 
+                    <input
                         key={key}
                         type="text"
                         name={key}
-                        placeholder={key.replace(/([A-Z])/g, ' $1')} // Format name for placeholder
+                        placeholder={key.replace(/([A-Z])/g, " $1")} // Format name for placeholder
                         value={locationFields[key]}
                         onChange={handleInputChange}
-                        required={key !== 'suffix'} // Make 'suffix' optional
+                        required={key !== "suffix"} // Make 'suffix' optional
                     />
                 ))}
                 <button type="submit">Add Location</button>
             </form>
+
+            <h2>Search Locations</h2>
+            <input
+                type="text"
+                placeholder="Search by address"
+                value={searchQuery}
+                onChange={handleSearch}
+            />
 
             <h2>Current Locations - Click On Location ID To Edit An Existing Location</h2>
             <div className="table-scroll">
@@ -176,21 +201,35 @@ const BasicTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((item, index) => (
+                        {filteredData.map((item, index) => (
                             <tr key={item.location_id}>
                                 <td>
-                                    <button onClick={() => handleEdit(index)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
+                                    <button
+                                        onClick={() => handleEdit(index)}
+                                        style={{
+                                            background: "none",
+                                            border: "none",
+                                            color: "blue",
+                                            textDecoration: "underline",
+                                            cursor: "pointer",
+                                        }}
+                                    >
                                         {item.location_id}
                                     </button>
                                 </td>
                                 <td>{item.address}</td>
                                 <td className="delete-column">
-                                    <button className="button-red"
+                                    <button
+                                        className="button-red"
                                         onClick={(e) => {
                                             e.preventDefault();
                                             handleDelete(item.location_id);
                                         }}
-                                        style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}
+                                        style={{
+                                            color: "red",
+                                            textDecoration: "underline",
+                                            cursor: "pointer",
+                                        }}
                                     >
                                         Delete
                                     </button>
@@ -206,14 +245,16 @@ const BasicTable = () => {
                     <h2>Edit Location {data[editIndex].location_id}</h2>
                     <form onSubmit={handleUpdate}>
                         {Object.keys(editFields).map((key) => (
-                            <input 
+                            <input
                                 key={key}
                                 type="text"
                                 name={key}
-                                placeholder={key.replace(/([A-Z])/g, ' ')} // Format name for placeholder
+                                placeholder={key.replace(/([A-Z])/g, " ")}
                                 value={editFields[key]}
-                                onChange={(e) => setEditFields((prev) => ({ ...prev, [key]: e.target.value }))} 
-                                required={key !== 'suffix'} // Make 'suffix' optional
+                                onChange={(e) =>
+                                    setEditFields((prev) => ({ ...prev, [key]: e.target.value }))
+                                }
+                                required={key !== "suffix"} // Make 'suffix' optional
                             />
                         ))}
                         <button type="submit">Update Location</button>

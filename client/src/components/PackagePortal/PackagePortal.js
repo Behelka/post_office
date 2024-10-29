@@ -42,15 +42,21 @@ const BasicTable = () => {
         recipient_id: item.Recipient_ID,
         recipient_name: `${item.Recipient_First_Name} ${item.Recipient_Last_Name}`,
         destination_address: `${item.Package_House_Number} ${item.Package_Street} ${item.Package_Suffix || ''}, ${item.Package_City}, ${item.Package_State} ${item.Package_Zip_Code}, ${item.Package_Country}`,
+        houseNumber: item.Package_House_Number,
+        street: item.Package_Street,
+        suffix: item.Package_Suffix,
+        city: item.Package_City,
+        state: item.Package_State,
+        zipCode: item.Package_Zip_Code,
+        country: item.Package_Country,
         package_status: item.Package_Status,
         length: item.Package_Length,
         width: item.Package_Width,
         height: item.Package_Height,
         weight: item.Package_Weight,
         shipping_method: item.Package_Shipping_Method,
-        shipping_cost: item.Package_Shipping_Cost,
-        country: item.Package_Country // Ensure this is included
-    });
+        shipping_cost: item.Package_Shipping_Cost
+        });
 
     const fetchPackage = useCallback(async () => {
         try {
@@ -123,34 +129,22 @@ const BasicTable = () => {
         setEditIndex(index);
         const pkg = filteredData[index]; // Use filtered data for editing
 
-        const [streetAddress, cityStateZip, country] = pkg.destination_address.split(',').map(part => part.trim());
-
-        const streetParts = streetAddress.split(' ');
-        const houseNumber = streetParts[0]; // House number
-        const suffix = streetParts.slice(-1).join(' '); // Last part is the suffix
-        const street = streetParts.slice(1, -1).join(' '); // Everything in between is the street name
-
-        const cityStateZipParts = cityStateZip.trim().split(' ');
-        const city = cityStateZipParts.slice(0, -2).join(' '); // Everything except the last two parts is the city
-        const state = cityStateZipParts.slice(-2, -1)[0]; // Second last part is the state
-        const zipCode = cityStateZipParts.slice(-1)[0]; // Last part is the zip code
-
         setFormValues({
             senderId: pkg.sender_id,
             recipientId: pkg.recipient_id,
-            houseNumber: houseNumber || '',
-            street: street || '',
-            suffix: suffix || '',
-            city: city || '',
-            state: state || '',
-            zipCode: zipCode || '',
-            country: country || '',
+            houseNumber: pkg.houseNumber || '',
+            street: pkg.street || '',
+            suffix: pkg.suffix || '',
+            city: pkg.city || '',
+            state: pkg.state || '',
+            zipCode: pkg.zipCode || '',
+            country: pkg.country || '',
+            packageStatus: pkg.package_status,
             length: pkg.length,
             width: pkg.width,
             height: pkg.height,
             weight: pkg.weight,
             shippingMethod: pkg.shipping_method,
-            packageStatus: pkg.package_status,
         });
     };
 
@@ -159,19 +153,40 @@ const BasicTable = () => {
         const updatedPackage = { ...formValues, package_id: filteredData[editIndex].package_id };
 
         try {
-            const response = await fetch(`${url}/api/PackagePortal`, {
+            const response = await fetch(`${url}/api/PackagePortal/${data[editIndex].package_id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedPackage),
             });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             await fetchPackage();
-            setEditMode(false);
-            setEditIndex(null);
+            resetEditFields();
         } catch (error) {
             console.error('Error updating package:', error);
         }
     };
+
+    const resetEditFields = () => {
+        setEditMode(false);
+        setEditIndex(null);
+        setFormValues({
+            senderId: "",
+            recipientId: "",
+            houseNumber: "",
+            street: "",
+            suffix: "",
+            city: "",
+            state: "",
+            zipCode: "",
+            country: "",
+            length: "",
+            width: "",
+            height: "",
+            weight: "",
+            shippingMethod: "Ground",
+            packageStatus: "Received",
+        });
+    }
 
     const handleDelete = (package_id) => {
         setPackageToDelete(package_id); // Set the package to delete
@@ -220,6 +235,7 @@ const BasicTable = () => {
                     <option value="Delivered">Delivered</option>
                 </select>
                 <button type="submit">{editMode ? "Update Package" : "Add Package"}</button>
+                <button type="button" onClick={resetEditFields}>Cancel</button>
             </form>
 
             <select value={searchColumn} onChange={handleColumnChange}>
@@ -234,7 +250,7 @@ const BasicTable = () => {
                 value={searchQuery} 
                 onChange={handleSearchChange} 
             />
-
+            <div className="table-scroll">
             <table>
                 <thead>
                     <tr>
@@ -243,7 +259,14 @@ const BasicTable = () => {
                         <th>Recipient</th>
                         <th>Destination</th>
                         <th>Status</th>
+                        <th>Length</th>
+                        <th>Width</th>
+                        <th>Height</th>
+                        <th>Weight</th>
+                        <th>shipping_method</th>
+                        <th>shipping_cost</th>
                         <th>Actions</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -254,6 +277,12 @@ const BasicTable = () => {
                             <td>{pkg.recipient_name}</td>
                             <td>{pkg.destination_address}</td>
                             <td>{pkg.package_status}</td>
+                            <td>{pkg.length}</td>
+                            <td>{pkg.width}</td>
+                            <td>{pkg.height}</td>
+                            <td>{pkg.weight}</td>
+                            <td>{pkg.shipping_method}</td>
+                            <td>{pkg.shipping_cost}</td>
                             <td>
                                 <button onClick={() => handleEdit(index)}>Edit</button>
                                 <button onClick={() => handleAddStop(pkg.package_id)} style={{ marginLeft: '10px' }}>Stops</button>
@@ -263,6 +292,7 @@ const BasicTable = () => {
                     ))}
                 </tbody>
             </table>
+            </div>
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)} // Close modal

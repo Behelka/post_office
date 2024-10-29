@@ -30,21 +30,21 @@ const PackagePortalRoute = (req, res) => {
             p.Package_ID;
     `;
 
-    const validatePackageFields = (body) => {
+    /*const validatePackageFields = (body) => {
         const requiredFields = [
-            'sender_id', 'recipient_id', 'packageHouseNumber', 'packageStreet',
-            'packageSuffix', 'packageCity', 'packageState', 'packageZipCode',
-            'packageCountry', 'packageStatus', 'packageLength', 'packageWidth',
-            'packageHeight', 'packageWeight', 'packageShippingMethod'
+            'senderId', 'recipientId', 'houseNumber', 'street',
+            'suffix', 'city', 'state', 'zipCode',
+            'country', 'packageStatus', 'length', 'width',
+            'height', 'weight', 'shippingMethod'
         ];
         return requiredFields.every(field => body[field]);
-    };
+    };*/
 
-    const CalCost = (packageHeight, packageLength, packageWidth, packageWeight, packageShippingMethod) => {
+    const CalCost = (height, length, width, weight, shippingMethod) => {
         const shippingMethodCosts = { 'Overnight': 15, 'Air': 7, 'Ground': 0 };
-        const methodCost = shippingMethodCosts[packageShippingMethod] || 0;
-        return Math.ceil(packageLength / 6) + Math.ceil(packageWidth / 6) +
-               Math.ceil(packageHeight / 6) + Math.ceil(packageWeight) + methodCost;
+        const methodCost = shippingMethodCosts[shippingMethod] || 0;
+        return Math.ceil(length / 6) + Math.ceil(width / 6) +
+               Math.ceil(height / 6) + Math.ceil(weight) + methodCost;
     };
 
     switch (req.method) {
@@ -71,16 +71,16 @@ const PackagePortalRoute = (req, res) => {
         case 'POST':
             if (parsedUrl.pathname === '/api/PackagePortal') {
                 parseBody(req, async (body) => {
-                    if (!validatePackageFields(body)) {
+                    /*if (!validatePackageFields(body)) {
                         res.writeHead(400, { 'Content-Type': 'application/json' });
                         return res.end(JSON.stringify({ message: 'All fields are required' }));
-                    }
+                    }*/
 
-                    const { sender_id, recipient_id, packageHouseNumber, packageStreet, packageSuffix,
-                            packageCity, packageState, packageZipCode, packageCountry, packageStatus,
-                            packageLength, packageWidth, packageHeight, packageWeight, packageShippingMethod } = body;
+                    const { senderId, recipientId, houseNumber, street, suffix,
+                            city, state, zipCode, country, packageStatus,
+                            length, width, height, weight, shippingMethod } = body;
 
-                    const cost = CalCost(packageHeight, packageLength, packageWidth, packageWeight, packageShippingMethod);
+                    const cost = CalCost(height, length, width, weight, shippingMethod);
 
                     try {
                         const insertQuery = `
@@ -94,10 +94,10 @@ const PackagePortalRoute = (req, res) => {
                         `;
 
                         await db.query(insertQuery, [
-                            sender_id, recipient_id, packageHouseNumber, packageStreet,
-                            packageSuffix, packageCity, packageState, packageZipCode,
-                            packageCountry, packageStatus, packageLength, packageWidth,
-                            packageHeight, packageWeight, packageShippingMethod, cost
+                            senderId, recipientId, houseNumber, street,
+                            suffix, city, state, zipCode,
+                            country, packageStatus, length, width,
+                            height, weight, shippingMethod, cost
                         ]);
 
                         const [lastPackageQuery] = await db.query(infoQuery);
@@ -114,18 +114,19 @@ const PackagePortalRoute = (req, res) => {
 
         // Handle PUT request to update an existing package
         case 'PUT':
-            if (parsedUrl.pathname === '/api/PackagePortal') {
+            if (parsedUrl.pathname.startsWith('/api/PackagePortal/')) {
+                const Package_ID = parsedUrl.pathname.split('/')[3];
                 parseBody(req, async (body) => {
-                    if (!validatePackageFields(body) || !body.package_id) {
+                   /*if (!validatePackageFields(body) || !Package_ID) {
                         res.writeHead(400, { 'Content-Type': 'application/json' });
                         return res.end(JSON.stringify({ message: 'All fields are required' }));
-                    }
+                    }*/
 
-                    const { package_id, sender_id, recipient_id, packageHouseNumber, packageStreet, packageSuffix,
-                            packageCity, packageState, packageZipCode, packageCountry, packageStatus,
-                            packageLength, packageWidth, packageHeight, packageWeight, packageShippingMethod } = body;
+                    const { senderId, recipientId, houseNumber, street, suffix,
+                            city, state, zipCode, country, packageStatus,
+                            length, width, height, weight, shippingMethod } = body;
 
-                    const cost = CalCost(packageHeight, packageLength, packageWidth, packageWeight, packageShippingMethod);
+                    const cost = CalCost(height, length, width, weight, shippingMethod);
 
                     try {
                         const updateQuery = `
@@ -140,10 +141,10 @@ const PackagePortalRoute = (req, res) => {
                         `;
 
                         await db.query(updateQuery, [
-                            sender_id, recipient_id, packageHouseNumber, packageStreet,
-                            packageSuffix, packageCity, packageState, packageZipCode,
-                            packageCountry, packageStatus, packageLength, packageWidth,
-                            packageHeight, packageWeight, packageShippingMethod, cost, package_id
+                            senderId, recipientId, houseNumber, street,
+                            suffix, city, state, zipCode,
+                            country, packageStatus, length, width,
+                            height, weight, shippingMethod, cost, Package_ID
                         ]);
 
                         const [updatedPackageQuery] = await db.query(infoQuery);

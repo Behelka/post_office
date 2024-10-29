@@ -1,98 +1,150 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AddDepartment.css";
 
-const BasicTable = () => {
-    // Sample data to display in the table
-    const [data, setData] = useState([
-        { department_id: 1, department_name: "Customer Service", department_manager: 1, department_location: 1 },
-        { department_id: 2, department_name: "Processing", department_manager: 2, department_location: 1 },
-        { department_id: 3, department_name: "Delivery", department_manager: 3, department_location: 1 },
-    ]);
-
-    // State for form inputs (department fields)
-    const [departmentName, setDepartmentName] = useState("");
-    const [departmentManager, setDepartmentManager] = useState("");
-    const [departmentLocation, setDepartmentLocation] = useState("");
+const  AddDepartment = () => {
+    const [data, setData] = useState([]);
+    const [departmentFields, setDepartmentFields] = useState({
+        departmentName: "",
+        departmentManager: "",
+        departmentLocation: ""
+    });
 
     const [editMode, setEditMode] = useState(false);
-    const [editIndex, setEditIndex] = useState(null); // Track which row is being edited
-    const [editDepartmentName, setEditDepartmentName] = useState("");
-    const [editDepartmentManager, setEditDepartmentManager] = useState("");
-    const [editDepartmentLocation, setEditDepartmentLocation] = useState("");
+    const [editIndex, setEditIndex] = useState(null);
+    const [editFields, setEditFields] = useState({ ...departmentFields });
 
-    const handleSubmit = (e) => {
+    // Fetch departments from the API
+    const fetchDepartments = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/departments');
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const result = await response.json();
+            
+            const formattedData = result.map((item) => ({
+                department_id: item.Department_ID,
+                department_name: item.Department_Name,
+                department_manager: item.Department_Manager_ID,
+                department_location: item.Department_Location_ID
+            }));
+            setData(formattedData);
+        } catch (error) {
+            console.error('Error fetching departments:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchDepartments();
+    }, []);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setDepartmentFields((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const clearInputFields = () => {
+        setDepartmentFields({
+            departmentName: "",
+            departmentManager: "",
+            departmentLocation: ""
+        });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const newDepartment = {
-            department_id: data.length + 1, // Increment department_id
-            department_name: departmentName,
-            department_manager: departmentManager,
-            department_location: departmentLocation,
-        };
-        setData([...data, newDepartment]); // Add new department to the data array
-        // Clear the input fields
-        setDepartmentName("");
-        setDepartmentManager("");
-        setDepartmentLocation("");
+        const newDepartment = { ...departmentFields };
+
+        try {
+            const response = await fetch('http://localhost:3001/departments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newDepartment),
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const result = await response.json();
+
+            setData((prev) => [...prev, result]);
+            clearInputFields();
+        } catch (error) {
+            console.error('Error adding department:', error);
+        }
     };
 
     const handleEdit = (index) => {
         setEditMode(true);
         setEditIndex(index);
-
         const department = data[index];
-        setEditDepartmentName(department.department_name);
-        setEditDepartmentManager(department.department_manager);
-        setEditDepartmentLocation(department.department_location);
+        setEditFields({
+            departmentName: department.department_name,
+            departmentManager: department.department_manager,
+            departmentLocation: department.department_location
+        });
     };
 
-    const handleUpdate = (e) => {
+    const handleUpdate = async (e) => {
         e.preventDefault();
+        const updatedDepartment = { ...editFields };
 
-        const updatedDepartment = {
-            department_id: data[editIndex].department_id, // Keep the same department_id
-            department_name: editDepartmentName,
-            department_manager: editDepartmentManager,
-            department_location: editDepartmentLocation,
-        };
+        try {
+            const response = await fetch(`http://localhost:3001/departments/${data[editIndex].department_id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedDepartment),
+            });
 
-        const updatedData = data.map((department, index) =>
-            index === editIndex ? updatedDepartment : department
-        );
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const updatedData = data.map((department, idx) =>
+                idx === editIndex ? { ...department, ...editFields } : department
+            );
 
-        setData(updatedData); // Update state with edited department
-        setEditMode(false);
-        setEditIndex(null);
+            setData(updatedData);
+            setEditMode(false);
+            setEditIndex(null);
+        } catch (error) {
+            console.error('Error updating department:', error);
+        }
+    };
+
+    const handleDelete = async (department_id) => {
+        try {
+            const response = await fetch(`http://localhost:3001/departments/${department_id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            setData((prev) =>
+                prev.map(department =>
+                    department.department_id === department_id ? { ...department, Delete_Department: 1 } : department
+                )
+            );
+            fetchDepartments(); // Update display
+        } catch (error) {
+            console.error('Error deleting department:', error);
+        }
     };
 
     return (
         <div className="table-container">
             <h2>Add a New Department</h2>
             <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Department Name"
-                    value={departmentName}
-                    onChange={(e) => setDepartmentName(e.target.value)}
-                    required
-                />
-                <input
-                    type="number"
-                    placeholder="Department Manager ID"
-                    value={departmentManager}
-                    onChange={(e) => setDepartmentManager(e.target.value)}
-                    required
-                />
-                <input
-                    type="number"
-                    placeholder="Department Location ID"
-                    value={departmentLocation}
-                    onChange={(e) => setDepartmentLocation(e.target.value)}
-                    required
-                />
+                {Object.keys(departmentFields).map((key) => (
+                    <input 
+                        key={key}
+                        type="text"
+                        name={key}
+                        placeholder={key.replace(/([A-Z])/g, ' $1')} // Format name for placeholder
+                        value={departmentFields[key]}
+                        onChange={handleInputChange}
+                        required
+                    />
+                ))}
                 <button type="submit">Add Department</button>
             </form>
 
-            <h2>Current Departments - Click On Department ID To Edit An Existing Department</h2>
+            <h2>Current Departments - Click On Department ID To Edit</h2>
             <div className="table-scroll">
                 <table>
                     <thead>
@@ -101,19 +153,31 @@ const BasicTable = () => {
                             <th>Department Name</th>
                             <th>Manager ID</th>
                             <th>Location ID</th>
+                            <th className="center-header">Delete Department</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data.map((item, index) => (
                             <tr key={item.department_id}>
                                 <td>
-                                    <button onClick={() => handleEdit(index)}>
+                                    <button onClick={() => handleEdit(index)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
                                         {item.department_id}
                                     </button>
                                 </td>
                                 <td>{item.department_name}</td>
                                 <td>{item.department_manager}</td>
                                 <td>{item.department_location}</td>
+                                <td className="delete-column">
+                                    <button className="button-red"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleDelete(item.department_id);
+                                        }}
+                                        style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -122,29 +186,19 @@ const BasicTable = () => {
 
             {editMode && (
                 <div>
-                    <h2>Edit Department {editIndex + 1}</h2>
+                    <h2>Edit Department {data[editIndex].department_id}</h2>
                     <form onSubmit={handleUpdate}>
-                        <input
-                            type="text"
-                            placeholder="Department Name"
-                            value={editDepartmentName}
-                            onChange={(e) => setEditDepartmentName(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="number"
-                            placeholder="Department Manager ID"
-                            value={editDepartmentManager}
-                            onChange={(e) => setEditDepartmentManager(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="number"
-                            placeholder="Department Location ID"
-                            value={editDepartmentLocation}
-                            onChange={(e) => setEditDepartmentLocation(e.target.value)}
-                            required
-                        />
+                        {Object.keys(editFields).map((key) => (
+                            <input 
+                                key={key}
+                                type="text"
+                                name={key}
+                                placeholder={key.replace(/([A-Z])/g, ' ')} // Format name for placeholder
+                                value={editFields[key]}
+                                onChange={(e) => setEditFields((prev) => ({ ...prev, [key]: e.target.value }))} 
+                                required
+                            />
+                        ))}
                         <button type="submit">Update Department</button>
                     </form>
                 </div>
@@ -152,14 +206,5 @@ const BasicTable = () => {
         </div>
     );
 };
-
-function AddDepartment() {
-
-    return (
-        <div>
-            <BasicTable />
-        </div>
-    );
-}
 
 export default AddDepartment;
