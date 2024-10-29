@@ -271,6 +271,6 @@ const EmployeeProfile = () => {
             )}
         </div>
     );
-}
+};
 
 export default EmployeeProfile;
