@@ -25,10 +25,10 @@ import Contact from "./components/ContactUS/contact";
       ["Login", "Login/Register"],
       ["Shop", "Shop"],
       ["AboutUs", "About Us"],
-      ["Contact","Contact Us"]
+      ["Contactus","Contact Us"]
     ];
 
-  var user = "customer"; // This is to see different roles
+  var user = ""; // This is to see different roles
 
   if (user === "employee") {
     links = [
@@ -61,7 +61,7 @@ import Contact from "./components/ContactUS/contact";
         ["Reports", "Reports"],
         ["Shop", "Shop"],
         ["AboutUs", "About"],
-        ["Contact", "Contact Us"], 
+        ["Contactus", "Contact Us"], 
         ["CustomerProfile", "Profile"],
       ];
     }
