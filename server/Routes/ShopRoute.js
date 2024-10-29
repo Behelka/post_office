@@ -31,24 +31,27 @@ const customerShopRoute = (req, res) => {
             }
             break;
 
-        case 'POST':
-            if (parsedUrl.pathname === '/api/shop') {
-            parseBody(req, async (cart) => {
-                // Process the cart and create a transaction entry
-                try {
-                for (const product of cart) {
-                    await db.query('INSERT INTO transaction (Transaction_ID, Amount_Deducted, Transaction_Date) VALUES (?, ?, ?)', [/* values */]);
+            case 'POST':
+                if (parsedUrl.pathname === '/api/shop') {
+                    parseBody(req, async (cart) => {
+                        try {
+                            for (const product of cart) {
+                                const transactionId = product.Transaction_ID || null; // Adjust if Transaction_ID is provided or auto-incremented
+                                const transactionDate = new Date().toISOString().slice(0, 19).replace('T', ' '); // Format for MySQL DATETIME
+                                
+                                await db.query('INSERT INTO transactions (Transaction_ID, Transaction_Date) VALUES (?, ?)', [transactionId, transactionDate]);
+                            }
+                            res.writeHead(201, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ message: 'Payment success' }));
+                        } catch (error) {
+                            console.error('Error processing checkout:', error);
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ message: 'Checkout failed' }));
+                        }
+                    });
                 }
-                res.writeHead(201, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ message: 'Payment success' }));
-                } catch (error) {
-                console.error('Error processing checkout:', error);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ message: 'Checkout failed' }));
-                }
-            });
-            }
-            break;
+                break;
+            
 
         // Handle unmatched routes
         default:
