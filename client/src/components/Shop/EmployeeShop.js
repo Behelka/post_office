@@ -1,8 +1,16 @@
 // EmployeeShop.js
 import React, { useState, useEffect } from 'react';
-import ProductList from './ProductList';
-import AdminControls from './AdminControls';
-import './Shop.css';
+import "./Shop.css";
+
+/* product array */
+const initialProducts = [
+  { id: 1, name: 'Stamp', price: 0.5 },
+  { id: 2, name: 'Envelope', price: 1 },
+  { id: 3, name: 'Postcard', price: 0.75 },
+  { id: 4, name: 'Small Package', price: 5 },
+  { id: 5, name: 'Medium Package', price: 7 },
+  { id: 6, name: 'Large Package', price: 10 }
+];
 
 const EmployeeShop = () => {
   const [products, setProducts] = useState([]);
@@ -65,7 +73,7 @@ const EmployeeShop = () => {
 
   const deleteProduct = async (id) => {
     try {
-      await fetch('http://localhost:3001/shop', {
+    await fetch(`http://localhost:3001/shop/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Product_ID: id }),

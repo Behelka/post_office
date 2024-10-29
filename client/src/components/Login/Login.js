@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,17 +34,19 @@ const Login = () => {
 
     const response = await fetch("/api/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
 
     const result = await response.json();
+
     if (response.ok) {
-      localStorage.setItem("token", result.token);
-      localStorage.setItem("role", result.role);
-      console.log("Login successful");
+      localStorage.setItem("Customer_ID", result.Customer_ID);
+      localStorage.setItem(
+        "Customer_Email_Address",
+        result.Customer_Email_Address
+      );
+      navigate("/CustomerProfile");
     } else {
       setLoginError(result.message || "Login failed");
     }

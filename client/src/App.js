@@ -16,16 +16,19 @@ import SignUp from "./components/SignUp/SignUp";
 import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
 import EmployeeShop from "./components/Shop/EmployeeShop";
 import Stops from "./components/PackagePortal/Stops";
+import Contact from "./components/ContactUS/contact";
 
-const App = () => {
-  let links = [
-    ["", "Home"],
-    ["Login", "Login/Register"],
-    ["Shop", "Shop"],
-    ["AboutUs", "About/Contact Us"],
-  ];
 
-  var user = "admin"; // This is to see different roles
+  const App = () => {
+    let links = [
+      ["", "Home"],
+      ["Login", "Login/Register"],
+      ["Shop", "Shop"],
+      ["AboutUs", "About Us"],
+      ["Contact","Contact Us"]
+    ];
+
+  var user = "customer"; // This is to see different roles
 
   if (user === "employee") {
     links = [
@@ -33,7 +36,8 @@ const App = () => {
       ["PackagePortal", "Package Portal"],
       ["TrackingHistory", "Tracking History"],
       ["EmployeeProfile", "Profile"],
-      ["EmployeeShop", "Shop"]
+      ["EmployeeShop", "Shop"],
+      ["Reports", "Reports"]
     ];
   }
 
@@ -44,21 +48,23 @@ const App = () => {
       ["TrackingHistory", "Tracking History"],
       ["ManagerPortal", "Manager Portal"],
       ["EmployeeProfile", "Profile"],
-      ["EmployeeShop", "Shop"]
+      ["EmployeeShop", "Shop"],
+      ["Reports", "Reports"]
     ];
   }
 
-  if (user === "customer") {
-    links = [
-      ["", "Home"],
-      ["Dashboard", "Dashboard"],
-      ["TrackingHistory", "Tracking History"],
-      ["Reports", "Reports"],
-      ["Shop", "Shop"],
-      ["AboutUs", "About/Contact Us"],
-      ["CustomerProfile", "Profile"],
-    ];
-  }
+    if (user === "customer") {
+      links = [
+        ["", "Home"],
+        ["Dashboard", "Dashboard"],
+        ["TrackingHistory", "Tracking History"],
+        ["Reports", "Reports"],
+        ["Shop", "Shop"],
+        ["AboutUs", "About"],
+        ["Contact", "Contact Us"], 
+        ["CustomerProfile", "Profile"],
+      ];
+    }
 
   if (user === "admin") {
     links = [
@@ -94,9 +100,10 @@ const App = () => {
         <Route path="/AddLocation" element={<AddLocation />} />
         <Route path="/EmployeeShop" element={<EmployeeShop />} />
         <Route path="/stops/:packageId" element={<Stops />} />
-      </Routes>
+        <Route path="/ContactUS" element={<Contact />} />
+        </Routes>
     </Router>
   );
 };
 
-export default App;
+  export default App;

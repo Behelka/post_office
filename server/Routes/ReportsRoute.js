@@ -1,37 +1,43 @@
-const db = require('../db'); // Import your db connection
+const db = require('../db');
 const url = require('url');
-
 
 const reportsRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
-    const path = parsedUrl.pathname;
+    const pathParts = parsedUrl.pathname.split('/');
 
-    if (req.method === 'GET' && parsedUrl.pathname.startsWith('/api/Reports/')){
-      const reportType = parsedUrl.pathname.split('/')[3];
-      const query = 'SELECT * FROM Employee WHERE Delete_Employee != 1';
-            /* if (reportType === 'employee-department') {
-              const query = 'SELECT * FROM Employee WHERE Delete_Employee != 1';
-          } else if (reportType === 'package-delivery') {
-              const query = 'SELECT * FROM Package WHERE Delete_Package != 1';
-          } else if (reportType === 'financial-transactions') {
-              const query = 'SELECT * FROM Package WHERE Delete_Package != 1';
-          } */
+    if (req.method === 'GET' && pathParts[2] === 'reports') {
+        const reportType = pathParts[3]; // Retrieves the specific report type after /api/Reports/
 
-          db.query(query)
-          .then(([results]) => {
-              res.writeHead(200, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify(results));
-          })
-          .catch(error => {
-              console.error('Error querying lpackages:', error);
-              res.writeHead(500, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify({ message: 'Internal Server Error' }));
-          });
-  } else {
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ message: 'Not Found' }));
-}
+        let query;
+        switch (reportType) {
+            case 'employee-department':
+                query = 'SELECT * FROM Employee WHERE Delete_Employee != 1';
+                break;
+            case 'package-delivery':
+                query = 'SELECT * FROM Package WHERE Delete_Package != 1';
+                break;
+            case 'financial-transactions':
+                query = 'SELECT * FROM Transactions';
+                break;
+            default:
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ message: 'Report type not found' }));
+        }
 
+        db.query(query)
+            .then(([results]) => {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(results));
+            })
+            .catch(error => {
+                console.error('Error querying packages:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Internal Server Error' }));
+            });
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Not Found' }));
+    }
 };
 
 module.exports = reportsRoute;
