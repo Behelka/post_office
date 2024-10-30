@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./AddLocation.css";
 
-const url = process.env.REACT_APP_SERVER_URL; // Environment variable for base URL
+import { SERVER_URL } from "../../App";
 
 const BasicTable = () => {
     const [data, setData] = useState([]);
@@ -22,7 +22,7 @@ const BasicTable = () => {
     // Fetch locations from the API
     const fetchLocations = async () => {
         try {
-            const response = await fetch(`${url}/api/location`);
+            const response = await fetch(`${SERVER_URL}/api/location`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
 
@@ -62,7 +62,7 @@ const BasicTable = () => {
         const newLocation = { ...locationFields };
 
         try {
-            const response = await fetch(`${url}/api/location`, {
+            const response = await fetch(`${SERVER_URL}/api/location`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newLocation),
@@ -110,7 +110,7 @@ const BasicTable = () => {
         const updatedLocation = { ...editFields };
 
         try {
-            const response = await fetch(`${url}/api/location/${data[editIndex].location_id}`, {
+            const response = await fetch(`${SERVER_URL}/api/location/${data[editIndex].location_id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedLocation),
@@ -137,7 +137,7 @@ const BasicTable = () => {
 
     const handleDelete = async (location_id) => {
         try {
-            const response = await fetch(`${url}/api/location/${location_id}`, {
+            const response = await fetch(`${SERVER_URL}/api/location/${location_id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./EmployeeProfile.css";
 
+import { SERVER_URL } from "../../App";
+
 const EmployeeProfile = () => {
     const [customerID, setCustomerID] = useState(''); 
     const [customerInfo, setCustomerInfo] = useState(null); 
@@ -14,7 +16,7 @@ const EmployeeProfile = () => {
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:3001/api/customer?customerId=${customerID}`);
+            const response = await fetch(`${SERVER_URL}/api/customer?customerId=${customerID}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch customer data');
             }
@@ -54,7 +56,7 @@ const EmployeeProfile = () => {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:3001/api/customer', {
+            const response = await fetch(`${SERVER_URL}/api/customer`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(customerInfo),

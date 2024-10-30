@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Modal from '../Modal/Modal';
 
-const url = process.env.REACT_APP_SERVER_URL;
+import { SERVER_URL } from "../../App";
 
 const Stops = () => {
     const { packageId } = useParams();
@@ -33,7 +33,7 @@ const Stops = () => {
             departure_date: item.Stop_Departure_Date ? formatDate(item.Stop_Departure_Date) : "Not Departed",
         });
         try {
-            const response = await fetch(`${url}/Stops/${packageId}`);
+            const response = await fetch(`${SERVER_URL}/Stops/${packageId}`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             const formattedData = result.map(formatStopItem);
@@ -45,7 +45,7 @@ const Stops = () => {
 
     const fetchLocations = useCallback(async () => {
         try {
-            const response = await fetch(`${url}/api/location`);
+            const response = await fetch(`${SERVER_URL}/api/location`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             const filteredLocations = result.filter(location =>
@@ -87,7 +87,7 @@ const Stops = () => {
         };
 
         try {
-            const response = await fetch(`${url}/Stops/${packageId}`, {
+            const response = await fetch(`${SERVER_URL}/Stops/${packageId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newStop),
@@ -116,7 +116,7 @@ const Stops = () => {
         };
 
         try {
-            const response = await fetch(`${url}/Stops/${editStopId}`, {
+            const response = await fetch(`${SERVER_URL}/Stops/${editStopId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedStop),
@@ -143,7 +143,7 @@ const Stops = () => {
         if (!stopToDelete) return;
 
         try {
-            const response = await fetch(`${url}/Stops/${stopToDelete}`, {
+            const response = await fetch(`${SERVER_URL}/Stops/${stopToDelete}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
             });

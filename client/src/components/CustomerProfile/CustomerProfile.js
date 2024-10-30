@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CustomerProfile.css";
 
+import { SERVER_URL } from "../../App";
+
 const CustomerProfile = () => {
   const navigate = useNavigate();
   const [customerInfo, setCustomerInfo] = useState(null);
@@ -24,7 +26,7 @@ const CustomerProfile = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:3001/api/customer?email=${email}`
+          `${SERVER_URL}/api/customer?email=${email}`
         );
         if (!response.ok) {
           if (response.status === 404) {
@@ -58,7 +60,7 @@ const CustomerProfile = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/customer", {
+      const response = await fetch(`${SERVER_URL}/api/customer`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(customerInfo),

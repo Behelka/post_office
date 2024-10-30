@@ -18,6 +18,8 @@ import EmployeeShop from "./components/Shop/EmployeeShop";
 import Stops from "./components/PackagePortal/Stops";
 import Contact from "./components/ContactUS/contact";
 
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
+export { SERVER_URL };
 
   const App = () => {
     let links = [

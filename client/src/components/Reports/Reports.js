@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './Reports.css';
 
+import { SERVER_URL } from "../../App";
+
 const Reports = () => {
     const [formData, setFormData] = useState({
         reportType: '',
@@ -20,7 +22,7 @@ const Reports = () => {
         e.preventDefault();
 
         const { reportType, startDate, endDate } = formData;
-        const url = new URL(`http://localhost:3001/api/reports/${reportType}`);
+        const url = new URL(`${SERVER_URL}/api/reports/${reportType}`);
 
         // Only append startDate and endDate if the report type is financial-transactions
         if (reportType === 'financial-transactions') {

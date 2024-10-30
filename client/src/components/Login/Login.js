@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 
+import { SERVER_URL } from "../../App";
+
 const Login = () => {
   const navigate = useNavigate();
 
@@ -32,7 +34,7 @@ const Login = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const response = await fetch("/api/login", {
+    const response = await fetch(`${SERVER_URL}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
