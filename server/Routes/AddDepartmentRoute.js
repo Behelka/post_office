@@ -8,7 +8,22 @@ const addDepartmentsRoute = (req, res) => {
     switch (req.method) {
         case 'GET':
             if (parsedUrl.pathname === '/departments') {
-                const query = `SELECT * FROM departments WHERE Delete_Department != 1;`;
+                const query = `
+                    SELECT d.*, 
+                           e.First_Name AS managerFirstName, 
+                           e.Last_Name AS managerLastName, 
+                           l.Location_Address_House_Number, 
+                           l.Location_Address_Street, 
+                           l.Location_Address_Suffix, 
+                           l.Location_Address_City, 
+                           l.Location_Address_State, 
+                           l.Location_Address_Zip_Code, 
+                           l.Location_Address_Country 
+                    FROM departments d 
+                    LEFT JOIN employee e ON d.Department_Manager_ID = e.Employee_ID
+                    LEFT JOIN location l ON d.Department_Location_ID = l.Location_ID
+                    WHERE d.Delete_Department != 1;
+                `;
                 db.query(query)
                     .then(([results]) => {
                         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -39,12 +54,25 @@ const addDepartmentsRoute = (req, res) => {
                     try {
                         const insertQuery = `
                             INSERT INTO departments 
-                            (Department_Name, Department_Manager, Department_Location, Delete_Department) 
+                            (Department_Name, Department_Manager_ID, Department_Location_ID, Delete_Department) 
                             VALUES (?, ?, ?, 0);
                         `;
                         await db.query(insertQuery, [departmentName, departmentManager, departmentLocation]);
 
-                        const [lastDepartmentQuery] = await db.query(`SELECT * FROM department WHERE Department_ID = LAST_INSERT_ID();`);
+                        const [lastDepartmentQuery] = await db.query(`SELECT d.*, 
+                           e.First_Name AS managerFirstName, 
+                           e.Last_Name AS managerLastName, 
+                           l.Location_Address_House_Number, 
+                           l.Location_Address_Street, 
+                           l.Location_Address_Suffix, 
+                           l.Location_Address_City, 
+                           l.Location_Address_State, 
+                           l.Location_Address_Zip_Code, 
+                           l.Location_Address_Country 
+                    FROM departments d 
+                    LEFT JOIN employee e ON d.Department_Manager_ID = e.Employee_ID
+                    LEFT JOIN location l ON d.Department_Location_ID = l.Location_ID
+                    WHERE d.Department_ID = LAST_INSERT_ID();`);
                         res.writeHead(201, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify(lastDepartmentQuery[0]));
                     } catch (error) {
@@ -61,7 +89,7 @@ const addDepartmentsRoute = (req, res) => {
 
         case 'PUT':
             if (parsedUrl.pathname.startsWith('/departments/')) {
-                const departmentId = parsedUrl.pathname.split('/')[2]; // Extract the department ID from the URL
+                const departmentId = parsedUrl.pathname.split('/')[2]; 
                 parseBody(req, async (body) => {
                     const { departmentName, departmentManager, departmentLocation } = body;
 
@@ -74,12 +102,26 @@ const addDepartmentsRoute = (req, res) => {
                     try {
                         const updateQuery = `
                             UPDATE departments 
-                            SET Department_Name = ?, Department_Manager = ?, Department_Location = ? 
+                            SET Department_Name = ?, Department_Manager_ID = ?, Department_Location_ID = ? 
                             WHERE Department_ID = ? AND Delete_Department != 1;
                         `;
                         await db.query(updateQuery, [departmentName, departmentManager, departmentLocation, departmentId]);
 
-                        const [updatedDepartmentQuery] = await db.query(`SELECT * FROM department WHERE Department_ID = ?;`, [departmentId]);
+                        const [updatedDepartmentQuery] = await db.query(`SELECT d.*, 
+                            e.First_Name AS managerFirstName, 
+                            e.Last_Name AS managerLastName, 
+                            l.Location_Address_House_Number, 
+                            l.Location_Address_Street, 
+                            l.Location_Address_Suffix, 
+                            l.Location_Address_City, 
+                            l.Location_Address_State, 
+                            l.Location_Address_Zip_Code, 
+                            l.Location_Address_Country 
+                            FROM departments d 
+                            LEFT JOIN employee e ON d.Department_Manager_ID = e.Employee_ID
+                            LEFT JOIN location l ON d.Department_Location_ID = l.Location_ID
+                            WHERE d.Department_ID = ?;`, [departmentId]);
+
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify(updatedDepartmentQuery[0]));
                     } catch (error) {
@@ -96,8 +138,8 @@ const addDepartmentsRoute = (req, res) => {
 
         case 'PATCH':
             if (parsedUrl.pathname.startsWith('/departments/')) {
-                const departmentId = parsedUrl.pathname.split('/')[2]; // Extract the department ID from the URL
-                const deleteQuery = `UPDATE department SET Delete_Department = 1 WHERE Department_ID = ?;`;
+                const departmentId = parsedUrl.pathname.split('/')[2];
+                const deleteQuery = `UPDATE departments SET Delete_Department = 1 WHERE Department_ID = ?;`;
                 db.query(deleteQuery, [departmentId])
                     .then(() => {
                         res.writeHead(204);
@@ -122,3 +164,5 @@ const addDepartmentsRoute = (req, res) => {
 };
 
 module.exports = addDepartmentsRoute;
+
+

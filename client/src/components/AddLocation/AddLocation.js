@@ -156,6 +156,12 @@ const BasicTable = () => {
         }
     };
 
+    const handleCancel = () => {
+        setEditMode(false);
+        setEditIndex(null);
+        setEditFields({ ...locationFields }); // Reset to initial fields
+    };
+
     const handleSearch = (e) => {
         setSearchQuery(e.target.value.toLowerCase());
     };
@@ -258,6 +264,9 @@ const BasicTable = () => {
                             />
                         ))}
                         <button type="submit">Update Location</button>
+                        <button type="button" onClick={handleCancel} style={{ marginLeft: '10px' }}>
+                            Cancel
+                        </button>
                     </form>
                 </div>
             )}
