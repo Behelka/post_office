@@ -17,6 +17,8 @@ import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
 import EmployeeShop from "./components/Shop/EmployeeShop";
 import Stops from "./components/PackagePortal/Stops";
 import Contact from "./components/ContactUS/contact";
+import CustomerSearch from "./components/CustomerSearch/CustomerSearch";
+
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
 export { SERVER_URL };
@@ -103,6 +105,7 @@ export { SERVER_URL };
         <Route path="/EmployeeShop" element={<EmployeeShop />} />
         <Route path="/stops/:packageId" element={<Stops />} />
         <Route path="/ContactUS" element={<Contact />} />
+        <Route path="/CustomerSearch" element={<CustomerSearch />} />
         </Routes>
     </Router>
   );
