@@ -11,11 +11,12 @@ const handleCustomerShopRoutes = require("./ShopRoute");
 const handleReportsRoute = require('./ReportsRoute');
 const handleShopRoute = require('./ShopRoute');
 const handleDepartmentRoute = require('./AddDepartmentRoute');
-
+const handleEmployeeRoutes = require("./EmployeeProfileRoute");
 
 const appRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const method = req.method;
+
 
     // Route handling
     if (parsedUrl.pathname.startsWith("/api/location")) {
@@ -42,10 +43,13 @@ const appRoute = (req, res) => {
         handleEmployeeShopRoutes(req, res);
     } else if (parsedUrl.pathname.startsWith("/api/shop")) {
         handleCustomerShopRoutes(req, res);
+    } else if (parsedUrl.pathname.startsWith("/api/employee")) {
+        handleEmployeeRoutes(req, res);
     } else {
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ message: "Not Found" }));
     }
+
 };
 
 module.exports = appRoute;
