@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Modal from '../Modal/Modal';
 import "./AddLocation.css";
 
 import { SERVER_URL } from "../../App";
@@ -18,6 +19,9 @@ const BasicTable = () => {
     const [editIndex, setEditIndex] = useState(null);
     const [editFields, setEditFields] = useState({ ...locationFields });
     const [searchQuery, setSearchQuery] = useState(""); // State for search query
+    const [locationToDelete, setLocationToDelete] = useState(null);
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
 
     // Fetch locations from the API
     const fetchLocations = async () => {
@@ -135,9 +139,15 @@ const BasicTable = () => {
         }
     };
 
-    const handleDelete = async (location_id) => {
+    const handleDelete = (location_id) => {
+        setLocationToDelete(location_id); // Set the stop to delete
+        setIsModalOpen(true); // Open the modal
+    };
+
+    const confirmDelete = async (location_id) => {
+        if (!locationToDelete) return;
         try {
-            const response = await fetch(`${SERVER_URL}/api/location/${location_id}`, {
+            const response = await fetch(`${SERVER_URL}/api/location/${locationToDelete}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -150,15 +160,24 @@ const BasicTable = () => {
                     location.location_id === location_id ? { ...location, Delete_Location: 1 } : location
                 )
             );
-            fetchLocations(); // Update website display
+            await fetchLocations(); // Update website display
+            setIsModalOpen(false);
+            setLocationToDelete(null);
         } catch (error) {
             console.error("Error deleting location:", error);
         }
     };
 
+    const handleCancel = () => {
+        setEditMode(false);
+        setEditIndex(null);
+        setEditFields({ ...locationFields }); // Reset to initial fields
+    };
+
     const handleSearch = (e) => {
         setSearchQuery(e.target.value.toLowerCase());
     };
+
 
     const filteredData = data.filter((item) =>
         item.address.toLowerCase().includes(searchQuery)
@@ -221,10 +240,7 @@ const BasicTable = () => {
                                 <td className="delete-column">
                                     <button
                                         className="button-red"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handleDelete(item.location_id);
-                                        }}
+                                        onClick={() => handleDelete(item.location_id)}
                                         style={{
                                             color: "red",
                                             textDecoration: "underline",
@@ -258,9 +274,17 @@ const BasicTable = () => {
                             />
                         ))}
                         <button type="submit">Update Location</button>
+                        <button type="button" onClick={handleCancel} style={{ marginLeft: '10px' }}>
+                            Cancel
+                        </button>
                     </form>
                 </div>
             )}
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)} 
+                onConfirm={confirmDelete} 
+            />
         </div>
     );
 };

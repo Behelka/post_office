@@ -12,6 +12,7 @@ const addStopRoute = (req, res) => {
                 const infoQuery = `
                     SELECT 
                         s.Stop_ID, 
+                        l.Location_ID,  -- Add this line to select the Location_ID
                         l.Location_Address_House_Number, 
                         l.Location_Address_Street, 
                         l.Location_Address_Suffix, 
@@ -85,43 +86,52 @@ const addStopRoute = (req, res) => {
             }
             break;
 
-        case 'PUT':
-            if (parsedUrl.pathname.startsWith('/Stops/')) {
-                const Stop_ID = parsedUrl.pathname.split('/')[2];
-                parseBody(req, (body) => {
-                    const {arrival_date, departure_date } = body;
-
-                    const formattedArrivalDate = new Date(arrival_date).toISOString().slice(0, 19).replace('T', ' ');
-                    const formattedDepartureDate = new Date(departure_date).toISOString().slice(0, 19).replace('T', ' ');
-
-                    if (!arrival_date) {
-                        res.writeHead(400, { 'Content-Type': 'application/json' });
-                        return res.end(JSON.stringify({ message: 'Arrival Date are required' }));
-                    }
-
-                    const updateQuery = `
-                        UPDATE stop 
-                        SET
-                            Stop_Arrival_Date = ?, 
-                            Stop_Departure_Date = ? 
-                        WHERE Stop_ID = ?`;
-
-                    db.query(updateQuery, [formattedArrivalDate, formattedDepartureDate || null, Stop_ID])
-                        .then(() => {
-                            res.writeHead(200, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ message: 'Stop updated successfully' }));
-                        })
-                        .catch(error => {
-                            console.error('Error updating stop:', error);
-                            res.writeHead(500, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ message: 'Internal Server Error' }));
-                        });
-                });
-            } else {
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ message: 'Not Found' }));
-            }
-            break;
+            case 'PUT':
+                if (parsedUrl.pathname.startsWith('/Stops/')) {
+                    const Stop_ID = parsedUrl.pathname.split('/')[2];
+                    parseBody(req, (body) => {
+                        const { arrival_date, departure_date, location } = body;
+            
+                        // Convert dates to CST (UTC -5) or replace with desired offset
+                        const formatToCST = (date) => {
+                            const localDate = new Date(date);
+                            localDate.setHours(localDate.getHours() - 5); // Adjusting by -5 hours
+                            return localDate.toISOString().slice(0, 19).replace('T', ' ');
+                        };
+            
+                        const formattedArrivalDate = formatToCST(arrival_date);
+                        const formattedDepartureDate = departure_date ? formatToCST(departure_date) : null;
+            
+                        // Validate input
+                        if (!arrival_date || !location) {
+                            res.writeHead(400, { 'Content-Type': 'application/json' });
+                            return res.end(JSON.stringify({ message: 'Arrival Date and Location are required' }));
+                        }
+            
+                        const updateQuery = 
+                            `UPDATE stop 
+                            SET
+                                Stop_Arrival_Date = ?, 
+                                Stop_Departure_Date = ?, 
+                                Stop_Location = ? 
+                            WHERE Stop_ID = ?;`;
+            
+                        db.query(updateQuery, [formattedArrivalDate, formattedDepartureDate, location, Stop_ID])
+                            .then(() => {
+                                res.writeHead(200, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ message: 'Stop updated successfully' }));
+                            })
+                            .catch(error => {
+                                console.error('Error updating stop:', error);
+                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ message: 'Internal Server Error' }));
+                            });
+                    });
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: 'Not Found' }));
+                }
+                break;
 
         case 'PATCH':
             if (parsedUrl.pathname.startsWith('/Stops/')) {
