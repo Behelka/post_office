@@ -16,6 +16,7 @@ const Stops = () => {
     const [editStopId, setEditStopId] = useState(null);
     const [editArrivalDate, setEditArrivalDate] = useState("");
     const [editDepartureDate, setEditDepartureDate] = useState("");
+    const [editLocationId, setEditLocationId] = useState("");
     const [stopToDelete, setStopToDelete] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -81,8 +82,8 @@ const Stops = () => {
 
         const newStop = {
             location: selectedLocation.Location_ID,
-            arrival_date: formatDate(arrivalDate),
-            departure_date: formatDate(departureDate),
+            arrival_date: formatToMySQLDate(arrivalDate), // Convert here
+            departure_date: formatToMySQLDate(departureDate), // Convert here
             Stop_Package_ID: packageId,
         };
 
@@ -103,27 +104,35 @@ const Stops = () => {
 
     const handleEditStop = (stop) => {
         setEditStopId(stop.stop_id);
-        setEditArrivalDate(stop.arrival_date);
-        setEditDepartureDate(stop.departure_date === "Not Departed" ? "" : stop.departure_date);
+        setEditArrivalDate(formatToLocalDate(stop.arrival_date));
+        setEditDepartureDate(stop.departure_date === "Not Departed" ? "" : formatToLocalDate(stop.departure_date));
+        setEditLocationId(stop.location_id); // Set the location ID for editing
     };
+
+    const formatToLocalDate = (dateString) => {
+        const date = new Date(dateString); // Assume dateString is in UTC
+        return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16); // Adjust for timezone offset
+    };
+
 
     const handleUpdateStop = async (e) => {
         e.preventDefault();
-
+    
         const updatedStop = {
-            arrival_date: formatDate(editArrivalDate),
-            departure_date: formatDate(editDepartureDate),
+            location: editLocationId, // Add location ID to the updated stop
+            arrival_date: formatToMySQLDate(editArrivalDate),
+            departure_date: formatToMySQLDate(editDepartureDate),
         };
-
+    
         try {
             const response = await fetch(`${url}/Stops/${editStopId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedStop),
             });
-
+    
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
+    
             await fetchStops();
             resetEditFields();
         } catch (error) {
@@ -131,8 +140,14 @@ const Stops = () => {
         }
     };
 
-
-
+    const formatToMySQLDate = (dateString) => {
+        if (!dateString) return null; // Handle empty dates
+        const localDate = new Date(dateString);
+        return new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' '); // Adjust to UTC
+    };
 
     const handleDelete = (stop_id) => {
         setStopToDelete(stop_id); // Set the stop to delete
@@ -174,13 +189,8 @@ const Stops = () => {
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-        const formattedDate = date.toLocaleDateString(undefined, options);
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const formattedTime = `${hours % 12 || 12}:${String(minutes).padStart(2, '0')} ${ampm}`;
-        return `${formattedDate} ${formattedTime}`;
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true };
+        return date.toLocaleString(undefined, options); // Use locale string for proper formatting
     };
 
     // Pagination logic
@@ -192,57 +202,8 @@ const Stops = () => {
     return (
         <div className="table-container">
             <h2>Stops for Package ID: {packageId}</h2>
-
-            <h3>Current Stops</h3>
-            {currentStops.length > 0 ? (
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Stop ID</th>
-                            <th>Location</th>
-                            <th>Arrival Date</th>
-                            <th>Departure Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentStops.map((stop) => (
-                            <tr key={stop.stop_id}>
-                                <td>{stop.stop_id}</td>
-                                <td>{stop.stop_location}</td>
-                                <td>{stop.arrival_date}</td>
-                                <td>{stop.departure_date}</td>
-                                <td>
-                                    <button onClick={() => handleEditStop(stop)}>Edit</button>
-                                    <button onClick={() => handleDelete(stop.stop_id)}>Delete</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                    <Modal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)} // Close modal
-                        onConfirm={confirmDelete} // Confirm deletion
-                    />
-                </table>
-            ) : (
-                <p>No stops available</p>
-            )}
-
-            {/* Pagination Controls */}
-            <div style={{ marginTop: '20px' }}>
-                {Array.from({ length: totalPages }, (_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setCurrentPage(index + 1)}
-                        style={{ margin: '0 5px', backgroundColor: currentPage === index + 1 ? '#007BFF' : 'transparent', color: currentPage === index + 1 ? 'white' : 'black' }}
-                    >
-                        {index + 1}
-                    </button>
-                ))}
-            </div>
-
-            {/* Adding Fields */}
+    
+            {/* Adding Fields Above the Table */}
             <div style={{ marginTop: '20px' }}>
                 <h3>Add New Stop</h3>
                 <form onSubmit={handleAddStop}>
@@ -265,6 +226,14 @@ const Stops = () => {
                                 setDepartureDate(depDate);
                             }
                         }}
+                    />
+
+                    {/* New textbox for selected location ID */}
+                    <input
+                        type="text"
+                        placeholder="Selected Location ID"
+                        value={selectedLocation ? selectedLocation.Location_ID : ""}
+                        readOnly // Make it read-only since it will be filled automatically
                     />
 
                     <input
@@ -290,7 +259,10 @@ const Stops = () => {
                                         ${location.Location_Address_City}, ${location.Location_Address_State} ${location.Location_Address_Zip_Code}, 
                                         ${location.Location_Address_Country}`}</td>
                                         <td>
-                                            <button type="button" onClick={() => setSelectedLocation(location)}>
+                                            <button type="button" onClick={() => {
+                                                setSelectedLocation(location);
+                                                setSearchTerm(""); // Clear the search term
+                                            }}>
                                                 Select
                                             </button>
                                         </td>
@@ -302,23 +274,75 @@ const Stops = () => {
                     <button type="submit">Add Stop</button>
                 </form>
             </div>
+    
+            <h3>Current Stops</h3>
+            {currentStops.length > 0 ? (
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stop ID</th>
+                            <th>Location</th>
+                            <th>Arrival Date</th>
+                            <th>Departure Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {currentStops.map((stop) => (
+                            <tr key={stop.stop_id}>
+                                <td>
+                                    <a 
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault(); 
+                                            handleEditStop(stop); 
+                                        }}
+                                    >
+                                        {stop.stop_id}
+                                    </a>
+                                </td>
+                                <td>{stop.stop_location}</td>
+                                <td>{stop.arrival_date}</td>
+                                <td>{stop.departure_date}</td>
+                                <td>
+                                    <button onClick={() => handleDelete(stop.stop_id)}>Delete</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ) : (
+                <p>No stops available</p>
+            )}
+            <Modal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)} 
+                        onConfirm={confirmDelete} 
+                    />
 
-            {/* Editing Fields */}
+            {/* Editing Fields Below the Table */}
             {editStopId && (
                 <div style={{ marginTop: '20px' }}>
-                    <h3>Edit Stop</h3>
+                    <h3>Edit Stop {editStopId}</h3>
                     <form onSubmit={handleUpdateStop}>
+                        <input
+                            type="text"
+                            placeholder="Location ID"
+                            value={editLocationId}
+                            onChange={(e) => setEditLocationId(e.target.value)} // Handle change for location ID
+                            required
+                        />
                         <input
                             type="datetime-local"
                             placeholder="Edit Arrival Date"
-                            value={stops.arrival_date}
+                            value={editArrivalDate}
                             onChange={(e) => setEditArrivalDate(e.target.value)}
                             required
                         />
                         <input
                             type="datetime-local"
                             placeholder="Edit Departure Date"
-                            value={stops.departure_date}
+                            value={editDepartureDate}
                             onChange={(e) => {
                                 const depDate = e.target.value;
                                 if (depDate && depDate < editArrivalDate) {
@@ -335,8 +359,7 @@ const Stops = () => {
                 </div>
             )}
         </div>
-    );
+    );    
 };
 
 export default Stops;
-

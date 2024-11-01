@@ -7,7 +7,7 @@ const Modal = ({ isOpen, onClose, onConfirm }) => {
     return (
         <div className="modal-overlay">
             <div className="modal-content">
-                <h3>Are you sure you want to delete this package?</h3>
+                <h3>Are you sure you want to delete this stop?</h3>
                 <button onClick={onConfirm}>Yes</button>
                 <button onClick={onClose}>No</button>
             </div>

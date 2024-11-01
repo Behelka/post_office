@@ -3,17 +3,17 @@ import Modal from '../Modal/Modal';
 import { useNavigate } from "react-router-dom";
 import "./PackagePortal.css";
 
-
 const url = process.env.REACT_APP_SERVER_URL;
-
 
 const BasicTable = () => {
     const navigate = useNavigate();
     const [data, setData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]); // State for filtered data
-    const [searchQuery, setSearchQuery] = useState(""); // State for search input
-    const [searchColumn, setSearchColumn] = useState("sender_name"); // Default search column
-    const [formValues, setFormValues] = useState({
+    const [filteredData, setFilteredData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchColumn, setSearchColumn] = useState("sender_name");
+    
+    // Separate states for add and edit forms
+    const [addFormValues, setAddFormValues] = useState({
         senderId: "",
         recipientId: "",
         houseNumber: "",
@@ -30,10 +30,12 @@ const BasicTable = () => {
         shippingMethod: "Ground",
         packageStatus: "Received",
     });
+    const [editFormValues, setEditFormValues] = useState({ ...addFormValues });
+    
     const [editMode, setEditMode] = useState(false);
     const [editIndex, setEditIndex] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
-    const [packageToDelete, setPackageToDelete] = useState(null); // Store package ID to delete
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [packageToDelete, setPackageToDelete] = useState(null);
 
     const formatPackageItem = (item) => ({
         package_id: item.Package_ID,
@@ -56,7 +58,7 @@ const BasicTable = () => {
         weight: item.Package_Weight,
         shipping_method: item.Package_Shipping_Method,
         shipping_cost: item.Package_Shipping_Cost
-        });
+    });
 
     const fetchPackage = useCallback(async () => {
         try {
@@ -65,7 +67,7 @@ const BasicTable = () => {
             const result = await response.json();
             const formattedData = result.map(formatPackageItem);
             setData(formattedData);
-            setFilteredData(formattedData); // Set filtered data initially
+            setFilteredData(formattedData);
         } catch (error) {
             console.error('Error fetching packages:', error);
         }
@@ -76,17 +78,16 @@ const BasicTable = () => {
     }, [fetchPackage]);
 
     useEffect(() => {
-        // Filter data whenever searchQuery or searchColumn changes
         const filtered = data.filter(pkg => {
-            const valueToSearch = pkg[searchColumn]?.toString().toLowerCase() || ''; // Get the value to search based on the selected column
+            const valueToSearch = pkg[searchColumn]?.toString().toLowerCase() || '';
             return valueToSearch.includes(searchQuery.toLowerCase());
         });
         setFilteredData(filtered);
-    }, [searchQuery, searchColumn, data]); // Re-run filtering on searchQuery, searchColumn, or data change
+    }, [searchQuery, searchColumn, data]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormValues((prev) => ({ ...prev, [name]: value }));
+        setAddFormValues((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSearchChange = (e) => {
@@ -95,17 +96,13 @@ const BasicTable = () => {
 
     const handleColumnChange = (e) => {
         setSearchColumn(e.target.value);
-        setSearchQuery(""); // Reset search query when changing column
-    };
-
-    const handleAddStop = (packageId) => {
-        navigate(`/stops/${packageId}`);
+        setSearchQuery("");
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newPackage = { ...formValues };
-
+        const newPackage = { ...addFormValues };
+    
         try {
             const response = await fetch(`${url}/api/PackagePortal`, {
                 method: 'POST',
@@ -113,11 +110,27 @@ const BasicTable = () => {
                 body: JSON.stringify(newPackage),
             });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            const result = await response.json();
-            setData((prev) => [...prev, formatPackageItem(result)]);
-            setFilteredData((prev) => [...prev, formatPackageItem(result)]); // Update filtered data
-            setFormValues({
-                senderId: "", recipientId: "", houseNumber: "", street: "", suffix: "", city: "", state: "", zipCode: "", country: "", length: "", width: "", height: "", weight: "", shippingMethod: "Ground", packageStatus: "Received"
+            
+            // Optionally fetch the updated list of packages
+            await fetchPackage(); // Fetch the updated data after adding a package
+    
+            // Clear the add form values
+            setAddFormValues({
+                senderId: "",
+                recipientId: "",
+                houseNumber: "",
+                street: "",
+                suffix: "",
+                city: "",
+                state: "",
+                zipCode: "",
+                country: "",
+                length: "",
+                width: "",
+                height: "",
+                weight: "",
+                shippingMethod: "Ground",
+                packageStatus: "Received",
             });
         } catch (error) {
             console.error('Error adding package:', error);
@@ -127,9 +140,9 @@ const BasicTable = () => {
     const handleEdit = (index) => {
         setEditMode(true);
         setEditIndex(index);
-        const pkg = filteredData[index]; // Use filtered data for editing
+        const pkg = filteredData[index];
 
-        setFormValues({
+        setEditFormValues({
             senderId: pkg.sender_id,
             recipientId: pkg.recipient_id,
             houseNumber: pkg.houseNumber || '',
@@ -146,11 +159,16 @@ const BasicTable = () => {
             weight: pkg.weight,
             shippingMethod: pkg.shipping_method,
         });
+
+        // Clear add form values when entering edit mode
+        setAddFormValues({ 
+            senderId: "", recipientId: "", houseNumber: "", street: "", suffix: "", city: "", state: "", zipCode: "", country: "", length: "", width: "", height: "", weight: "", shippingMethod: "Ground", packageStatus: "Received" 
+        });
     };
 
     const handleUpdate = async (e) => {
         e.preventDefault();
-        const updatedPackage = { ...formValues, package_id: filteredData[editIndex].package_id };
+        const updatedPackage = { ...editFormValues, package_id: filteredData[editIndex].package_id };
 
         try {
             const response = await fetch(`${url}/api/PackagePortal/${data[editIndex].package_id}`, {
@@ -169,28 +187,12 @@ const BasicTable = () => {
     const resetEditFields = () => {
         setEditMode(false);
         setEditIndex(null);
-        setFormValues({
-            senderId: "",
-            recipientId: "",
-            houseNumber: "",
-            street: "",
-            suffix: "",
-            city: "",
-            state: "",
-            zipCode: "",
-            country: "",
-            length: "",
-            width: "",
-            height: "",
-            weight: "",
-            shippingMethod: "Ground",
-            packageStatus: "Received",
-        });
-    }
+        setEditFormValues({ ...addFormValues }); // Resetting to initial add form values
+    };
 
     const handleDelete = (package_id) => {
-        setPackageToDelete(package_id); // Set the package to delete
-        setIsModalOpen(true); // Open the modal
+        setPackageToDelete(package_id);
+        setIsModalOpen(true);
     };
 
     const confirmDelete = async () => {
@@ -200,8 +202,8 @@ const BasicTable = () => {
             const response = await fetch(`${url}/api/PackagePortal/${packageToDelete}`, { method: 'PATCH' });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             await fetchPackage();
-            setIsModalOpen(false); // Close modal after deletion
-            setPackageToDelete(null); // Clear package to delete
+            setIsModalOpen(false);
+            setPackageToDelete(null);
         } catch (error) {
             console.error('Error deleting package:', error);
         }
@@ -209,33 +211,32 @@ const BasicTable = () => {
 
     return (
         <div className="table-container">
-            <h2>{editMode ? "Edit Package" : "Add Package"}</h2>
-            <form onSubmit={editMode ? handleUpdate : handleSubmit}>
-                <input type="text" name="senderId" placeholder="Sender ID" value={formValues.senderId} onChange={handleChange} required />
-                <input type="text" name="recipientId" placeholder="Recipient ID" value={formValues.recipientId} onChange={handleChange} required />
-                <input type="text" name="houseNumber" placeholder="House Number" value={formValues.houseNumber} onChange={handleChange} required />
-                <input type="text" name="street" placeholder="Street" value={formValues.street} onChange={handleChange} required />
-                <input type="text" name="suffix" placeholder="Suffix" value={formValues.suffix} onChange={handleChange} required />
-                <input type="text" name="city" placeholder="City" value={formValues.city} onChange={handleChange} required />
-                <input type="text" name="state" placeholder="State" value={formValues.state} onChange={handleChange} required />
-                <input type="text" name="zipCode" placeholder="Zip Code" value={formValues.zipCode} onChange={handleChange} required />
-                <input type="text" name="country" placeholder="Country" value={formValues.country} onChange={handleChange} required />
-                <input type="number" name="length" placeholder="Length" value={formValues.length} onChange={handleChange} required />
-                <input type="number" name="width" placeholder="Width" value={formValues.width} onChange={handleChange} required />
-                <input type="number" name="height" placeholder="Height" value={formValues.height} onChange={handleChange} required />
-                <input type="number" name="weight" placeholder="Weight" value={formValues.weight} onChange={handleChange} required />
-                <select name="shippingMethod" value={formValues.shippingMethod} onChange={handleChange}>
+            <h2>Add Package</h2>
+            <form onSubmit={handleSubmit}>
+                <input type="text" name="senderId" placeholder="Sender ID" value={addFormValues.senderId} onChange={handleChange} required />
+                <input type="text" name="recipientId" placeholder="Recipient ID" value={addFormValues.recipientId} onChange={handleChange} required />
+                <input type="text" name="houseNumber" placeholder="House Number" value={addFormValues.houseNumber} onChange={handleChange} required />
+                <input type="text" name="street" placeholder="Street" value={addFormValues.street} onChange={handleChange} required />
+                <input type="text" name="suffix" placeholder="Suffix" value={addFormValues.suffix} onChange={handleChange} required />
+                <input type="text" name="city" placeholder="City" value={addFormValues.city} onChange={handleChange} required />
+                <input type="text" name="state" placeholder="State" value={addFormValues.state} onChange={handleChange} required />
+                <input type="text" name="zipCode" placeholder="Zip Code" value={addFormValues.zipCode} onChange={handleChange} required />
+                <input type="text" name="country" placeholder="Country" value={addFormValues.country} onChange={handleChange} required />
+                <input type="number" name="length" placeholder="Length" value={addFormValues.length} onChange={handleChange} required />
+                <input type="number" name="width" placeholder="Width" value={addFormValues.width} onChange={handleChange} required />
+                <input type="number" name="height" placeholder="Height" value={addFormValues.height} onChange={handleChange} required />
+                <input type="number" name="weight" placeholder="Weight" value={addFormValues.weight} onChange={handleChange} required />
+                <select name="shippingMethod" value={addFormValues.shippingMethod} onChange={handleChange}>
                     <option value="Ground">Ground</option>
                     <option value="Air">Air</option>
                     <option value="Express">Express</option>
                 </select>
-                <select name="packageStatus" value={formValues.packageStatus} onChange={handleChange}>
+                <select name="packageStatus" value={addFormValues.packageStatus} onChange={handleChange}>
                     <option value="Received">Received</option>
                     <option value="In Transit">In Transit</option>
                     <option value="Delivered">Delivered</option>
                 </select>
-                <button type="submit">{editMode ? "Update Package" : "Add Package"}</button>
-                <button type="button" onClick={resetEditFields}>Cancel</button>
+                <button type="submit">Add Package</button>
             </form>
 
             <select value={searchColumn} onChange={handleColumnChange}>
@@ -250,8 +251,10 @@ const BasicTable = () => {
                 value={searchQuery} 
                 onChange={handleSearchChange} 
             />
+
+            <h2>Current Packages - Click On Package ID To Edit</h2>
             <div className="table-scroll">
-            <table>
+                <table>
                 <thead>
                     <tr>
                         <th>Package ID</th>
@@ -259,44 +262,81 @@ const BasicTable = () => {
                         <th>Recipient</th>
                         <th>Destination</th>
                         <th>Status</th>
-                        <th>Length</th>
-                        <th>Width</th>
-                        <th>Height</th>
-                        <th>Weight</th>
-                        <th>shipping_method</th>
-                        <th>shipping_cost</th>
-                        <th>Actions</th>
-
+                        <th>(L x W x H) In</th> {/* Updated header */}
+                        <th>Weight lbs</th>
+                        <th>Shipping Method</th>
+                        <th>Shipping Cost</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     {filteredData.map((pkg, index) => (
                         <tr key={pkg.package_id}>
-                            <td>{pkg.package_id}</td>
+                            <td>
+                                <button
+                                    onClick={() => handleEdit(index)}
+                                    style={{ color: 'blue', textDecoration: 'underline', background: 'none', border: 'none', padding: 0 }}
+                                >
+                                    {pkg.package_id}
+                                </button>
+                            </td>
                             <td>{pkg.sender_name}</td>
                             <td>{pkg.recipient_name}</td>
                             <td>{pkg.destination_address}</td>
                             <td>{pkg.package_status}</td>
-                            <td>{pkg.length}</td>
-                            <td>{pkg.width}</td>
-                            <td>{pkg.height}</td>
+                            <td>{`${pkg.length} x ${pkg.width} x ${pkg.height}`}</td> {/* Combined dimensions for display */}
                             <td>{pkg.weight}</td>
                             <td>{pkg.shipping_method}</td>
                             <td>{pkg.shipping_cost}</td>
                             <td>
-                                <button onClick={() => handleEdit(index)}>Edit</button>
-                                <button onClick={() => handleAddStop(pkg.package_id)} style={{ marginLeft: '10px' }}>Stops</button>
                                 <button onClick={() => handleDelete(pkg.package_id)}>Delete</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
+                </table>
             </div>
+
+            {editMode && (
+                <div>
+                    <h2>Edit Package {filteredData[editIndex].package_id}</h2>
+                    <form onSubmit={handleUpdate}>
+                        <input type="text" name="senderId" placeholder="Sender ID" value={editFormValues.senderId} onChange={(e) => setEditFormValues({ ...editFormValues, senderId: e.target.value })} required />
+                        <input type="text" name="recipientId" placeholder="Recipient ID" value={editFormValues.recipientId} onChange={(e) => setEditFormValues({ ...editFormValues, recipientId: e.target.value })} required />
+                        <input type="text" name="houseNumber" placeholder="House Number" value={editFormValues.houseNumber} onChange={(e) => setEditFormValues({ ...editFormValues, houseNumber: e.target.value })} required />
+                        <input type="text" name="street" placeholder="Street" value={editFormValues.street} onChange={(e) => setEditFormValues({ ...editFormValues, street: e.target.value })} required />
+                        <input type="text" name="suffix" placeholder="Suffix" value={editFormValues.suffix} onChange={(e) => setEditFormValues({ ...editFormValues, suffix: e.target.value })} required />
+                        <input type="text" name="city" placeholder="City" value={editFormValues.city} onChange={(e) => setEditFormValues({ ...editFormValues, city: e.target.value })} required />
+                        <input type="text" name="state" placeholder="State" value={editFormValues.state} onChange={(e) => setEditFormValues({ ...editFormValues, state: e.target.value })} required />
+                        <input type="text" name="zipCode" placeholder="Zip Code" value={editFormValues.zipCode} onChange={(e) => setEditFormValues({ ...editFormValues, zipCode: e.target.value })} required />
+                        <input type="text" name="country" placeholder="Country" value={editFormValues.country} onChange={(e) => setEditFormValues({ ...editFormValues, country: e.target.value })} required />
+                        <input type="number" name="length" placeholder="Length" value={editFormValues.length} onChange={(e) => setEditFormValues({ ...editFormValues, length: e.target.value })} required />
+                        <input type="number" name="width" placeholder="Width" value={editFormValues.width} onChange={(e) => setEditFormValues({ ...editFormValues, width: e.target.value })} required />
+                        <input type="number" name="height" placeholder="Height" value={editFormValues.height} onChange={(e) => setEditFormValues({ ...editFormValues, height: e.target.value })} required />
+                        <input type="number" name="weight" placeholder="Weight" value={editFormValues.weight} onChange={(e) => setEditFormValues({ ...editFormValues, weight: e.target.value })} required />
+                        <select name="shippingMethod" value={editFormValues.shippingMethod} onChange={(e) => setEditFormValues({ ...editFormValues, shippingMethod: e.target.value })}>
+                            <option value="Ground">Ground</option>
+                            <option value="Air">Air</option>
+                            <option value="Express">Express</option>
+                        </select>
+                        <select name="packageStatus" value={editFormValues.packageStatus} onChange={(e) => setEditFormValues({ ...editFormValues, packageStatus: e.target.value })}>
+                            <option value="Received">Received</option>
+                            <option value="In Transit">In Transit</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
+                        <button type="submit">Update Package</button>
+                        <button type="button" onClick={resetEditFields}>Cancel</button>
+                        <button type="button" onClick={() => navigate(`/stops/${filteredData[editIndex].package_id}`)}>
+                            View Stops
+                        </button>
+                    </form>
+                </div>
+            )}
+
             <Modal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)} // Close modal
-                onConfirm={confirmDelete} // Confirm deletion
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={confirmDelete}
             />
         </div>
     );
