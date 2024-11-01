@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import "./Shop.css";
 
+import { SERVER_URL } from "../../App";
+
 const ProductList = ({ products, addToCart }) => {
   return (
     <div className="product-list">
@@ -42,7 +44,7 @@ const Checkout = ({ cart, clearCart }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/shop', {
+      const response = await fetch(`${SERVER_URL}/api/shop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cart)
@@ -73,7 +75,7 @@ function Shop() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/shop');
+        const response = await fetch(`${SERVER_URL}/api/shop`);
         const data = await response.json();
         setProducts(data);
       } catch (error) {

@@ -3,9 +3,7 @@ import Modal from '../Modal/Modal';
 import { useNavigate } from "react-router-dom";
 import "./PackagePortal.css";
 
-
-const url = process.env.REACT_APP_SERVER_URL;
-
+import { SERVER_URL } from "../../App";
 
 const BasicTable = () => {
     const navigate = useNavigate();
@@ -60,7 +58,7 @@ const BasicTable = () => {
 
     const fetchPackage = useCallback(async () => {
         try {
-            const response = await fetch(`${url}/api/PackagePortal`);
+            const response = await fetch(`${SERVER_URL}/api/PackagePortal`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             const formattedData = result.map(formatPackageItem);
@@ -107,7 +105,7 @@ const BasicTable = () => {
         const newPackage = { ...formValues };
 
         try {
-            const response = await fetch(`${url}/api/PackagePortal`, {
+            const response = await fetch(`${SERVER_URL}/api/PackagePortal`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newPackage),
@@ -153,7 +151,7 @@ const BasicTable = () => {
         const updatedPackage = { ...formValues, package_id: filteredData[editIndex].package_id };
 
         try {
-            const response = await fetch(`${url}/api/PackagePortal/${data[editIndex].package_id}`, {
+            const response = await fetch(`${SERVER_URL}/api/PackagePortal/${data[editIndex].package_id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedPackage),
@@ -197,7 +195,7 @@ const BasicTable = () => {
         if (!packageToDelete) return;
 
         try {
-            const response = await fetch(`${url}/api/PackagePortal/${packageToDelete}`, { method: 'PATCH' });
+            const response = await fetch(`${SERVER_URL}/api/PackagePortal/${packageToDelete}`, { method: 'PATCH' });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             await fetchPackage();
             setIsModalOpen(false); // Close modal after deletion

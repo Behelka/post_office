@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./TrackingHistory.css";
 import { useLocation } from "react-router-dom";
 
+import { SERVER_URL } from "../../App";
+
 const TrackingPage = () => {
     const [trackingID, setTrackingID] = useState('');
     const [searchedTrackingID, setSearchedTrackingID] = useState('');
@@ -36,7 +38,7 @@ const TrackingPage = () => {
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:3001/api/tracking?trackingId=${id}`);
+            const response = await fetch(`${SERVER_URL}/api/tracking?trackingId=${id}`);
             if (!response.ok) {
                 throw new Error('No data found for this Tracking ID');
             }

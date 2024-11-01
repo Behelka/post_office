@@ -1,6 +1,9 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./EmployeeProfile.css";
+
+import { SERVER_URL } from "../../App";
 
 const EmployeeProfile = () => {
   const navigate = useNavigate();
@@ -24,7 +27,7 @@ const EmployeeProfile = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:3001/api/employee?email=${email}`
+          `${SERVER_URL}/api/employee?email=${email}`
         );
         if (!response.ok) {
           if (response.status === 404) {
@@ -63,7 +66,7 @@ const EmployeeProfile = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/employee", {
+      const response = await fetch(`${SERVER_URL}/api/employee`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(employeeInfo),

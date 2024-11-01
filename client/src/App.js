@@ -20,6 +20,8 @@ import Contact from "./components/ContactUS/contact";
 import CustomerSearch from "./components/CustomerSearch/CustomerSearch";
 
 
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
+export { SERVER_URL };
 
   const App = () => {
     let links = [

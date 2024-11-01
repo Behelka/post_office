@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./AddDepartment.css";
 
+import { SERVER_URL } from "../../App";
+
 const  AddDepartment = () => {
     const [data, setData] = useState([]);
     const [departmentFields, setDepartmentFields] = useState({
@@ -16,7 +18,7 @@ const  AddDepartment = () => {
     // Fetch departments from the API
     const fetchDepartments = async () => {
         try {
-            const response = await fetch('http://localhost:3001/departments');
+            const response = await fetch(`${SERVER_URL}/departments`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             
@@ -54,7 +56,7 @@ const  AddDepartment = () => {
         const newDepartment = { ...departmentFields };
 
         try {
-            const response = await fetch('http://localhost:3001/departments', {
+            const response = await fetch(`${SERVER_URL}/departments`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newDepartment),
@@ -86,7 +88,7 @@ const  AddDepartment = () => {
         const updatedDepartment = { ...editFields };
 
         try {
-            const response = await fetch(`http://localhost:3001/departments/${data[editIndex].department_id}`, {
+            const response = await fetch(`${SERVER_URL}/departments/${data[editIndex].department_id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedDepartment),
@@ -107,7 +109,7 @@ const  AddDepartment = () => {
 
     const handleDelete = async (department_id) => {
         try {
-            const response = await fetch(`http://localhost:3001/departments/${department_id}`, {
+            const response = await fetch(`${SERVER_URL}/departments/${department_id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

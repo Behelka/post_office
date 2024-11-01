@@ -3,7 +3,7 @@ const appRoute = require('./Routes/appRoute'); // Adjust path as necessary
 
 const server = http.createServer((req, res) => {
     // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); // Allow your front-end domain
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow your front-end domain
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS'); // Allowed methods
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Pragma, Cache-Control'); // Allowed headers
 

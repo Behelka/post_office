@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./ManagerPortal.css";
 
+import { SERVER_URL } from "../../App";
+
 const ManagerPortal = () => {
     const [employees, setEmployees] = useState([]);
     const [locations, setLocations] = useState({}); // To store location data
@@ -49,7 +51,7 @@ const ManagerPortal = () => {
 
     const fetchEmployees = async () => {
         /*try {
-            const response = await fetch('http://localhost:3001/api/employees');
+            const response = await fetch(`${SERVER_URL}/api/employees`);
             if (!response.ok) throw new Error(HTTP error! Status: ${response.status});
             const result = await response.json();
             setEmployees(result);
@@ -63,7 +65,7 @@ const ManagerPortal = () => {
 
     const fetchLocation = async (locationId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/location/${locationId}`);
+            const response = await fetch(`${SERVER_URL}/api/location/${locationId}`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return await response.json();
         } catch (error) {
@@ -102,7 +104,7 @@ const ManagerPortal = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:3001/api/employees', {
+            const response = await fetch(`${SERVER_URL}/api/employees`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
@@ -141,7 +143,7 @@ const ManagerPortal = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:3001/api/employees/${editData.id}`, {
+            const response = await fetch(`${SERVER_URL}/api/employees/${editData.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editData),
@@ -162,7 +164,7 @@ const ManagerPortal = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/employees/${id}`, {
+            const response = await fetch(`${SERVER_URL}/api/employees/${id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
             });
