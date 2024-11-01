@@ -12,6 +12,7 @@ const addStopRoute = (req, res) => {
                 const infoQuery = `
                     SELECT 
                         s.Stop_ID, 
+                        l.Location_ID,  -- Add this line to select the Location_ID
                         l.Location_Address_House_Number, 
                         l.Location_Address_Street, 
                         l.Location_Address_Suffix, 

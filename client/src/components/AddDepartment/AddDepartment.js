@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Modal from '../Modal/Modal';
 import "./AddDepartment.css";
 
 const AddDepartment = () => {
@@ -14,6 +15,9 @@ const AddDepartment = () => {
     const [editMode, setEditMode] = useState(false);
     const [editIndex, setEditIndex] = useState(null);
     const [editFields, setEditFields] = useState({ ...departmentFields });
+    const [departmentToDelete, setDepartmentToDelete] = useState(null);
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
 
     // Fetch departments, managers, and locations from the API
     const fetchDepartments = async () => {
@@ -121,9 +125,15 @@ const AddDepartment = () => {
         }
     };
 
-    const handleDelete = async (department_id) => {
+    const handleDelete = (department_id) => {
+        setDepartmentToDelete(department_id); // Set the stop to delete
+        setIsModalOpen(true); // Open the modal
+    };
+
+    const confirmDelete = async (department_id) => {
+        if (!departmentToDelete) return;
         try {
-            const response = await fetch(`http://localhost:3001/departments/${department_id}`, {
+            const response = await fetch(`http://localhost:3001/departments/${departmentToDelete}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -134,6 +144,10 @@ const AddDepartment = () => {
             setData((prev) =>
                 prev.filter(department => department.Department_ID !== department_id)
             );
+
+            await fetchDepartments(); // Update website display
+            setIsModalOpen(false);
+            setDepartmentToDelete(null);
         } catch (error) {
             console.error('Error deleting department:', error);
         }
@@ -202,10 +216,7 @@ const AddDepartment = () => {
                                     <td>{`${item.Location_Address_House_Number} ${item.Location_Address_Street}, ${item.Location_Address_City}, ${item.Location_Address_State} ${item.Location_Address_Zip_Code}, ${item.Location_Address_Country}`}</td>
                                     <td className="delete-column">
                                         <button className="button-red"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                handleDelete(item.Department_ID);
-                                            }}
+                                            onClick={() => handleDelete(item.Department_ID)}
                                             style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}
                                         >
                                             Delete
@@ -253,6 +264,11 @@ const AddDepartment = () => {
                     </form>
                 </div>
             )}
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)} 
+                onConfirm={confirmDelete} 
+            />
         </div>
     );
 };

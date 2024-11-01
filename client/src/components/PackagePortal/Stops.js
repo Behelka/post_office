@@ -32,6 +32,7 @@ const Stops = () => {
                             ${item.Location_Address_State} ${item.Location_Address_Zip_Code}, ${item.Location_Address_Country}`,
             arrival_date: formatDate(item.Stop_Arrival_Date),
             departure_date: item.Stop_Departure_Date ? formatDate(item.Stop_Departure_Date) : "Not Departed",
+            location_id: item.Location_ID  // Ensure this is included
         });
         try {
             const response = await fetch(`${url}/Stops/${packageId}`);
@@ -106,7 +107,7 @@ const Stops = () => {
         setEditStopId(stop.stop_id);
         setEditArrivalDate(formatToLocalDate(stop.arrival_date));
         setEditDepartureDate(stop.departure_date === "Not Departed" ? "" : formatToLocalDate(stop.departure_date));
-        setEditLocationId(stop.location_id); // Set the location ID for editing
+        setEditLocationId(stop.location_id || ""); // Set the location ID for editing
     };
 
     const formatToLocalDate = (dateString) => {
@@ -329,7 +330,7 @@ const Stops = () => {
                             type="text"
                             placeholder="Location ID"
                             value={editLocationId}
-                            onChange={(e) => setEditLocationId(e.target.value)} // Handle change for location ID
+                            readOnly // Make it read-only since it will be filled automatically
                             required
                         />
                         <input
