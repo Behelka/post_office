@@ -10,42 +10,44 @@ const CustomerProfile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [newAvatar, setNewAvatar] = useState(null);
+  const [previewAvatar, setPreviewAvatar] = useState(null); 
 
   // Fetch customer data based on the email from localStorage
+const fetchCustomerData = async () => {
+  const email = localStorage.getItem("Customer_Email_Address");
+  if (!email) {
+    alert("Account not found, Please log in again.");
+    window.location.replace("/login");
+    return;
+  }
+
+  setLoading(true);
+  setError(null);
+
+  try {
+    const response = await fetch(
+      `${SERVER_URL}/api/customer?email=${email}`
+    );
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Customer not found.");
+      }
+      throw new Error(
+        "Failed to fetch customer data. Please try again later."
+      );
+    }
+    const data = await response.json();
+    setCustomerInfo(data);
+  } catch (err) {
+    setError(err.message);
+    setCustomerInfo(null);
+  } finally {
+    setLoading(false);
+  }
+};
+
   useEffect(() => {
-    const fetchCustomerData = async () => {
-      const email = localStorage.getItem("Customer_Email_Address");
-      if (!email) {
-        alert("Account not found, Please log in again.");
-        window.location.replace("/login");
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch(
-          `${SERVER_URL}/api/customer?email=${email}`
-        );
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error("Customer not found.");
-          }
-          throw new Error(
-            "Failed to fetch customer data. Please try again later."
-          );
-        }
-        const data = await response.json();
-        setCustomerInfo(data);
-      } catch (err) {
-        setError(err.message);
-        setCustomerInfo(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCustomerData();
   }, []);
 
@@ -55,26 +57,40 @@ const CustomerProfile = () => {
     navigate("/login");
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setNewAvatar(file);
+    setPreviewAvatar(URL.createObjectURL(file));
+  };
+
+
   const handleSave = async () => {
     setLoading(true);
     setError(null);
-
+  
     try {
+      const updatedData = {
+        ...customerInfo,
+        AvatarName: newAvatar ? newAvatar.name : null,
+      };
+  
       const response = await fetch(`${SERVER_URL}/api/customer`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(customerInfo),
+        body: JSON.stringify(updatedData),
       });
-
+  
       if (!response.ok) {
-        throw new Error(
-          "Failed to update customer data. Please try again later."
-        );
+        throw new Error("Failed to update customer data. Please try again later.");
       }
-
+  
       const result = await response.json();
       alert(result.message);
+      fetchCustomerData();
       setEditMode(false);
+
+
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -90,15 +106,21 @@ const CustomerProfile = () => {
   if (loading) return <p>Loading customer data...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
+
   return (
     <div className="Information">
       <h1>&nbsp;</h1>
-
       <h1 className="h">Information</h1>
       {customerInfo && (
         <div className="customer-info">
           {!editMode ? (
             <div>
+              <img
+                src={`/${customerInfo.Avatar_URL}`}
+                alt="User Avatar"
+                className="Avatar"
+              />
+
               <p className="Information">
                 <strong>Name:</strong>{" "}
                 {`${customerInfo.Customer_First_Name} ${
@@ -135,6 +157,17 @@ const CustomerProfile = () => {
           ) : (
             <form class="form-container">
               <table class="form-table">
+                <tr>
+                  <td className="label">Avatar:</td>
+                  <td>
+                    <img
+                      src={previewAvatar || `/${customerInfo.Avatar_URL}`}
+                      alt="User Avatar"
+                      className="Avatar"
+                    />
+                    <input type="file" onChange={handleFileChange} accept="image/*" />
+                  </td>
+                </tr>
                 <tr>
                   <td class="label">Customer Name:</td>
                   <td>

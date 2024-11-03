@@ -185,7 +185,7 @@ const EmployeeProfile = () => {
                     />
                   </td>
                 </tr>
-
+{/* 
                 <tr>
                   <td className="label">Date of Birth:</td>
                   <td colspan="5">
@@ -198,7 +198,7 @@ const EmployeeProfile = () => {
                     />
                   </td>
                 </tr>
-
+*/}
                 <tr>
                   <td colspan="6" className="button-container">
                     <button

@@ -75,6 +75,7 @@ const CustomerProfileRoute = (req, res) => {
     parseBody(req, async (body) => {
       const {
         Customer_ID,
+        AvatarName,
         Customer_First_Name,
         Customer_Middle_Name,
         Customer_Last_Name,
@@ -88,21 +89,27 @@ const CustomerProfileRoute = (req, res) => {
         Customer_Address_Zip_Code,
         Customer_Address_Country,
         Customer_Balance,
+        
+        
       } = body;
 
       const updateQuery = `
             UPDATE customer SET 
+                Avatar_URL = COALESCE(?, Avatar_URL),
                 Customer_First_Name = ?, Customer_Middle_Name = ?, Customer_Last_Name = ?,
                 Customer_Phone_Number = ?, Customer_Email_Address = ?, 
                 Customer_Address_House_Number = ?, Customer_Address_Street = ?, 
                 Customer_Address_Suffix = ?, Customer_Address_City = ?, 
                 Customer_Address_State = ?, Customer_Address_Zip_Code = ?, 
                 Customer_Address_Country = ?, Customer_Balance = ?
+                
             WHERE Customer_ID = ?;
         `;
+      const avatarPath = AvatarName ? `assets/${AvatarName}` : null;
 
       try {
         await db.query(updateQuery, [
+          avatarPath,
           Customer_First_Name,
           Customer_Middle_Name,
           Customer_Last_Name,
@@ -117,6 +124,7 @@ const CustomerProfileRoute = (req, res) => {
           Customer_Address_Country,
           Customer_Balance,
           Customer_ID,
+
         ]);
 
         res.writeHead(200, { "Content-Type": "application/json" });
