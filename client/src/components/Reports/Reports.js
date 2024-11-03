@@ -6,6 +6,7 @@ const Reports = () => {
         reportType: '',
         startDate: '',
         endDate: '',
+        departmentName : '',
     });
     const [data, setData] = useState([]);
     const handleChange = (e) => {
@@ -19,11 +20,14 @@ const Reports = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { reportType, startDate, endDate } = formData;
+        const { reportType, startDate, endDate, departmentName } = formData;
         const url = new URL(`http://localhost:3001/api/reports/${reportType}`);
 
         // Only append startDate and endDate if the report type is financial-transactions
-        if (reportType === 'financial-transactions') {
+        if (reportType === 'employee-department') {
+            if (departmentName) url.searchParams.append("departmentName", departmentName);
+        }
+        else if (reportType === 'financial-transactions') {
             if (startDate) url.searchParams.append("startDate", startDate);
             if (endDate) url.searchParams.append("endDate", endDate);
         } 
@@ -50,8 +54,8 @@ const Reports = () => {
             return result.map((item) => ({
                 id: item.Employee_ID,
                 name: `${item.First_Name} ${item.Middle_Name || ''} ${item.Last_Name}`,
-                department: item.Employee_Department_ID,
-                department_name: item.Department_Name,
+                 department: item.Employee_Department_ID,
+                department_name: item.Department_Name, 
             }));
         } else if (reportType === 'package-delivery') {
             return result.map((item) => ({
@@ -163,6 +167,26 @@ const Reports = () => {
                             <option value="financial-transactions">Financial Transactions Report</option>
                         </select>
                     </div>
+                    {/* Department selection for employee-department reports */}
+                    {formData.reportType === 'employee-department' && (
+                        <div className="form-group">
+                            <label htmlFor="departmentName">Department</label>
+                            <select
+                                name="departmentName"
+                                id="departmentName"
+                                value={formData.departmentName} 
+                                onChange={handleChange} 
+                            >
+                                <option value="">-- Select Department --</option>
+                                <option value="Distribution">Distribution</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Human Resources">Human Resources</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Legal">Legal</option>
+                                <option value="Transportation">Transportation</option>
+                            </select>
+                        </div>
+                    )}
                     {/* date filtering for financial transaction reports */}
                     {formData.reportType === 'financial-transactions' && (
                         <>

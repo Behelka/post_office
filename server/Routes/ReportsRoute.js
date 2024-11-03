@@ -4,7 +4,7 @@ const url = require('url');
 const reportsRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const pathParts = parsedUrl.pathname.split('/');
-    const { startDate, endDate, departmentId } = parsedUrl.query;
+    const { startDate, endDate, departmentName } = parsedUrl.query;
 
     if (req.method === 'GET' && pathParts[2] === 'reports') {
         const reportType = pathParts[3]; // Retrieves the specific report type after /api/reports/
@@ -14,15 +14,20 @@ const reportsRoute = (req, res) => {
 
         switch (reportType) {
             case 'employee-department':
-                query = 'SELECT employee.*, departments.Department_Name FROM employee JOIN departments ON employee.Employee_Department_ID = departments.Department_ID WHERE employee.Delete_Employee != 1';
-                if (departmentId) {
-                    query += ' AND departments.Department_ID = ?';
-                    queryParams.push(departmentId);
-                }
+                query = `SELECT employee.*, departments.Department_Name 
+                        FROM employee JOIN departments ON employee.Employee_Department_ID = departments.Department_ID 
+                        WHERE employee.Delete_Employee != 1`;
+                 if (departmentName) {
+                    query += ' AND departments.Department_Name = ?';
+                    queryParams.push(departmentName);
+                } 
                 break;
 
             case 'package-delivery':
-                query = 'SELECT * FROM Package WHERE Delete_Package != 1';
+                query = 'SELECT * FROM Package'
+                /* `SELECT p.*, s.*, l.* 
+                        FROM Package AS p, Stop AS s, Location AS l 
+                        WHERE p.Package_ID = s.Stop_Package_ID AND s.Stop_Location = l.Location_ID AND p.Delete_Package != 1` */;
                 break;
 
             case 'financial-transactions':
