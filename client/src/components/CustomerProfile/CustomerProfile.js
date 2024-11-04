@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CustomerProfile.css";
-
 import { SERVER_URL } from "../../App";
 
 const CustomerProfile = () => {
@@ -11,41 +10,36 @@ const CustomerProfile = () => {
   const [error, setError] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [newAvatar, setNewAvatar] = useState(null);
-  const [previewAvatar, setPreviewAvatar] = useState(null); 
+  const [previewAvatar, setPreviewAvatar] = useState(null);
 
-  // Fetch customer data based on the email from localStorage
-const fetchCustomerData = async () => {
-  const email = localStorage.getItem("Customer_Email_Address");
-  if (!email) {
-    alert("Account not found, Please log in again.");
-    window.location.replace("/login");
-    return;
-  }
-
-  setLoading(true);
-  setError(null);
-
-  try {
-    const response = await fetch(
-      `${SERVER_URL}/api/customer?email=${email}`
-    );
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("Customer not found.");
-      }
-      throw new Error(
-        "Failed to fetch customer data. Please try again later."
-      );
+  const fetchCustomerData = async () => {
+    const email = localStorage.getItem("Customer_Email_Address");
+    if (!email) {
+      alert("Account not found, Please log in again.");
+      window.location.replace("/login");
+      return;
     }
-    const data = await response.json();
-    setCustomerInfo(data);
-  } catch (err) {
-    setError(err.message);
-    setCustomerInfo(null);
-  } finally {
-    setLoading(false);
-  }
-};
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${SERVER_URL}/api/customer?email=${email}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error("Customer not found.");
+        }
+        throw new Error("Failed to fetch customer data. Please try again later.");
+      }
+      const data = await response.json();
+      setCustomerInfo(data);
+    } catch (err) {
+      setError(err.message);
+      setCustomerInfo(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchCustomerData();
@@ -63,34 +57,57 @@ const fetchCustomerData = async () => {
     setPreviewAvatar(URL.createObjectURL(file));
   };
 
+  const uploadAvatar = async () => {
+    if (!newAvatar) return null;
+
+    const formData = new FormData();
+    formData.append("avatar", newAvatar);
+
+    try {
+      const response = await fetch(`${SERVER_URL}/api/customer/avatar`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload avatar.");
+      }
+
+      const result = await response.json();
+      alert(result.message);
+      return result.filePath;
+    } catch (err) {
+      console.error("Error uploading avatar:", err);
+      setError("Failed to upload avatar.");
+      return null;
+    }
+  };
 
   const handleSave = async () => {
     setLoading(true);
     setError(null);
-  
+
     try {
+      const avatarPath = await uploadAvatar();
       const updatedData = {
         ...customerInfo,
-        AvatarName: newAvatar ? newAvatar.name : null,
+        AvatarName: avatarPath ? avatarPath.split("/").pop() : customerInfo.Avatar_URL,
       };
-  
+
       const response = await fetch(`${SERVER_URL}/api/customer`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to update customer data. Please try again later.");
       }
-  
+
       const result = await response.json();
       alert(result.message);
       fetchCustomerData();
       setEditMode(false);
-
-
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -106,7 +123,6 @@ const fetchCustomerData = async () => {
   if (loading) return <p>Loading customer data...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
-
   return (
     <div className="Information">
       <h1>&nbsp;</h1>
@@ -120,7 +136,6 @@ const fetchCustomerData = async () => {
                 alt="User Avatar"
                 className="Avatar"
               />
-
               <p className="Information">
                 <strong>Name:</strong>{" "}
                 {`${customerInfo.Customer_First_Name} ${
@@ -155,8 +170,8 @@ const fetchCustomerData = async () => {
               </button>
             </div>
           ) : (
-            <form class="form-container">
-              <table class="form-table">
+            <form className="form-container">
+              <table className="form-table">
                 <tr>
                   <td className="label">Avatar:</td>
                   <td>
@@ -169,7 +184,7 @@ const fetchCustomerData = async () => {
                   </td>
                 </tr>
                 <tr>
-                  <td class="label">Customer Name:</td>
+                  <td className="label">Customer Name:</td>
                   <td>
                     <input
                       type="text"
@@ -198,9 +213,8 @@ const fetchCustomerData = async () => {
                     />
                   </td>
                 </tr>
-
                 <tr>
-                  <td class="label">Phone Number:</td>
+                  <td className="label">Phone Number:</td>
                   <td colspan="3">
                     <input
                       type="text"
@@ -211,9 +225,8 @@ const fetchCustomerData = async () => {
                     />
                   </td>
                 </tr>
-
                 <tr>
-                  <td class="label">Email:</td>
+                  <td className="label">Email:</td>
                   <td colspan="3">
                     <input
                       type="email"
@@ -224,9 +237,8 @@ const fetchCustomerData = async () => {
                     />
                   </td>
                 </tr>
-
                 <tr>
-                  <td class="label">Address:</td>
+                  <td className="label">Address:</td>
                   <td>
                     <input
                       type="text"
@@ -255,9 +267,8 @@ const fetchCustomerData = async () => {
                     />
                   </td>
                 </tr>
-
                 <tr>
-                  <td class="label">City:</td>
+                  <td className="label">City:</td>
                   <td colspan="3">
                     <input
                       type="text"
@@ -268,9 +279,8 @@ const fetchCustomerData = async () => {
                     />
                   </td>
                 </tr>
-
                 <tr>
-                  <td class="label">State:</td>
+                  <td className="label">State:</td>
                   <td colspan="3">
                     <input
                       type="text"
@@ -281,9 +291,8 @@ const fetchCustomerData = async () => {
                     />
                   </td>
                 </tr>
-
                 <tr>
-                  <td class="label">Zip Code:</td>
+                  <td className="label">Zip Code:</td>
                   <td colspan="3">
                     <input
                       type="text"
@@ -294,9 +303,8 @@ const fetchCustomerData = async () => {
                     />
                   </td>
                 </tr>
-
                 <tr>
-                  <td class="label">Country:</td>
+                  <td className="label">Country:</td>
                   <td colspan="3">
                     <input
                       type="text"
@@ -307,21 +315,12 @@ const fetchCustomerData = async () => {
                     />
                   </td>
                 </tr>
-
                 <tr>
-                  <td colspan="4" class="button-container">
-                    <button
-                      type="button"
-                      onClick={handleSave}
-                      class="updateButton"
-                    >
+                  <td colspan="4" className="button-container">
+                    <button type="button" onClick={handleSave} className="updateButton">
                       Save
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditMode(false)}
-                      class="updateButton"
-                    >
+                    <button type="button" onClick={() => setEditMode(false)} className="updateButton">
                       Cancel
                     </button>
                   </td>
