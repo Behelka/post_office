@@ -43,12 +43,18 @@ const Login = () => {
     const result = await response.json();
 
     if (response.ok) {
-      localStorage.setItem("Customer_ID", result.Customer_ID);
-      localStorage.setItem(
-        "Customer_Email_Address",
-        result.Customer_Email_Address
-      );
-      navigate("/CustomerProfile");
+      if(result["Customer_Email_Address"]) {
+        localStorage.setItem("Customer_ID", result.Customer_ID);
+        localStorage.setItem(
+          "Customer_Email_Address",
+          result.Customer_Email_Address
+        );
+        navigate("/CustomerProfile");
+      } else if( result["Email"]) {
+        localStorage.setItem("Employee_ID", result.Employee_ID);
+        localStorage.setItem("Employee_Email", result.Email);
+        navigate("/EmployeeProfile");
+      }
     } else {
       setLoginError(result.message || "Login failed");
     }
