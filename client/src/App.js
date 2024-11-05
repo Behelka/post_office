@@ -19,20 +19,27 @@ import Stops from "./components/PackagePortal/Stops";
 import Contact from "./components/ContactUS/contact";
 import CustomerSearch from "./components/CustomerSearch/CustomerSearch";
 
-
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
 export { SERVER_URL };
 
-  const App = () => {
-    let links = [
-      ["", "Home"],
-      ["Login", "Login/Register"],
-      ["Shop", "Shop"],
-      ["AboutUs", "About Us"],
-      ["Contactus","Contact Us"]
-    ];
+const App = () => {
+  let links = [
+    ["", "Home"],
+    ["Login", "Login/Register"],
+    ["Shop", "Shop"],
+    ["AboutUs", "About Us"],
+    ["Contactus", "Contact Us"],
+  ];
 
-  var user = ""; // This is to see different roles
+  let user = ""; // This is to see different roles
+
+  // console.log(localStorage);
+
+  if (localStorage.getItem("Customer_Email_Address")) {
+    user = "customer";
+  } else if (localStorage.getItem("Employee_Email")) {
+    user = "employee";
+  }
 
   if (user === "employee") {
     links = [
@@ -41,7 +48,7 @@ export { SERVER_URL };
       ["TrackingHistory", "Tracking History"],
       ["EmployeeProfile", "Profile"],
       ["EmployeeShop", "Shop"],
-      ["Reports", "Reports"]
+      ["Reports", "Reports"],
     ];
   }
 
@@ -53,22 +60,21 @@ export { SERVER_URL };
       ["ManagerPortal", "Manager Portal"],
       ["EmployeeProfile", "Profile"],
       ["EmployeeShop", "Shop"],
-      ["Reports", "Reports"]
+      ["Reports", "Reports"],
     ];
   }
 
-    if (user === "customer") {
-      links = [
-        ["", "Home"],
-        ["Dashboard", "Dashboard"],
-        ["TrackingHistory", "Tracking History"],
-        ["Reports", "Reports"],
-        ["Shop", "Shop"],
-        ["AboutUs", "About"],
-        ["Contactus", "Contact Us"], 
-        ["CustomerProfile", "Profile"],
-      ];
-    }
+  if (user === "customer") {
+    links = [
+      ["", "Home"],
+      ["Dashboard", "Dashboard"],
+      ["TrackingHistory", "Tracking History"],
+      ["Shop", "Shop"],
+      ["AboutUs", "About"],
+      ["Contactus", "Contact Us"],
+      ["CustomerProfile", "Profile"],
+    ];
+  }
 
   if (user === "admin") {
     links = [
@@ -80,7 +86,7 @@ export { SERVER_URL };
       ["AddDepartment", "Add Department"],
       ["AddLocation", "Add Location"],
       ["EmployeeProfile", "Profile"],
-      ["EmployeeShop", "Shop"]
+      ["EmployeeShop", "Shop"],
     ];
   }
 
@@ -106,9 +112,9 @@ export { SERVER_URL };
         <Route path="/stops/:packageId" element={<Stops />} />
         <Route path="/ContactUS" element={<Contact />} />
         <Route path="/CustomerSearch" element={<CustomerSearch />} />
-        </Routes>
+      </Routes>
     </Router>
   );
 };
 
-  export default App;
+export default App;
