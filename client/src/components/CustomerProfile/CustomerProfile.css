@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;700&family=Montserrat:wght@400;700&display=swap");
 
 .customer-profile-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
   background-color: #f9f9f9;
@@ -64,4 +64,9 @@
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.form-table {
+  width: 100%;
+  border-collapse: collapse;
 }
