@@ -170,15 +170,15 @@ const CustomerProfile = () => {
               </button>
             </div>
           ) : (
-            <form className="form-container">
+            <form className="form-table">
               <table className="form-table">
                 <tr>
                   <td className="label">Avatar:</td>
                   <td>
                     <img
                       src={previewAvatar || `/${customerInfo.Avatar_URL}`}
-                      alt="User Avatar"
                       className="Avatar"
+                      alt=""
                     />
                     <input type="file" onChange={handleFileChange} accept="image/*" />
                   </td>
