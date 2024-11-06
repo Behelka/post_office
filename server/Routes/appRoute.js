@@ -12,6 +12,7 @@ const handleReportsRoute = require("./ReportsRoute");
 const handleShopRoute = require("./ShopRoute");
 const handleDepartmentRoute = require("./AddDepartmentRoute");
 const handleEmployeeRoutes = require("./EmployeeProfileRoute");
+const handleManagerPortalRoutes = require('./ManagerPortalRoute');
 
 const appRoute = (req, res) => {
   const parsedUrl = url.parse(req.url, true);
@@ -46,6 +47,8 @@ const appRoute = (req, res) => {
     handleCustomerShopRoutes(req, res);
   } else if (parsedUrl.pathname.startsWith("/api/employee")) {
     handleEmployeeRoutes(req, res);
+  } else if (parsedUrl.pathname.startsWith('/api/ManagerPortal')) {
+    handleManagerPortalRoutes(req, res);
   } else {
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: "Not Found" }));
