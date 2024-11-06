@@ -3,6 +3,8 @@ import ProductList from './ProductList';
 import AdminControls from './AdminControls';
 import './Shop.css';
 
+import { SERVER_URL } from "../../App";
+
 const EmployeeShop = () => {
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -16,7 +18,7 @@ const EmployeeShop = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/shop', {
+      const response = await fetch(`${SERVER_URL}/shop`, {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache',
@@ -36,7 +38,7 @@ const EmployeeShop = () => {
 
   const addProduct = async (newProduct) => {
     try {
-      await fetch('http://localhost:3001/shop', {
+      await fetch(`${SERVER_URL}/shop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newProduct),
@@ -50,7 +52,7 @@ const EmployeeShop = () => {
 
   const editProduct = async (updatedProduct) => {
     try {
-      await fetch('http://localhost:3001/shop', {
+      await fetch(`${SERVER_URL}/shop`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedProduct),
@@ -64,7 +66,7 @@ const EmployeeShop = () => {
 
   const deleteProduct = async (id) => {
     try {
-    await fetch(`http://localhost:3001/shop/${id}`, {
+    await fetch(`${SERVER_URL}/shop/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Product_ID: id }),

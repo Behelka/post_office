@@ -18,7 +18,11 @@ const TrackingRoute = (req, res) => {
                 s.Stop_ID, 
                 s.Stop_Arrival_Date, 
                 s.Stop_Departure_Date, 
-                l.Location_Address_City
+                l.Location_Address_City,
+                l.Location_Address_State,
+                l.Location_Address_Country,
+                th.Package_Status
+
             FROM 
                 tracking_history th
             JOIN 

@@ -16,6 +16,12 @@ import SignUp from "./components/SignUp/SignUp";
 import TrackingHistory from "./components/TrackingHistory/TrackingHistory";
 import EmployeeShop from "./components/Shop/EmployeeShop";
 import Stops from "./components/PackagePortal/Stops";
+import Contact from "./components/ContactUS/contact";
+import CustomerSearch from "./components/CustomerSearch/CustomerSearch";
+
+
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
+export { SERVER_URL };
 
   const App = () => {
     let links = [
@@ -23,10 +29,10 @@ import Stops from "./components/PackagePortal/Stops";
       ["Login", "Login/Register"],
       ["Shop", "Shop"],
       ["AboutUs", "About Us"],
-      ["Contact","Contact Us"]
+      ["Contactus","Contact Us"]
     ];
 
-  var user = "customer"; // This is to see different roles
+  var user = ""; // This is to see different roles
 
   if (user === "employee") {
     links = [
@@ -59,7 +65,7 @@ import Stops from "./components/PackagePortal/Stops";
         ["Reports", "Reports"],
         ["Shop", "Shop"],
         ["AboutUs", "About"],
-        ["Contact", "Contact Us"], 
+        ["Contactus", "Contact Us"], 
         ["CustomerProfile", "Profile"],
       ];
     }
@@ -98,7 +104,9 @@ import Stops from "./components/PackagePortal/Stops";
         <Route path="/AddLocation" element={<AddLocation />} />
         <Route path="/EmployeeShop" element={<EmployeeShop />} />
         <Route path="/stops/:packageId" element={<Stops />} />
-      </Routes>
+        <Route path="/ContactUS" element={<Contact />} />
+        <Route path="/CustomerSearch" element={<CustomerSearch />} />
+        </Routes>
     </Router>
   );
 };

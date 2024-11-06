@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../Login/Login.css";
 
+import { SERVER_URL } from "../../App";
+
 const SignUp = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -52,7 +55,7 @@ const SignUp = () => {
 
     if (!validateForm()) return;
 
-    const response = await fetch("http://localhost:3000/api/signup", {
+    const response = await fetch(`${SERVER_URL}/api/customer`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -62,7 +65,11 @@ const SignUp = () => {
 
     const result = await response.json();
     const message = result.message;
+
     alert(message);
+    if (response.ok) {
+      navigate("/login");
+    }
   };
 
   return (

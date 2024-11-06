@@ -1,13 +1,74 @@
-.main_div{
-    position: absolute;
-    top: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    padding: 20px;
-
+.th_main_div {
+  position: absolute;
+  top: 10%;
+  left: 30%;
+  width: 50%;
+  padding: 20px;
 }
 
-p{
-    color: red;
+
+.h {
+  color: rgb(85, 84, 84);
+  font-size: 40px;
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+
+.input {
+  flex: 1;
+  padding: 10px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 20px;
+  border-color: #33536d;
+  color: rgb(99, 94, 94);
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.th_searchButton {
+  padding: 10px 30px;
+  font-size: 22px;
+  color: black;
+  background-color: rgb(126, 181, 197);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: none;
+  padding: 12px 8px;
+  text-align: left;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: transparent;
+}
+
+.dotted-line {
+  border-top: 1px dotted #999;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.h2 {
+  color: #12795a;
 }

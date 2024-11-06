@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './Reports.css';
 
+import { SERVER_URL } from "../../App";
+
 const Reports = () => {
     const [formData, setFormData] = useState({
         reportType: '',
@@ -216,10 +218,10 @@ const Reports = () => {
                         </>
                     )}
 
-                    <div className="form-group">
-                        <button type="submit">Submit Request</button>
-                    </div>
-                </form>
+          <div className="form-group">
+            <button type="submit">Submit Request</button>
+          </div>
+        </form>
 
                 {data.length > 0 && (
                     <div>

@@ -1,3 +1,4 @@
+// ProductList.js
 import React from 'react';
 
 const ProductList = ({ products, deleteProduct, setEditingProduct }) => {

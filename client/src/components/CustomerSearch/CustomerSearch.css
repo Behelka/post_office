@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;700&family=Montserrat:wght@400;700&display=swap');
 
 
-.ep_main_div{
+.cs_main_div{
     position: absolute;
     top: 10%;
     left: 30%;
@@ -40,7 +40,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 }
 
-.ep_searchButton {
+.cs_searchButton {
   padding: 10px 30px;
   font-size: 22px;
   color: black;
