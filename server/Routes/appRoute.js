@@ -23,8 +23,15 @@ const appRoute = (req, res) => {
   // Route handling
   if (parsedUrl.pathname.startsWith("/api/location")) {
     handleLocationRoutes(req, res);
+
   } else if (parsedUrl.pathname.startsWith("/api/customer")) {
-    handleCustomerRoutes(req, res);
+
+    if (parsedUrl.pathname === "/api/customer/balance") {
+        handleCustomerShopRoutes(req, res);
+    } else {
+        handleCustomerRoutes(req, res);
+    }
+    
   } else if (parsedUrl.pathname.startsWith("/api/login")) {
     handleLoginRoutes(req, res);
   } else if (parsedUrl.pathname.startsWith("/api/PackagePortal")) {
