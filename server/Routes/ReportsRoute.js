@@ -4,7 +4,7 @@ const url = require('url');
 const reportsRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const pathParts = parsedUrl.pathname.split('/');
-    const { startDate, endDate, departmentName } = parsedUrl.query;
+    const { startDate, endDate, departmentName, productType } = parsedUrl.query;
 
     if (req.method === 'GET' && pathParts[2] === 'reports') {
         const reportType = pathParts[3]; // Retrieves the specific report type after /api/reports/
@@ -31,13 +31,27 @@ const reportsRoute = (req, res) => {
                 break;
 
             case 'financial-transactions':
-                query = 'SELECT * FROM Transactions';
+                query = `
+                    SELECT t.*, tp.Product_ID, p.Product_Name
+                    FROM Transactions AS t
+                    JOIN Transaction_Products AS tp ON t.Transaction_ID = tp.Transaction_ID
+                    JOIN Products AS p ON tp.Product_ID = p.Product_ID
+                `;
 
                 // Apply date filtering if startDate and endDate are provided
                 if (startDate && endDate) {
-                    query += ' WHERE Transaction_Date BETWEEN ? AND ?';
+                    query += ' WHERE t.Transaction_Date BETWEEN ? AND ?';
                     queryParams = [startDate, endDate];
                 }
+
+                // Example of adding an optional product type filter
+                if (productType) { // Check if a productType is provided in the query params
+                    query += (startDate && endDate ? ' AND' : ' WHERE') + ' p.Product_Name = ?';
+                    queryParams.push(productType);
+                }
+
+                    //going to use ORDER BY for sorting by month, day or year
+                    //need to add locations for 
                 break;
 
             default:

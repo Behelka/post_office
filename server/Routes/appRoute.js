@@ -5,11 +5,9 @@ const handleLoginRoutes = require("./LoginRoute"); // Add other routes as necess
 const handlePackagePortalRoutes = require("./PackagePortalRoute");
 const handleStopRoutes = require("./StopRoute");
 const handleTrackingRoutes = require("./TrackingHistoryRoute");
-const handleReportRoutes = require("./ReportsRoute");
-const handleEmployeeShopRoutes = require("./EmployeeShopRoute");
-const handleCustomerShopRoutes = require("./ShopRoute");
-const handleReportsRoute = require("./ReportsRoute");
-const handleShopRoute = require("./ShopRoute");
+const handleEmployeeShopRoutes = require("./EmployeeShopRoute");//employee shop
+const handleCustomerShopRoutes = require("./ShopRoute");//customer shop
+const handleReportsRoute = require("./ReportsRoute");//reports
 const handleDepartmentRoute = require("./AddDepartmentRoute");
 const handleEmployeeRoutes = require("./EmployeeProfileRoute");
 const handleManagerPortalRoutes = require('./ManagerPortalRoute');
@@ -31,16 +29,12 @@ const appRoute = (req, res) => {
     handlePackagePortalRoutes(req, res);
   } else if (parsedUrl.pathname.startsWith("/Stops")) {
     handleStopRoutes(req, res);
-  } else if (parsedUrl.pathname.startsWith("/api/Reports")) {
+  } else if (parsedUrl.pathname.startsWith("/api/reports")) {
     handleReportsRoute(req, res);
-  } else if (parsedUrl.pathname.startsWith("/shop")) { // Why are there two of these?
-    handleShopRoute(req, res); // Different handler here
   } else if (parsedUrl.pathname.startsWith("/departments")) {
     handleDepartmentRoute(req, res);
   } else if (parsedUrl.pathname.startsWith("/api/tracking")) {
     handleTrackingRoutes(req, res);
-  } else if (parsedUrl.pathname.startsWith("/api/reports")) {
-    handleReportRoutes(req, res);
   } else if (parsedUrl.pathname.startsWith("/shop")) { // Why are there two of these?
     handleEmployeeShopRoutes(req, res); // Different handler here
   } else if (parsedUrl.pathname.startsWith("/api/shop")) {

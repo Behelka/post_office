@@ -32,7 +32,7 @@ export { SERVER_URL };
       ["Contactus","Contact Us"]
     ];
 
-  var user = ""; // This is to see different roles
+  var user = "employee"; // This is to see different roles
 
   if (user === "employee") {
     links = [

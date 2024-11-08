@@ -9,20 +9,25 @@ const Reports = () => {
         startDate: '',
         endDate: '',
         departmentName : '',
+        productType:'',
     });
     const [data, setData] = useState([]);
+    const [customerSuggestions, setCustomerSuggestions] = useState([]);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
             [name]: value,
         });
+        if (name === 'customerName' && value.length > 0) {
+            fetchCustomerSuggestions(value);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { reportType, startDate, endDate, departmentName } = formData;
+        const { reportType, startDate, endDate, departmentName, productType } = formData;
         const url = new URL(`http://localhost:3001/api/reports/${reportType}`);
 
         // Only append startDate and endDate if the report type is financial-transactions
@@ -32,6 +37,7 @@ const Reports = () => {
         else if (reportType === 'financial-transactions') {
             if (startDate) url.searchParams.append("startDate", startDate);
             if (endDate) url.searchParams.append("endDate", endDate);
+            if (productType) url.searchParams.append("productType", productType);
         } 
         try {
             const response = await fetch(url, {
@@ -50,7 +56,25 @@ const Reports = () => {
             console.error('Error fetching report data:', error);
         }
     };
+/////////////
+    const fetchCustomerSuggestions = async (query) => {
+        try {
+            const response = await fetch(`http://localhost:3001/api/customers?search=${query}`);
+            const result = await response.json();
+            setCustomerSuggestions(result);
+        } catch (error) {
+            console.error('Error fetching customer suggestions:', error);
+        }
+    };
 
+    const handleCustomerSelect = (customerName) => {
+        setFormData({
+            ...formData,
+            customerName
+        });
+        setCustomerSuggestions([]); // Clear suggestions after selection
+    };
+//////////////
     const formatData = (result, reportType) => {
         if (reportType === 'employee-department') {
             return result.map((item) => ({
@@ -75,6 +99,7 @@ const Reports = () => {
                 transaction_id: item.Transaction_ID,
                 amount: item.Amount_Deducted,
                 date: item.Transaction_Date,
+                category: item.Product_Name,
             }));
         }
         return [];
@@ -215,6 +240,48 @@ const Reports = () => {
                                     required
                                 />
                             </div>
+
+                            <div className="form-group">
+                                <label htmlFor="productType">Product Type</label>
+                                <select
+                                    id="productType"
+                                    name="productType"
+                                    value={formData.productType}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">Select a product type</option>
+                                    <option value="stamps">Stamps</option>
+                                    <option value="envelopes">Envelopes</option>
+                                    <option value="small package">Small Package</option>
+                                    <option value="medium package">Medium Package</option>
+                                    <option value="large package">Large Package</option>
+                                    {/* Add more product types as needed */}
+                                </select>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="customerName">Customer Name</label>
+                    <input
+                        type="text"
+                        id="customerName"
+                        name="customerName"
+                        value={formData.customerName}
+                        onChange={handleChange}
+                        placeholder="Search by customer name"
+                    />
+                    {customerSuggestions.length > 0 && (
+                        <ul className="dropdown">
+                            {customerSuggestions.map((customer) => (
+                                <li
+                                    key={customer.Customer_ID}
+                                    onClick={() => handleCustomerSelect(customer.Name)}
+                                >
+                                    {customer.Name}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
                         </>
                     )}
 
