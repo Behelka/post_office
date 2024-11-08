@@ -92,15 +92,22 @@ const addStopRoute = (req, res) => {
                     parseBody(req, (body) => {
                         const { arrival_date, departure_date, location } = body;
             
-                        // Convert dates to CST (UTC -5) or replace with desired offset
-                        const formatToCST = (date) => {
+                        const formattimezone = (date) => {
                             const localDate = new Date(date);
-                            localDate.setHours(localDate.getHours() - 5); // Adjusting by -5 hours
+
+                            // Check if the input date is in UTC (optional: adjust this logic as needed)
+                            if (localDate.getTimezoneOffset() === 0) {
+                                // Input is UTC, do not adjust
+                                return localDate.toISOString().slice(0, 19).replace('T', ' ');
+                            }
+
+                            // Otherwise, adjust to CST (or desired timezone)
+                            localDate.setHours(localDate.getHours() - localDate.getTimezoneOffset() / 60);
                             return localDate.toISOString().slice(0, 19).replace('T', ' ');
                         };
             
-                        const formattedArrivalDate = formatToCST(arrival_date);
-                        const formattedDepartureDate = departure_date ? formatToCST(departure_date) : null;
+                        const formattedArrivalDate = formattimezone(arrival_date);
+                        const formattedDepartureDate = departure_date ? formattimezone(departure_date) : null;
             
                         // Validate input
                         if (!arrival_date || !location) {
