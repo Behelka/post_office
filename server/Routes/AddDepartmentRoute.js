@@ -59,6 +59,13 @@ const addDepartmentsRoute = (req, res) => {
                         `;
                         await db.query(insertQuery, [departmentName, departmentManager, departmentLocation]);
 
+                        const updateQuery = `
+                            UPDATE employee
+                            SET Role = 'manager'
+                            WHERE Employee_ID = ?;
+                        `;
+                        await db.query(updateQuery, [departmentManager]);
+
                         const [lastDepartmentQuery] = await db.query(`SELECT d.*, 
                            e.First_Name AS managerFirstName, 
                            e.Last_Name AS managerLastName, 
@@ -99,13 +106,20 @@ const addDepartmentsRoute = (req, res) => {
                         return res.end(JSON.stringify({ message: 'All department fields are required' }));
                     }
 
-                    try {
+                    try { 
                         const updateQuery = `
                             UPDATE departments 
                             SET Department_Name = ?, Department_Manager_ID = ?, Department_Location_ID = ? 
                             WHERE Department_ID = ? AND Delete_Department != 1;
                         `;
                         await db.query(updateQuery, [departmentName, departmentManager, departmentLocation, departmentId]);
+
+                        const  promoteQuery = `
+                            UPDATE employee
+                            SET Role = 'manager'
+                            WHERE Employee_ID = ?;
+                        `;
+                        await db.query(promoteQuery, [departmentManager]);
 
                         const [updatedDepartmentQuery] = await db.query(`SELECT d.*, 
                             e.First_Name AS managerFirstName, 
