@@ -52,7 +52,7 @@ const Stops = () => {
         return timeZone;
     }
     
-    const userTimeZone = getUserTimeZone();  // Output: "America/Chicago", "Europe/London", etc.
+    //const userTimeZone = getUserTimeZone();  // Output: "America/Chicago", "Europe/London", etc.
     
     function convertUTCToTimeZone(utcDateString, timeZone) {
         if (!utcDateString) return null;
@@ -67,6 +67,7 @@ const Stops = () => {
             day: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
+            second: "2-digit",
             hour12: true,  // Optional: Set to false for 24-hour format
             timeZone: timeZone // Specify the desired time zone
         };
@@ -83,12 +84,12 @@ const Stops = () => {
 
 
     const convertLocalToUTC = (localDateString) => {
-        if (!localDateString) return null;
-        const localDate = new Date(localDateString);
-        return new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
+        if (!localDateString) return "";
+    const localDate = new Date(localDateString);
+    const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+    return new Date(localDate.toUTCString())
             .toISOString()
             .slice(0, 19)
-            .replace("T", " ");
     };
 
     const fetchLocations = useCallback(async () => {

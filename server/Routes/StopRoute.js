@@ -32,8 +32,24 @@ const addStopRoute = (req, res) => {
 
                         db.query(infoQuery, [Stop_Package_ID])
                         .then(([results]) => {
+                            const convertLocalToUTC = (localDateString) => {
+                                if (!localDateString) return null;
+                                const localDate = new Date(localDateString);
+                                return new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
+                                    .toISOString()
+                            };
+                    
+                            // Iterate over each row in the results array and convert dates
+                            const updatedResults = results.map((row) => {
+                                return {
+                                    ...row,
+                                    Stop_Arrival_Date: convertLocalToUTC(row.Stop_Arrival_Date),
+                                    Stop_Departure_Date: convertLocalToUTC(row.Stop_Departure_Date)
+                                };
+                            });
+                    
                             res.writeHead(200, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify(results));
+                            res.end(JSON.stringify(updatedResults));
                         })
                     .catch(error => {
                         console.error('Error querying locations:', error);

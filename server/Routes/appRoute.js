@@ -12,6 +12,7 @@ const handleReportsRoute = require("./ReportsRoute");
 const handleShopRoute = require("./ShopRoute");
 const handleDepartmentRoute = require("./AddDepartmentRoute");
 const handleEmployeeRoutes = require("./EmployeeProfileRoute");
+const handlePackagesRoute = require('./PackageRoute');
 const handleManagerPortalRoutes = require('./ManagerPortalRoute');
 
 const appRoute = (req, res) => {
@@ -54,6 +55,8 @@ const appRoute = (req, res) => {
     handleCustomerShopRoutes(req, res);
   } else if (parsedUrl.pathname.startsWith("/api/employee")) {
     handleEmployeeRoutes(req, res);
+  } else if (parsedUrl.pathname.startsWith('/packages')) {
+    handlePackagesRoute(req, res);
   } else if (parsedUrl.pathname.startsWith('/api/ManagerPortal')) {
     handleManagerPortalRoutes(req, res);
   } else {
