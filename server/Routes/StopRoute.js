@@ -30,11 +30,11 @@ const addStopRoute = (req, res) => {
                         s.Delete_Stop != 1 
                         AND s.Stop_Package_ID = ?`;
 
-                db.query(infoQuery, [Stop_Package_ID])
-                    .then(([results]) => {
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify(results));
-                    })
+                        db.query(infoQuery, [Stop_Package_ID])
+                        .then(([results]) => {
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(results));
+                        })
                     .catch(error => {
                         console.error('Error querying locations:', error);
                         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -92,23 +92,6 @@ const addStopRoute = (req, res) => {
                     parseBody(req, (body) => {
                         const { arrival_date, departure_date, location } = body;
             
-                        const formattimezone = (date) => {
-                            const localDate = new Date(date);
-
-                            // Check if the input date is in UTC (optional: adjust this logic as needed)
-                            if (localDate.getTimezoneOffset() === 0) {
-                                // Input is UTC, do not adjust
-                                return localDate.toISOString().slice(0, 19).replace('T', ' ');
-                            }
-
-                            // Otherwise, adjust to CST (or desired timezone)
-                            localDate.setHours(localDate.getHours() - localDate.getTimezoneOffset() / 60);
-                            return localDate.toISOString().slice(0, 19).replace('T', ' ');
-                        };
-            
-                        const formattedArrivalDate = formattimezone(arrival_date);
-                        const formattedDepartureDate = departure_date ? formattimezone(departure_date) : null;
-            
                         // Validate input
                         if (!arrival_date || !location) {
                             res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -123,7 +106,7 @@ const addStopRoute = (req, res) => {
                                 Stop_Location = ? 
                             WHERE Stop_ID = ?;`;
             
-                        db.query(updateQuery, [formattedArrivalDate, formattedDepartureDate, location, Stop_ID])
+                        db.query(updateQuery, [arrival_date, departure_date, location, Stop_ID])
                             .then(() => {
                                 res.writeHead(200, { 'Content-Type': 'application/json' });
                                 res.end(JSON.stringify({ message: 'Stop updated successfully' }));
