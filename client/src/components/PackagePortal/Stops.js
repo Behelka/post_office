@@ -30,8 +30,8 @@ const Stops = () => {
             stop_id: item.Stop_ID,
             stop_location: `${item.Location_Address_House_Number} ${item.Location_Address_Street} ${item.Location_Address_Suffix || ''}, ${item.Location_Address_City}, 
                             ${item.Location_Address_State} ${item.Location_Address_Zip_Code}, ${item.Location_Address_Country}`,
-            arrival_date: formatDate(item.Stop_Arrival_Date),
-            departure_date: item.Stop_Departure_Date ? formatDate(item.Stop_Departure_Date) : "Not Departed",
+            arrival_date: convertUTCToTimeZone(item.Stop_Arrival_Date, getUserTimeZone()),
+            departure_date: item.Stop_Departure_Date ? convertUTCToTimeZone(item.Stop_Departure_Date, getUserTimeZone()) : "Not Departed",
             location_id: item.Location_ID  // Ensure this is included
         });
         try {
@@ -44,6 +44,53 @@ const Stops = () => {
             console.error('Error fetching stops:', error);
         }
     }, [packageId]);
+
+
+    function getUserTimeZone() {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        //console.log('User Time Zone:', timeZone);  // e.g., "America/Chicago"
+        return timeZone;
+    }
+    
+    const userTimeZone = getUserTimeZone();  // Output: "America/Chicago", "Europe/London", etc.
+    
+    function convertUTCToTimeZone(utcDateString, timeZone) {
+        if (!utcDateString) return null;
+        
+        // Parse the UTC date string (Ensure it is treated as UTC)
+        const utcDate = new Date(utcDateString);  // The 'Z' is optional since UTC is assumed for ISO strings
+        
+        // Convert UTC to the specified time zone (e.g., "America/Chicago")
+        const options = {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,  // Optional: Set to false for 24-hour format
+            timeZone: timeZone // Specify the desired time zone
+        };
+        
+        // Return the formatted string in the desired time zone
+        return utcDate.toLocaleString(undefined, options);
+    }
+    
+    // Example usage:
+    //const utcDateString = "2024-10-23T03:00:00.000Z";  // UTC time
+    //const formattedDate = convertUTCToTimeZone(utcDateString, userTimeZone);
+    //console.log(formattedDate);  // Output will be in the user's local time zone (e.g., CST)
+    
+
+
+    const convertLocalToUTC = (localDateString) => {
+        if (!localDateString) return "";
+    const localDate = new Date(localDateString);
+    const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+    return new Date(localDate.toUTCString())
+            .toISOString()
+            .slice(0, 19)
+    };
 
     const fetchLocations = useCallback(async () => {
         try {
@@ -60,11 +107,11 @@ const Stops = () => {
         } catch (error) {
             console.error('Error fetching locations:', error);
         }
-    },[searchTerm]);
+    }, [searchTerm]);
 
     useEffect(() => {
         fetchStops();
-    }, [fetchStops,packageId]);
+    }, [fetchStops, packageId]);
 
     useEffect(() => {
         if (searchTerm) {
@@ -72,7 +119,7 @@ const Stops = () => {
         } else {
             setLocations([]); // Clear locations if search term is empty
         }
-    }, [fetchLocations,searchTerm]);
+    }, [fetchLocations, searchTerm]);
 
     const handleAddStop = async (e) => {
         e.preventDefault();
@@ -83,8 +130,8 @@ const Stops = () => {
 
         const newStop = {
             location: selectedLocation.Location_ID,
-            arrival_date: formatToMySQLDate(arrivalDate), // Convert here
-            departure_date: formatToMySQLDate(departureDate), // Convert here
+            arrival_date: convertLocalToUTC(arrivalDate), // Convert here
+            departure_date: convertLocalToUTC(departureDate), // Convert here
             Stop_Package_ID: packageId,
         };
 
@@ -103,37 +150,54 @@ const Stops = () => {
         }
     };
 
+    
+    const formatForDatetimeLocal = (dateString) => {
+        if (!dateString) return ""; // Handle empty dates if needed
+        const date = new Date(dateString);
+    
+        // Get local date and time components
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+        return `${year}-${month}-${day}T${hours}:${minutes}`; // Formats to "yyyy-MM-ddTHH:mm" in local time
+    };
+    
+    
+    // Update your function to use this simpler formatting
     const handleEditStop = (stop) => {
+        //console.log(stop.arrival_date);
         setEditStopId(stop.stop_id);
-        setEditArrivalDate(formatToLocalDate(stop.arrival_date));
-        setEditDepartureDate(stop.departure_date === "Not Departed" ? "" : formatToLocalDate(stop.departure_date));
+        setEditArrivalDate(formatForDatetimeLocal(stop.arrival_date));
+        //console.log(formatForDatetimeLocal(stop.arrival_date));
+        setEditDepartureDate(
+            stop.departure_date === "Not Departed" ? "" : formatForDatetimeLocal(stop.departure_date)
+        );
         setEditLocationId(stop.location_id || ""); // Set the location ID for editing
     };
-
-    const formatToLocalDate = (dateString) => {
-        const date = new Date(dateString); // Assume dateString is in UTC
-        return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16); // Adjust for timezone offset
-    };
+    
 
 
     const handleUpdateStop = async (e) => {
         e.preventDefault();
-    
+
         const updatedStop = {
             location: editLocationId, // Add location ID to the updated stop
-            arrival_date: formatToMySQLDate(editArrivalDate),
-            departure_date: formatToMySQLDate(editDepartureDate),
+            arrival_date: convertLocalToUTC(editArrivalDate),
+            departure_date: convertLocalToUTC(editDepartureDate),
         };
-    
+
         try {
             const response = await fetch(`${SERVER_URL}/Stops/${editStopId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedStop),
             });
-    
+
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    
+
             await fetchStops();
             resetEditFields();
         } catch (error) {
@@ -188,12 +252,6 @@ const Stops = () => {
         setSelectedLocation(null); // Clear selected location for edit
     };
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true };
-        return date.toLocaleString(undefined, options); // Use locale string for proper formatting
-    };
-
     // Pagination logic
     const indexOfLastStop = currentPage * stopsPerPage;
     const indexOfFirstStop = indexOfLastStop - stopsPerPage;
@@ -203,7 +261,7 @@ const Stops = () => {
     return (
         <div className="table-container">
             <h2>Stops for Package ID: {packageId}</h2>
-    
+
             {/* Adding Fields Above the Table */}
             <div style={{ marginTop: '20px' }}>
                 <h3>Add New Stop</h3>
@@ -275,7 +333,7 @@ const Stops = () => {
                     <button type="submit">Add Stop</button>
                 </form>
             </div>
-    
+
             <h3>Current Stops</h3>
             {currentStops.length > 0 ? (
                 <table>
@@ -292,15 +350,22 @@ const Stops = () => {
                         {currentStops.map((stop) => (
                             <tr key={stop.stop_id}>
                                 <td>
-                                    <a 
-                                        href="#"
+                                    <button
                                         onClick={(e) => {
-                                            e.preventDefault(); 
-                                            handleEditStop(stop); 
+                                            e.preventDefault();
+                                            handleEditStop(stop);
+                                        }}
+                                        style={{
+                                            background: "none",
+                                            border: "none",
+                                            color: "blue",
+                                            textDecoration: "underline",
+                                            cursor: "pointer",
                                         }}
                                     >
                                         {stop.stop_id}
-                                    </a>
+                                    </button>
+
                                 </td>
                                 <td>{stop.stop_location}</td>
                                 <td>{stop.arrival_date}</td>
@@ -316,10 +381,10 @@ const Stops = () => {
                 <p>No stops available</p>
             )}
             <Modal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)} 
-                        onConfirm={confirmDelete} 
-                    />
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={confirmDelete}
+            />
 
             {/* Editing Fields Below the Table */}
             {editStopId && (
@@ -360,7 +425,7 @@ const Stops = () => {
                 </div>
             )}
         </div>
-    );    
+    );
 };
 
 export default Stops;
