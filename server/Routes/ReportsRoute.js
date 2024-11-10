@@ -4,7 +4,7 @@ const url = require('url');
 const reportsRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const pathParts = parsedUrl.pathname.split('/');
-    const { startDate, endDate, departmentName, productType } = parsedUrl.query;
+    const { startDate, endDate, productType, customerName, status, deliveryMethod } = parsedUrl.query;
 
     if (req.method === 'GET' && pathParts[2] === 'reports') {
         const reportType = pathParts[3]; // Retrieves the specific report type after /api/reports/
@@ -13,51 +13,75 @@ const reportsRoute = (req, res) => {
         let queryParams = [];
 
         switch (reportType) {
-            case 'employee-department':
-                query = `SELECT employee.*, departments.Department_Name 
-                        FROM employee JOIN departments ON employee.Employee_Department_ID = departments.Department_ID 
-                        WHERE employee.Delete_Employee != 1`;
-                 if (departmentName) {
-                    query += ' AND departments.Department_Name = ?';
-                    queryParams.push(departmentName);
+            case 'inventory':
+                query = `SELECT p.*  
+                        FROM Products AS p
+                        WHERE p.Delete_Product != 1`;
+                 if (productType) {
+                    query += ' AND p.Product_Name = ?';
+                    queryParams.push(productType);
                 } 
                 break;
-
+        
             case 'package-delivery':
-                query = 'SELECT * FROM Package'
-                /* `SELECT p.*, s.*, l.* 
-                        FROM Package AS p, Stop AS s, Location AS l 
-                        WHERE p.Package_ID = s.Stop_Package_ID AND s.Stop_Location = l.Location_ID AND p.Delete_Package != 1` */;
-                break;
+                query = `SELECT p.*, th.* 
+                        FROM Package AS p, Tracking_history AS th 
+                        WHERE p.Package_ID = th.Package_ID AND p.Delete_Package != 1` ;
 
+                //date filter
+                if (startDate && endDate) {
+                    query += ' AND ((th.Arrival_Date BETWEEN ? AND ?) OR (th.Departure_Date BETWEEN ? AND ?))';
+                    queryParams.push(startDate, endDate, startDate, endDate);
+                }
+
+                //package status filter
+                if (status) {
+                    query += ' AND p.Package_Status = ?';
+                    queryParams.push(status);
+                }  
+
+                if (deliveryMethod) {
+                    query += ' AND p.Package_Shipping_Method = ?';
+                    queryParams.push(deliveryMethod);
+                }  
+                break;
+            
             case 'financial-transactions':
                 query = `
-                    SELECT t.*, tp.Product_ID, p.Product_Name
+                    SELECT t.*, p.*, c.*
                     FROM Transactions AS t
-                    JOIN Transaction_Products AS tp ON t.Transaction_ID = tp.Transaction_ID
-                    JOIN Products AS p ON tp.Product_ID = p.Product_ID
+                    JOIN Products AS p ON t.Product_ID = p.Product_ID
+                    JOIN Customer AS c ON t.Customer_ID = c.Customer_ID
                 `;
 
-                // Apply date filtering if startDate and endDate are provided
+                // date range filtering
                 if (startDate && endDate) {
                     query += ' WHERE t.Transaction_Date BETWEEN ? AND ?';
-                    queryParams = [startDate, endDate];
+                    queryParams.push(startDate, endDate);
                 }
-
-                // Example of adding an optional product type filter
-                if (productType) { // Check if a productType is provided in the query params
-                    query += (startDate && endDate ? ' AND' : ' WHERE') + ' p.Product_Name = ?';
+            
+                // product type filter
+                if (productType) {
+                    query += (queryParams.length ? ' AND' : ' WHERE') + ' p.Product_Name = ?';
                     queryParams.push(productType);
                 }
+            
+                // customer name filter
+                  if (customerName) {
+                    query += (queryParams.length ? ' AND' : ' WHERE') + 
+                                ` (c.Customer_First_Name LIKE ? OR c.Customer_Last_Name LIKE ?)`;
+                    queryParams.push(`%${customerName}%`, `%${customerName}%`);
+                } 
+            
+                // sorting by transaction date
+                query += ' ORDER BY t.Transaction_Date';
 
-                    //going to use ORDER BY for sorting by month, day or year
-                    //need to add locations for 
                 break;
-
-            default:
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                return res.end(JSON.stringify({ message: 'Report type not found' }));
-        }
+            
+        default:
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ message: 'Report type not found' }));
+    }
 
         db.query(query, queryParams)
             .then(([results]) => {
