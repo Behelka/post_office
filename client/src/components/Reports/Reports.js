@@ -33,7 +33,7 @@ const Reports = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { reportType, startDate, endDate, customerName, productType, status, deliveryMethod, stock } = formData;
+        const { reportType, startDate, endDate, customerName, productType, status, deliveryMethod } = formData;
         const url = new URL(`http://localhost:3001/api/reports/${reportType}`);
 
         // sending backend fetch according to report type
@@ -41,7 +41,7 @@ const Reports = () => {
             if (productType) url.searchParams.append("productType", productType);
             if (startDate) url.searchParams.append("startDate", startDate);
             if (endDate) url.searchParams.append("endDate", endDate);
-            if (stock) url.searchParams.append("stock", stock);
+            //if (stock) url.searchParams.append("stock", stock);
         } 
         else if (reportType === 'package-delivery'){
             if (startDate) url.searchParams.append("startDate", startDate);
@@ -92,10 +92,10 @@ const Reports = () => {
         if (reportType === 'inventory') {
             return result.map((item) => ({
                 productName: item.Product_Name,
-                stock: item.Stock,
-                restockDate: item.Restock_Date,
-                unitPrice: item.Unit_Price,
-                itemsSold: item.Quantity, 
+                stock: item.Product_Stock,
+                restockDate: new Date(item.Last_Restock_Date).toLocaleDateString(),
+                unitPrice: item.unit_price,
+                itemsSold: item.Units_Sold, 
             }));
         } else if (reportType === 'package-delivery') {
             return result.map((item) => ({
@@ -132,8 +132,8 @@ const Reports = () => {
                 <table className="report-table">
                     <thead>
                         <tr>
-                            <th onClick={() => handleSort('name')}>
-                                Product Name {sortField === 'name' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                            <th onClick={() => handleSort('productName')}>
+                                Product Name {sortField === 'productName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
                             <th onClick={() => handleSort('stock')}>
                                 Stock {sortField === 'stock' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
@@ -142,7 +142,7 @@ const Reports = () => {
                                 Last Restock Date {sortField === 'restockDate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
                             <th onClick={() => handleSort('unitPrice')}>
-                                Unit Price {sortField === 'time' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                Unit Price {sortField === 'unitPrice' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
                             <th onClick={() => handleSort('itemsSold')}>
                                 Units Sold {sortField === 'itemsSold' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
@@ -152,11 +152,11 @@ const Reports = () => {
                     <tbody>
                         {data.map((item) => (
                             <tr key={item.id}>
-                                <td>{item.name}</td>
+                                <td>{item.productName}</td>
                                 <td>{item.stock}</td> 
                                 <td>{item.restockDate}</td>
                                 <td>{item.unitPrice}</td>
-                                <td>{item.supplier}</td>
+                                <td>{item.itemsSold}</td>
                             </tr>
                         ))}
                     </tbody>

@@ -14,13 +14,26 @@ const reportsRoute = (req, res) => {
 
         switch (reportType) {
             case 'inventory':
-                query = `SELECT p.*  
-                        FROM Products AS p
-                        WHERE p.Delete_Product != 1`;
+                query = `SELECT 
+                           p.*,
+                        COALESCE(SUM(t.Quantity), 0) AS Units_Sold
+                        FROM 
+                            Products p
+                        LEFT JOIN 
+                            Transactions t ON p.Product_ID = t.Product_ID
+                        GROUP BY 
+                            p.Product_ID, p.Product_Name, p.Product_Stock`;
+
+
                  if (productType) {
-                    query += ' AND p.Product_Name = ?';
+                    query += ' WHERE p.Product_Name = ?';
                     queryParams.push(productType);
                 } 
+
+                if (startDate && endDate) {
+                    query += ' AND p.Last_Restock_Date BETWEEN ? AND ?';
+                    queryParams.push(startDate, endDate);
+                }
                 break;
         
             case 'package-delivery':
