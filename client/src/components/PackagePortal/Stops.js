@@ -67,7 +67,6 @@ const Stops = () => {
             day: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
-            second: "2-digit",
             hour12: true,  // Optional: Set to false for 24-hour format
             timeZone: timeZone // Specify the desired time zone
         };
