@@ -30,11 +30,27 @@ const addStopRoute = (req, res) => {
                         s.Delete_Stop != 1 
                         AND s.Stop_Package_ID = ?`;
 
-                db.query(infoQuery, [Stop_Package_ID])
-                    .then(([results]) => {
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify(results));
-                    })
+                        db.query(infoQuery, [Stop_Package_ID])
+                        .then(([results]) => {
+                            const convertLocalToUTC = (localDateString) => {
+                                if (!localDateString) return null;
+                                const localDate = new Date(localDateString);
+                                return new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
+                                    .toISOString()
+                            };
+                    
+                            // Iterate over each row in the results array and convert dates
+                            const updatedResults = results.map((row) => {
+                                return {
+                                    ...row,
+                                    Stop_Arrival_Date: convertLocalToUTC(row.Stop_Arrival_Date),
+                                    Stop_Departure_Date: convertLocalToUTC(row.Stop_Departure_Date)
+                                };
+                            });
+                    
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(updatedResults));
+                        })
                     .catch(error => {
                         console.error('Error querying locations:', error);
                         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -92,16 +108,6 @@ const addStopRoute = (req, res) => {
                     parseBody(req, (body) => {
                         const { arrival_date, departure_date, location } = body;
             
-                        // Convert dates to CST (UTC -5) or replace with desired offset
-                        const formatToCST = (date) => {
-                            const localDate = new Date(date);
-                            localDate.setHours(localDate.getHours() - 5); // Adjusting by -5 hours
-                            return localDate.toISOString().slice(0, 19).replace('T', ' ');
-                        };
-            
-                        const formattedArrivalDate = formatToCST(arrival_date);
-                        const formattedDepartureDate = departure_date ? formatToCST(departure_date) : null;
-            
                         // Validate input
                         if (!arrival_date || !location) {
                             res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -116,7 +122,7 @@ const addStopRoute = (req, res) => {
                                 Stop_Location = ? 
                             WHERE Stop_ID = ?;`;
             
-                        db.query(updateQuery, [formattedArrivalDate, formattedDepartureDate, location, Stop_ID])
+                        db.query(updateQuery, [arrival_date, departure_date, location, Stop_ID])
                             .then(() => {
                                 res.writeHead(200, { 'Content-Type': 'application/json' });
                                 res.end(JSON.stringify({ message: 'Stop updated successfully' }));

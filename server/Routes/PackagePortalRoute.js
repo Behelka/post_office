@@ -41,7 +41,7 @@ const PackagePortalRoute = (req, res) => {
     };*/
 
     const CalCost = (height, length, width, weight, shippingMethod) => {
-        const shippingMethodCosts = { 'Overnight': 15, 'Air': 7, 'Ground': 0 };
+        const shippingMethodCosts = { 'Express': 15, 'Air': 7, 'Ground': 0 };
         const methodCost = shippingMethodCosts[shippingMethod] || 0;
         return Math.ceil(length / 6) + Math.ceil(width / 6) +
                Math.ceil(height / 6) + Math.ceil(weight) + methodCost;
