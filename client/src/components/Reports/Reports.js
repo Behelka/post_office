@@ -16,6 +16,7 @@ const Reports = () => {
         customerName:'',
         status:'',
         deliveryMethod:'',
+        stock:'',
     });
     const [data, setData] = useState([]);
     const [sortField, setSortField] = useState('');
@@ -32,7 +33,7 @@ const Reports = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { reportType, startDate, endDate, customerName, productType, status, deliveryMethod } = formData;
+        const { reportType, startDate, endDate, customerName, productType, status, deliveryMethod, stock } = formData;
         const url = new URL(`http://localhost:3001/api/reports/${reportType}`);
 
         // sending backend fetch according to report type
@@ -40,6 +41,7 @@ const Reports = () => {
             if (productType) url.searchParams.append("productType", productType);
             if (startDate) url.searchParams.append("startDate", startDate);
             if (endDate) url.searchParams.append("endDate", endDate);
+            if (stock) url.searchParams.append("stock", stock);
         } 
         else if (reportType === 'package-delivery'){
             if (startDate) url.searchParams.append("startDate", startDate);
@@ -93,7 +95,7 @@ const Reports = () => {
                 stock: item.Stock,
                 restockDate: item.Restock_Date,
                 unitPrice: item.Unit_Price,
-                supplier: item.Supplier_name, 
+                itemsSold: item.Quantity, 
             }));
         } else if (reportType === 'package-delivery') {
             return result.map((item) => ({
@@ -104,7 +106,9 @@ const Reports = () => {
                 ${item.Package_City}`.trim(),
                 arrivalDate: new Date(item.Arrival_Date).toLocaleDateString(), 
                 shipping: `$${item.Package_Shipping_Cost}`,
-                weight: `${item.Package_Weight} lbs`,  
+                weight: `${item.Package_Weight} lbs`,
+                sender: `${item.Sender_First_Name} ${item.Sender_Middle_Name} ${item.Sender_Last_Name}`,
+                recipient: `${item.Recipient_First_Name} ${item.Recipient_Middle_Name} ${item.Recipient_Last_Name}`,   
             }));
         } else if (reportType === 'financial-transactions') {
             return result.map((item) => ({
@@ -121,7 +125,7 @@ const Reports = () => {
 
     const renderTable = () => {
         if (!data || data.length === 0) return <p>No data available.</p>;
-
+     
         // Decide which table to render based on report type
         if (formData.reportType === 'inventory') {
             return (
@@ -140,8 +144,8 @@ const Reports = () => {
                             <th onClick={() => handleSort('unitPrice')}>
                                 Unit Price {sortField === 'time' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
-                            <th onClick={() => handleSort('Supplier')}>
-                                Supplier {sortField === 'supplier' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                            <th onClick={() => handleSort('itemsSold')}>
+                                Units Sold {sortField === 'itemsSold' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
                         </tr>
                     </thead>
@@ -156,13 +160,19 @@ const Reports = () => {
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </table>         
             );
         } else if (formData.reportType === 'package-delivery') {
             return (
                 <table className="report-table">
                     <thead>
                         <tr>
+                            <th onClick={() => handleSort('sender')}>
+                                Package Sent By {sortField === 'sender' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                            </th>
+                            <th onClick={() => handleSort('recipient')}>
+                                Package Sent To {sortField === 'recipient' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                            </th>
                             <th onClick={() => handleSort('address')}>
                                 Package Address {sortField === 'address' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
@@ -180,6 +190,8 @@ const Reports = () => {
                     <tbody> {/*added required columns to the package-delivery report table*/}
                         {data.map((item) => (
                             <tr key={item.package_id}>
+                                <td>{item.sender}</td>
+                                <td>{item.recipient}</td>
                                 <td>{item.address}</td>
                                 <td>{item.arrivalDate}</td>
                                 <td>{item.shipping}</td>
@@ -188,6 +200,7 @@ const Reports = () => {
                         ))}
                     </tbody>
                 </table>
+             
             );
         } else if (formData.reportType === 'financial-transactions') {
             return (

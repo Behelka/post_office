@@ -24,9 +24,26 @@ const reportsRoute = (req, res) => {
                 break;
         
             case 'package-delivery':
-                query = `SELECT p.*, th.* 
-                        FROM Package AS p, Tracking_history AS th 
-                        WHERE p.Package_ID = th.Package_ID AND p.Delete_Package != 1` ;
+                query =  `SELECT 
+                            p.*,
+                            th.*,
+                            sender.Customer_First_Name AS Sender_First_Name,
+                            sender.Customer_Middle_Name AS Sender_Middle_Name,
+                            sender.Customer_Last_Name AS Sender_Last_Name,
+                            recipient.Customer_First_Name AS Recipient_First_Name,
+                            recipient.Customer_Middle_Name AS Recipient_Middle_Name,
+                            recipient.Customer_Last_Name AS Recipient_Last_Name
+                        FROM 
+                            Package AS p
+                        JOIN 
+                            Tracking_History AS th ON p.Package_ID = th.Package_ID
+                        JOIN 
+                            Customer AS sender ON p.Sender_ID = sender.Customer_ID
+                        JOIN 
+                            Customer AS recipient ON th.Recipient_ID = recipient.Customer_ID
+                        WHERE 
+                            p.Delete_Package != 1`;
+
 
                 //date filter
                 if (startDate && endDate) {
@@ -39,7 +56,7 @@ const reportsRoute = (req, res) => {
                     query += ' AND p.Package_Status = ?';
                     queryParams.push(status);
                 }  
-
+                //delivery method filter
                 if (deliveryMethod) {
                     query += ' AND p.Package_Shipping_Method = ?';
                     queryParams.push(deliveryMethod);
