@@ -20,39 +20,16 @@ const ManagerPortal = () => {
 
     const [editMode, setEditMode] = useState(false);
     const [editIndex, setEditIndex] = useState(null);
-    const [editData, setEditData] = useState({ ...formData });
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editEmployeeData, setEditEmployeeData] = useState({ ...employeeData });
 
-    const temporaryData = [ // This was added just to test the UI, feel free to remove when you want to populate real data from the back end
-        {
-            id: 1,
-            firstName: "John",
-            middleName: "A.",
-            lastName: "Doe",
-            email: "john.doe@example.com",
-            phoneNumber: "123-456-7890",
-            dateOfBirth: "1990-01-01",
-            locationId: "1",
-            departmentId: "HR",
-            supervisorId: "2"
-        },
-        {
-            id: 2,
-            firstName: "Jane",
-            middleName: "",
-            lastName: "Smith",
-            email: "jane.smith@example.com",
-            phoneNumber: "098-765-4321",
-            dateOfBirth: "1992-02-02",
-            locationId: "2",
-            departmentId: "Finance",
-            supervisorId: "1"
-        }
-    ]; // This was added just to test the UI, feel free to remove when you want to populate real data from the back end
+    const managerID = localStorage.getItem("Manager_Department_ID");
+
 
     const fetchEmployees = async () => {
-        /*try {
-            const response = await fetch(`${SERVER_URL}/api/employees`);
-            if (!response.ok) throw new Error(HTTP error! Status: ${response.status});
+        try {
+            const response = await fetch(`${SERVER_URL}/api/ManagerPortal/${managerID}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             setEmployees(result);
         } catch (error) {
