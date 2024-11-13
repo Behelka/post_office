@@ -31,7 +31,9 @@ module.exports = function packagesRoute(req, res) {
            cs.Customer_Last_Name) AS Sender_Full_Name,
     CONCAT(cr.Customer_First_Name, ' ', 
            COALESCE(cr.Customer_Middle_Name, ''), ' ', 
-           cr.Customer_Last_Name) AS Recipient_Full_Name
+           cr.Customer_Last_Name) AS Recipient_Full_Name,
+    p.Sender_ID,
+    p.Recipient_ID
     FROM package p
     LEFT JOIN tracking_history th ON p.Package_ID = th.Package_ID
     LEFT JOIN (

@@ -1,0 +1,97 @@
+.dashboard-container {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 20px;
+    border: 1px solid #494343a0;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-container h1 {
+    font-family: Arial, sans-serif; /* Change to your desired font */
+    font-weight: bold;              /* Makes the text bold */
+    color: black;                   /* Sets the text color to black */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.tab-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    
+}
+
+.tab-buttons button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    background-color: #ff6a6a;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    border-radius: 4px;
+}
+
+.tab-buttons button.active {
+    background-color: #00ff2a;
+    color: rgb(80, 86, 255);
+}
+
+.package-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.package-table th,
+.package-table td {
+    font-family: Arial, sans-serif; /* Change to your desired font */
+    font-weight: bold;              /* Makes the text bold */
+    color: black;                   /* Sets the text color to black */
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #80efc1;
+}
+
+.package-table th {
+    background-color: #ffa9e9;
+}
+
+.package-table tbody tr:nth-child(even) {
+    background-color: #fed09dfd;
+}
+
+.package-table tbody tr:hover {
+    background-color: #fde89f;
+    cursor: pointer;
+}
+
+.details-row {
+    background-color: #fbb7b7;
+}
+
+.details {
+    padding: 15px;
+}
+
+.selected {
+    background-color: #a0dfff !important;
+}
+
+.details ul {
+    padding-left: 20px;
+}
+
+.details ul li {
+    list-style-type: none;
+    margin-bottom: 5px;
+}
+
+.details ul li::before {
+    content: "\2022";
+    color: #d89b9b;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
