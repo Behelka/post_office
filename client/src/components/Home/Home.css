@@ -1,28 +1,31 @@
 /* Home.css */
 .home-container {
     min-height: 100vh;
+    width: 100vw; 
+    margin: 0;
+    padding: 0;
     background-color: #f8f9fa;
 }
 
 /* Hero Section */
 .hero-section {
-    background: linear-gradient(135deg, #3f51b5 0%, #303f9f 100%); /* Soft blue gradient */
-    padding: 4rem 2rem;
+    width: 100vw; /* Full width of the viewport */
+    padding: 6rem 0; /* Adjust padding to avoid large side gaps */
     text-align: center;
+    background: linear-gradient(135deg, #3f51b5 0%, #303f9f 100%);
     color: white;
     position: relative;
     overflow: hidden;
 }
 
 .hero-content {
-    max-width: 1200px;
+    width: 100%; /* Remove max-width restriction */
+    padding: 0 2rem; /* Keep some side padding for readability */
     margin: 0 auto;
-    position: relative;
-    z-index: 2;
 }
 
 .hero-logo {
-    width: 200px; 
+    width: 200px;
     height: auto;
     margin-bottom: 2rem;
     border-radius: 50%;
@@ -239,11 +242,14 @@
 .cta-section h2 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    font-weight: bold; /* Make the heading stand out */
+    color: #ffffff;
 }
 
 .cta-section p {
     font-size: 1.25rem;
     margin-bottom: 2rem;
+    color:ffffffb9;
     opacity: 0.9;
 }
 
