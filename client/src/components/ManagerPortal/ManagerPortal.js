@@ -26,7 +26,7 @@ const ManagerPortal = () => {
     const [editIndex, setEditIndex] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editEmployeeData, setEditEmployeeData] = useState({ ...employeeData });
-    const managerID = localStorage.getItem("Manager_Department_ID");
+    const managerID = localStorage.getItem("Employee_ID");
 
     const fetchEmployees = async () => {
         try {
