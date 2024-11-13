@@ -7,11 +7,10 @@
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     overflow-x: auto;               /* Enables horizontal scroll if needed */
+    font-family: sans-serif;
 }
 
 .dashboard-container h1 {
-    font-family: Arial, sans-serif; /* Change to your desired font */
-    font-weight: bold;
     color: black;
     text-align: center;
     margin-bottom: 20px;
@@ -48,46 +47,53 @@
     table-layout: auto;            /* Allows the table to resize based on content */
     font-size: clamp(10px, 1vw, 16px); /* Overall responsive font size */
 }
-
+.package-table tr {
+    border-radius: 8px;
+}
 .package-table th,
 .package-table td {
-    font-family: Arial, sans-serif;
-    font-weight: bold;
     color: black;
     padding: 12px;
     text-align: left;
-    border: 1px solid #80efc1;
+    font-weight: bold;
     font-size: clamp(0.7em, 1.2vw, 1em); /* Adjusted responsive font size */
 }
 
 .package-table th {
     background-color: #ffcff3;
+    
 }
 
-.package-table tbody tr:nth-child(even) {
+
+.package-table tbody tr:not(.details-row):nth-child(even) {
     background-color: #fbd7adfd;
 }
 
-.package-table tbody tr:nth-child(odd) {
+.package-table tbody tr:not(.details-row):nth-child(odd) {
     background-color: #ffead2fd;
 }
 
-.package-table tbody tr:hover {
-    background-color: #fde89f;
+.package-table tbody tr:not(.details-row):hover {
     cursor: pointer;
 }
 
-.details-row {
-    background-color: #fbb7b7;
+.package-table tbody tr:hover {
+    background-color: #ffecec;
+}
+
+.details-row td {
+    background-color: #ffecec;
 }
 
 .details {
     padding: 15px;
+    background-color: #ffecec;
     font-size: clamp(0.9em, 1.2vw, 1em); /* Responsive font size for details */
 }
 
 .selected {
     background-color: #a0dfff !important;
+    font-weight: bold;
 }
 
 .details ul {

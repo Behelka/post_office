@@ -80,7 +80,7 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-container">
-            <h1>Package History</h1>
+            <h1>Dashboard</h1>
             <table className="package-table">
                 <thead>
                     <tr>
