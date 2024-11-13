@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
+import Modal from '../Modal/Modal';
 import "./ManagerPortal.css";
-
 import { SERVER_URL } from "../../App";
 
 const ManagerPortal = () => {
     const [employees, setEmployees] = useState([]);
-    const [locations, setLocations] = useState({}); // To store location data
-    const [formData, setFormData] = useState({
+    const [location, setLocation] = useState(""); // To store the location
+    const [departmentId, setDepartmentId] = useState(""); // To store the department ID
+    const [locationId, setLocationId] = useState("");
+    const [employeeData, setEmployeeData] = useState({
+        Employee_ID: "",
         firstName: "",
         middleName: "",
         lastName: "",
@@ -15,16 +18,15 @@ const ManagerPortal = () => {
         dateOfBirth: "",
         locationId: "",
         departmentId: "",
-        supervisorId: ""
+        managerID: "",
     });
 
     const [editMode, setEditMode] = useState(false);
+    const [employeeToDelete, setEmployeeToDelete] = useState(null); 
     const [editIndex, setEditIndex] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editEmployeeData, setEditEmployeeData] = useState({ ...employeeData });
-
     const managerID = localStorage.getItem("Manager_Department_ID");
-
 
     const fetchEmployees = async () => {
         try {
@@ -32,22 +34,13 @@ const ManagerPortal = () => {
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             setEmployees(result);
+            if (result.length > 0) {
+                setLocation(`${result[0].Location_Address_House_Number} ${result[0].Location_Address_Street || ''} ${result[0].Location_Address_Suffix || ''}, ${result[0].Location_Address_City}, ${result[0].Location_Address_State} ${result[0].Location_Address_Zip_Code}, ${result[0].Location_Address_Country}`);
+                setDepartmentId(result[0].Department_ID);
+                setLocationId(result[0].Department_Location_ID);
+            }
         } catch (error) {
             console.error('Error fetching employees:', error);
-        }*/ //Uncomment this stuff when connecting to back end
-
-        // For now, set employees to temporary data. Remove this line when you want to remove the dummy data
-        setEmployees(temporaryData);
-    };
-
-    const fetchLocation = async (locationId) => {
-        try {
-            const response = await fetch(`${SERVER_URL}/api/location/${locationId}`);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching location:', error);
-            return null;
         }
     };
 
@@ -55,42 +48,35 @@ const ManagerPortal = () => {
         fetchEmployees();
     }, []);
 
-    useEffect(() => {
-        const loadLocations = async () => {
-            const locationPromises = employees.map(employee => fetchLocation(employee.locationId));
-            const locationsData = await Promise.all(locationPromises);
-            const locationsMap = locationsData.reduce((acc, location, index) => {
-                if (location) {
-                    acc[employees[index].locationId] = location;
-                }
-                return acc;
-            }, {});
-            setLocations(locationsMap);
-        };
-
-        if (employees.length > 0) {
-            loadLocations();
-        }
-    }, [employees]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setEmployeeData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setEditEmployeeData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const newEmployeeData = {
+            ...employeeData,
+            locationId,
+            departmentId,
+            managerID: 5,
+        };
+
         try {
-            const response = await fetch(`${SERVER_URL}/api/employees`, {
+            const response = await fetch(`${SERVER_URL}/api/ManagerPortal`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(newEmployeeData),
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
             const newEmployee = await response.json();
-            setEmployees(prev => [...prev, newEmployee]);
+            setEmployees((prev) => [...prev, newEmployee]);
             clearInputFields();
         } catch (error) {
             console.error('Error adding employee:', error);
@@ -98,7 +84,8 @@ const ManagerPortal = () => {
     };
 
     const clearInputFields = () => {
-        setFormData({
+        setEmployeeData({
+            Employee_ID: "",
             firstName: "",
             middleName: "",
             lastName: "",
@@ -107,76 +94,169 @@ const ManagerPortal = () => {
             dateOfBirth: "",
             locationId: "",
             departmentId: "",
-            supervisorId: ""
+            managerID: ""
         });
     };
 
+    const formatDate = (dateString) => {
+        return new Date(dateString).toISOString().slice(0, 10);
+    };
+
     const handleEdit = (index) => {
+        const employee = employees[index];
+
+        const formattedDateOfBirth = formatDate(employee.DOB) || '';
+
         setEditMode(true);
         setEditIndex(index);
-        setEditData(employees[index]);
+        setEditEmployeeData({
+            Employee_ID: employee.Employee_ID,
+            firstName: employee.First_Name,
+            middleName: employee.Middle_Name,
+            lastName: employee.Last_Name,
+            email: employee.Email,
+            phoneNumber: employee.Phone_Number,
+            dateOfBirth: formattedDateOfBirth,
+            locationId: employee.Employee_Location_ID,
+            departmentId: employee.Employee_Department_ID,
+            managerID: employee.Employee_Manager_ID,
+        });
     };
 
     const handleUpdate = async (e) => {
         e.preventDefault();
+        const updatedEmployeeData = {
+            ...editEmployeeData,
+            locationId,
+            departmentId,
+            managerID: 5,
+        };
+
         try {
-            const response = await fetch(`${SERVER_URL}/api/employees/${editData.id}`, {
+            const response = await fetch(`${SERVER_URL}/api/ManagerPortal/${editEmployeeData.Employee_ID}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(editData),
+                body: JSON.stringify(updatedEmployeeData),
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const updatedEmployees = employees.map((employee, idx) =>
-                idx === editIndex ? { ...employee, ...editData } : employee
+                idx === editIndex ? { ...employee, ...updatedEmployeeData } : employee
             );
             setEmployees(updatedEmployees);
+            fetchEmployees();
             setEditMode(false);
             setEditIndex(null);
+            clearInputFields();
         } catch (error) {
             console.error('Error updating employee:', error);
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = (Employee_ID) => {
+        setEmployeeToDelete(Employee_ID);  // Set the employee to delete
+        setIsModalOpen(true);  // Open the modal
+    };
+
+    const confirmDelete = async () => {
+        if (!employeeToDelete) return; // Ensure employeeToDelete is set
+
         try {
-            const response = await fetch(`${SERVER_URL}/api/employees/${id}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+            const response = await fetch(`${SERVER_URL}/api/ManagerPortal/${employeeToDelete}`, {
+                method: "PATCH", // Assuming PATCH is for soft delete
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ Delete_Employee: true }) // You may want to set this as true or false depending on your DB
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-            setEmployees(employees.filter(employee => employee.id !== id));
+            setEmployees((prev) =>
+                prev.filter((employee) => employee.Employee_ID !== employeeToDelete)
+            );
+            setIsModalOpen(false); // Close the modal
+            setEmployeeToDelete(null); // Reset the employeeToDelete state
         } catch (error) {
-            console.error('Error deleting employee:', error);
+            console.error("Error deleting employee:", error);
         }
     };
 
     const handleCancelEdit = () => {
         setEditMode(false);
         setEditIndex(null);
-        setEditData({ ...formData });
+        clearInputFields();
+    };
+
+    const formatPhoneNumber = (phoneNumber) => {
+        if (!phoneNumber) return phoneNumber;
+        const cleaned = phoneNumber.replace(/\D/g, "");
+        const match = cleaned.match(/(\d{3})(\d{3})(\d{4})/);
+        return match ? `${match[1]}-${match[2]}-${match[3]}` : phoneNumber;
     };
 
     return (
-        <div className="portal-container">
-            <h2>Add a new Employee</h2>
+        <div className="table-container">
+            <h2>{"Add a new Employee"}</h2>
             <form onSubmit={handleSubmit}>
-                <input type="text" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} required />
-                <input type="text" name="middleName" placeholder="Middle Name (optional)" value={formData.middleName} onChange={handleChange} />
-                <input type="text" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} required />
-                <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-                <input type="text" name="phoneNumber" placeholder="Phone Number" value={formData.phoneNumber} onChange={handleChange} required />
-                <input type="date" name="dateOfBirth" placeholder="Date of Birth" value={formData.dateOfBirth} onChange={handleChange} required />
-                <input type="text" name="locationId" placeholder="Location ID" value={formData.locationId} onChange={handleChange} required />
-                <input type="text" name="departmentId" placeholder="Department ID" value={formData.departmentId} onChange={handleChange} required />
-                <input type="text" name="supervisorId" placeholder="Supervisor ID" value={formData.supervisorId} onChange={handleChange} required />
-                <button type="submit">Add Employee</button>
+                <input 
+                    type="text" 
+                    name="firstName" 
+                    placeholder="First Name" 
+                    value={employeeData.firstName} 
+                    onChange={handleChange} 
+                    required 
+                />
+                <input 
+                    type="text" 
+                    name="middleName" 
+                    placeholder="Middle Name (optional)" 
+                    value={employeeData.middleName} 
+                    onChange={handleChange} 
+                />
+                <input 
+                    type="text" 
+                    name="lastName" 
+                    placeholder="Last Name" 
+                    value={employeeData.lastName} 
+                    onChange={handleChange} 
+                    required 
+                />
+                <input 
+                    type="text" 
+                    name="phoneNumber" 
+                    placeholder="Phone Number" 
+                    value={employeeData.phoneNumber} 
+                    onChange={handleChange} 
+                    required 
+                />
+                <input 
+                    type="email" 
+                    name="email" 
+                    placeholder="Email" 
+                    value={employeeData.email} 
+                    onChange={handleChange} 
+                    required 
+                />
+                <input 
+                    type="date" 
+                    name="dateOfBirth" 
+                    placeholder="Date of Birth" 
+                    value={employeeData.dateOfBirth} 
+                    onChange={handleChange} 
+                    required 
+                />
+                <button type="submit">{"Add Employee"}</button>
             </form>
 
-            <h2>Current Employees - Click On Employee ID To Edit</h2>
+            {employees.length > 0 && (
+                <>
+                    <h2>Current Employees In Department {departmentId} at {location}</h2>
+                    <h2>Click On Employee ID To Edit</h2>
+                </>
+            )}
+
             <div className="table-scroll">
                 <table>
                     <thead>
@@ -184,27 +264,23 @@ const ManagerPortal = () => {
                             <th>Employee ID</th>
                             <th>Name</th>
                             <th>Phone Number</th>
-                            <th>Location</th>
+                            <th>Email</th>
                             <th className="center-header">Delete</th>
                         </tr>
                     </thead>
                     <tbody>
                         {employees.map((employee, index) => (
-                            <tr key={employee.id}>
+                            <tr key={employee.Employee_ID}>
                                 <td>
                                     <button onClick={() => handleEdit(index)} style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
-                                        {employee.id}
+                                        {employee.Employee_ID}
                                     </button>
                                 </td>
-                                <td>{`${employee.firstName} ${employee.middleName ? employee.middleName + ' ' : ''}${employee.lastName}`}</td>
-                                <td>{employee.phoneNumber}</td>
-                                <td>
-                                    {locations[employee.locationId] ? 
-                                        `${locations[employee.locationId].houseNumber} ${locations[employee.locationId].street}, ${locations[employee.locationId].city}` : 
-                                        'Loading...'}
-                                </td>
+                                <td>{`${employee.First_Name} ${employee.Middle_Name ? employee.Middle_Name + ' ' : ''}${employee.Last_Name}`}</td>
+                                <td>{formatPhoneNumber(employee.Phone_Number)}</td>
+                                <td>{employee.Email}</td>
                                 <td className="delete-column">
-                                    <button onClick={() => handleDelete(employee.id)} style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}>
+                                    <button onClick={() => handleDelete(employee.Employee_ID)} style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}>
                                         Delete
                                     </button>
                                 </td>
@@ -216,22 +292,65 @@ const ManagerPortal = () => {
 
             {editMode && (
                 <div className="edit-menu">
-                    <h2>Edit Employee {editData.id}</h2>
+                    <h2>Edit Employee {editEmployeeData.Employee_ID}</h2>
                     <form onSubmit={handleUpdate}>
-                        <input type="email" name="email" placeholder="Email" value={editData.email} onChange={(e) => setEditData({ ...editData, email: e.target.value })} required />
-                        <input type="text" name="firstName" placeholder="First Name" value={editData.firstName} onChange={(e) => setEditData({ ...editData, firstName: e.target.value })} required />
-                        <input type="text" name="middleName" placeholder="Middle Name (optional)" value={editData.middleName} onChange={(e) => setEditData({ ...editData, middleName: e.target.value })} />
-                        <input type="text" name="lastName" placeholder="Last Name" value={editData.lastName} onChange={(e) => setEditData({ ...editData, lastName: e.target.value })} required />
-                        <input type="text" name="phoneNumber" placeholder="Phone Number" value={editData.phoneNumber} onChange={(e) => setEditData({ ...editData, phoneNumber: e.target.value })} required />
-                        <input type="date" name="dateOfBirth" placeholder="Date of Birth" value={editData.dateOfBirth} onChange={(e) => setEditData({ ...editData, dateOfBirth: e.target.value })} required />
-                        <input type="text" name="locationId" placeholder="Location ID" value={editData.locationId} onChange={(e) => setEditData({ ...editData, locationId: e.target.value })} required />
-                        <input type="text" name="departmentId" placeholder="Department ID" value={editData.departmentId} onChange={(e) => setEditData({ ...editData, departmentId: e.target.value })} required />
-                        <input type="text" name="supervisorId" placeholder="Supervisor ID" value={editData.supervisorId} onChange={(e) => setEditData({ ...editData, supervisorId: e.target.value })} required />
+                        <input 
+                            type="text" 
+                            name="firstName" 
+                            placeholder="First Name" 
+                            value={editEmployeeData.firstName} 
+                            onChange={handleEditChange} 
+                            required 
+                        />
+                        <input 
+                            type="text" 
+                            name="middleName" 
+                            placeholder="Middle Name (optional)" 
+                            value={editEmployeeData.middleName} 
+                            onChange={handleEditChange} 
+                        />
+                        <input 
+                            type="text" 
+                            name="lastName" 
+                            placeholder="Last Name" 
+                            value={editEmployeeData.lastName} 
+                            onChange={handleEditChange} 
+                            required 
+                        />
+                        <input 
+                            type="text" 
+                            name="phoneNumber" 
+                            placeholder="Phone Number" 
+                            value={editEmployeeData.phoneNumber} 
+                            onChange={handleEditChange} 
+                            required 
+                        />
+                        <input 
+                            type="email" 
+                            name="email" 
+                            placeholder="Email" 
+                            value={editEmployeeData.email} 
+                            onChange={handleEditChange} 
+                            required 
+                        />
+                        <input 
+                            type="date" 
+                            name="dateOfBirth" 
+                            value={editEmployeeData.dateOfBirth} 
+                            onChange={handleEditChange} 
+                            required 
+                        />
                         <button type="submit">Update Employee</button>
                         <button type="button" onClick={handleCancelEdit}>Cancel</button>
                     </form>
                 </div>
             )}
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)} 
+                onConfirm={confirmDelete} 
+            />
         </div>
     );
 };
