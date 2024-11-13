@@ -162,7 +162,7 @@ const Login = () => {
       } else if (result["Role"] === "manager" && result["Department_ID"]) {
         localStorage.setItem("Employee_ID", result.Employee_ID);
         localStorage.setItem("Employee_Email", result.Email);
-        localStorage.setItem("Manager_Department_ID", result.department_id);
+        localStorage.setItem("Manager_Department_ID", result.Employee_Department_ID);
         navigate("/ManagerPortal");
       } else if (result["Email"]) {
         localStorage.setItem("Employee_ID", result.Employee_ID);

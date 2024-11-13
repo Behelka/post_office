@@ -26,10 +26,10 @@ const ManagerPortal = () => {
     const [editIndex, setEditIndex] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editEmployeeData, setEditEmployeeData] = useState({ ...employeeData });
+    const managerID = localStorage.getItem("Employee_ID");
 
     const fetchEmployees = async () => {
         try {
-            const managerID = 5;
             const response = await fetch(`${SERVER_URL}/api/ManagerPortal/${managerID}`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();

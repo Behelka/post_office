@@ -35,7 +35,7 @@ const ManagerPortalRoute = (req, res) => {
                         location AS l ON d.Department_Location_ID = l.Location_ID
                     WHERE 
                         e.Delete_Employee = FALSE
-                        AND d.Department_Manager_ID = 5
+                        AND d.Department_Manager_ID = ?
                         AND e.Employee_ID != d.Department_Manager_ID;`;
                 db.query(query, [Department_Manager_ID])
                     .then(([results]) => {
