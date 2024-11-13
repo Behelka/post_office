@@ -101,7 +101,7 @@ const EmployeeProfile = () => {
       <h1>&nbsp;</h1>
       <h1 className="h">Employee Information</h1>
       {employeeInfo && (
-        <div className="employee-info">
+        <div className="Information">
           {!editMode ? (
             <div>
               <p className="Information">

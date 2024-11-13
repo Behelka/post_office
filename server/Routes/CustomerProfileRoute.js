@@ -105,7 +105,6 @@ const CustomerProfileRoute = (req, res) => {
 
       const updateQuery = `
         UPDATE customer SET 
-            Avatar_URL = COALESCE(?, Avatar_URL),
             Customer_First_Name = ?, 
             Customer_Middle_Name = ?, 
             Customer_Last_Name = ?,
@@ -121,11 +120,11 @@ const CustomerProfileRoute = (req, res) => {
             Customer_Balance = ?
         WHERE Customer_ID = ?;
       `;
-      const avatarPath = AvatarName ? `assets/${AvatarName}` : null;
+      //const avatarPath = AvatarName ? `assets/${AvatarName}` : null;
 
       try {
         await db.query(updateQuery, [
-          avatarPath,
+          //avatarPath,
           Customer_First_Name,
           Customer_Middle_Name,
           Customer_Last_Name,

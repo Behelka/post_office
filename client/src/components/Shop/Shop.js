@@ -4,8 +4,10 @@ import { SERVER_URL } from "../../App";
 
 function Shop() {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
   const [balance, setBalance] = useState(null);
+  const [productQuantities, setProductQuantities] = useState({});
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
 
   const customerID = localStorage.getItem("Customer_ID");
 
@@ -16,7 +18,14 @@ function Shop() {
         const data = await response.json();
         setProducts(data);
 
-        // Get blance
+        // quantity of each item to 0
+        const initialQuantities = {};
+        data.forEach(product => {
+          initialQuantities[product.Product_ID] = 0;
+        });
+        setProductQuantities(initialQuantities);
+
+        // get balance
         const balanceResponse = await fetch(`${SERVER_URL}/api/customer/balance?customerID=${customerID}`);
         const balanceData = await balanceResponse.json();
         setBalance(balanceData.balance);
@@ -28,23 +37,59 @@ function Shop() {
   }, [customerID]);
 
   const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
-
-  const removeFromCart = (productId) => {
-    setCart(cart.filter(item => item.Product_ID !== productId));
+    setProductQuantities(prevQuantities => ({
+      ...prevQuantities,
+      [product.Product_ID]: (prevQuantities[product.Product_ID] || 0) + 1
+    }));
+    setTotalQuantity(prevTotal => prevTotal + 1);
+    setTotalAmount(prevTotal => prevTotal + parseFloat(product.Product_Price));
   };
 
   const clearCart = () => {
-    setCart([]);
+    const clearedQuantities = {};
+    Object.keys(productQuantities).forEach(id => {
+      clearedQuantities[id] = 0;
+    });
+    setProductQuantities(clearedQuantities);
+    setTotalQuantity(0);
+    setTotalAmount(0);
+  };
+
+  const handleQuantityChange = (productID, newQuantity, productPrice) => {
+    newQuantity = parseInt(newQuantity) || 0; // if not num, set it 0
+    setProductQuantities(prevQuantities => ({
+      ...prevQuantities,
+      [productID]: newQuantity
+    }));
+
+    // udpate quantity and amount
+    const updatedTotalQuantity = Object.entries(productQuantities).reduce(
+      (acc, [id, qty]) => acc + (id === productID.toString() ? newQuantity : qty),
+      0
+    );
+
+    const updatedTotalAmount = Object.entries(productQuantities).reduce(
+      (acc, [id, qty]) => acc + (id === productID.toString() ? newQuantity * productPrice : qty * (products.find(p => p.Product_ID === parseInt(id))?.Product_Price || 0)),
+      0
+    );
+
+    setTotalQuantity(updatedTotalQuantity);
+    setTotalAmount(updatedTotalAmount);
   };
 
   return (
     <div className="Shop">
-      <h2>Balance: ${balance}</h2>
       <ProductList products={products} addToCart={addToCart} />
-      <Cart cart={cart} removeFromCart={removeFromCart} />
-      <Checkout cart={cart} clearCart={clearCart} customerID={customerID} balance={balance} />
+      <Cart
+        products={products}
+        productQuantities={productQuantities}
+        totalQuantity={totalQuantity}
+        totalAmount={totalAmount}
+        clearCart={clearCart}
+        handleQuantityChange={handleQuantityChange}
+        customerID={customerID}
+        balance={balance}
+      />
     </div>
   );
 }
@@ -54,8 +99,13 @@ const ProductList = ({ products, addToCart }) => {
     <div className="product-list">
       {products.map(product => (
         <div key={product.Product_ID} className="product-box">
-          <h3>{product.Product_Name}</h3>
-          <p>${parseFloat(product.Product_Price).toFixed(2)}</p>
+          <img
+            src={`data:image/jpeg;base64,${product.Product_Image}`}
+            alt={product.Product_Name}
+            className="product_image"
+          />
+          <p>{product.Product_Name}</p>
+          <p>{`$${parseFloat(product.Product_Price).toFixed(2)}`}</p>
           <button onClick={() => addToCart(product)}>Add to Cart</button>
         </div>
       ))}
@@ -63,64 +113,74 @@ const ProductList = ({ products, addToCart }) => {
   );
 };
 
-const Cart = ({ cart, removeFromCart }) => {
-  const totalPrice = cart.reduce((total, item) => total + parseFloat(item.Product_Price), 0);
 
-  return (
-    <div>
-      <h2>Shopping Cart</h2>
-      <ul>
-        {cart.map((item, index) => (
-          <li key={index}>
-            {item.Product_Name} - ${parseFloat(item.Product_Price).toFixed(2)}
-            <button onClick={() => removeFromCart(item.Product_ID)}>Remove</button>
-          </li>
-        ))}
-      </ul>
-      <h3>Total: ${totalPrice.toFixed(2)}</h3>
-    </div>
-  );
-};
-
-const Checkout = ({ cart, clearCart, customerID,balance }) => {
+const Cart = ({ products, productQuantities, totalQuantity, totalAmount, clearCart, handleQuantityChange, customerID, balance }) => {
   const handleCheckout = async () => {
+    //check shoping cart empty or not
+    const cart = products
+      .filter(product => productQuantities[product.Product_ID] > 0)
+      .map(product => ({
+        Product_ID: product.Product_ID,
+        Quantity: productQuantities[product.Product_ID],
+      }));
+  
     if (cart.length === 0) {
-      alert("Your cart is empty!");
+      alert("Your cart is empty.");
       return;
     }
   
-    // Count total
-    const totalAmount = cart.reduce((total, item) => total + parseFloat(item.Product_Price), 0);
-  
+    // check balance
     if (totalAmount > balance) {
-      alert("Balance not enough, please try again!");
+      alert("Insufficient balance to complete the purchase.");
       return;
     }
-
+  
     try {
       const response = await fetch(`${SERVER_URL}/api/shop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cart, customerID, totalAmount }) // Send total
+        body: JSON.stringify({ customerID, cart, totalAmount })
       });
+  
       if (response.ok) {
-        alert("Payment success!");
+        alert("Checkout successful!");
         clearCart();
-        window.location.reload()
-
       } else {
-        alert("Payment failed.");
+        alert("Checkout failed.");
       }
     } catch (error) {
       console.error("Error during checkout:", error);
-      alert("Error processing your payment.");
     }
   };
   
 
   return (
-    <div>
-      <button onClick={handleCheckout}>Checkout</button>
+    <div className="cart">
+      <h2>Shopping Cart</h2>
+      <ul>
+        {products.map(product => {
+          const quantity = productQuantities[product.Product_ID];
+          return quantity > 0 ? (
+            <div key={product.Product_ID} className='list'>
+              <span>{product.Product_Name}</span> - 
+              <span>${parseFloat(product.Product_Price).toFixed(2)}</span> - 
+              <button className='count_button' onClick={() => handleQuantityChange(product.Product_ID, quantity - 1, product.Product_Price)}>-</button>
+              <input
+                className='cart_input'
+                type="number"
+                min="0"
+                value={quantity}
+                onChange={(e) => handleQuantityChange(product.Product_ID, e.target.value, product.Product_Price)}
+              />
+              <button className='count_button' onClick={() => handleQuantityChange(product.Product_ID, quantity + 1, product.Product_Price)}>+</button>
+            </div>
+          ) : null;
+        })}
+      </ul>
+      <h3>Total Quantity: {totalQuantity}</h3>
+      <h3>Total Amount: ${totalAmount.toFixed(2)}</h3>
+      <button onClick={handleCheckout} className='cart_button'>Checkout</button>
+      <button onClick={clearCart} className='cart_button'>Clear Cart</button>
     </div>
   );
 };

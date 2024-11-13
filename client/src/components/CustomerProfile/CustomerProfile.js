@@ -9,8 +9,8 @@ const CustomerProfile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [newAvatar, setNewAvatar] = useState(null);
-  const [previewAvatar, setPreviewAvatar] = useState(null);
+  //const [newAvatar, setNewAvatar] = useState(null);
+  //const [previewAvatar, setPreviewAvatar] = useState(null);
 
   const fetchCustomerData = async () => {
     const email = localStorage.getItem("Customer_Email_Address");
@@ -51,17 +51,17 @@ const CustomerProfile = () => {
     navigate("/login");
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setNewAvatar(file);
-    setPreviewAvatar(URL.createObjectURL(file));
-  };
+  //const handleFileChange = (e) => {
+    //const file = e.target.files[0];
+    //setNewAvatar(file);
+    //setPreviewAvatar(URL.createObjectURL(file));
+  //};
 
   const uploadAvatar = async () => {
-    if (!newAvatar) return null;
+    //if (!newAvatar) return null;
 
     const formData = new FormData();
-    formData.append("avatar", newAvatar);
+    //formData.append("avatar", newAvatar);
 
     try {
       const response = await fetch(`${SERVER_URL}/api/customer/avatar`, {
@@ -124,7 +124,7 @@ const CustomerProfile = () => {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div className="Information">
+    <div className="C_Information">
       <h1>&nbsp;</h1>
       <h1 className="h">Information</h1>
       {customerInfo && (
@@ -136,20 +136,20 @@ const CustomerProfile = () => {
                 alt="User Avatar"
                 className="Avatar"
               />
-              <p className="Information">
+              <p className="C_Information">
                 <strong>Name:</strong>{" "}
                 {`${customerInfo.Customer_First_Name} ${
                   customerInfo.Customer_Middle_Name || ""
                 } ${customerInfo.Customer_Last_Name}`}
               </p>
-              <p className="Information">
+              <p className="C_Information">
                 <strong>Phone Number:</strong>{" "}
                 {customerInfo.Customer_Phone_Number}
               </p>
-              <p className="Information">
+              <p className="C_Information">
                 <strong>Email:</strong> {customerInfo.Customer_Email_Address}
               </p>
-              <p className="Information">
+              <p className="C_Information">
                 <strong>Address:</strong>{" "}
                 {`${customerInfo.Customer_Address_House_Number} ${
                   customerInfo.Customer_Address_Street
@@ -159,7 +159,7 @@ const CustomerProfile = () => {
                   customerInfo.Customer_Address_Zip_Code
                 }, ${customerInfo.Customer_Address_Country}`}
               </p>
-              <p className="Information">
+              <p className="C_Information">
                 <strong>Balance:</strong> ${customerInfo.Customer_Balance}
               </p>
               <button onClick={handleEdit} className="button">
@@ -173,7 +173,7 @@ const CustomerProfile = () => {
             <form className="form-table">
               <table className="form-table">
                 <tr>
-                  <td className="label">Avatar:</td>
+                  {/*<td className="label">Avatar:</td>
                   <td>
                     <img
                       src={previewAvatar || `/${customerInfo.Avatar_URL}`}
@@ -181,7 +181,7 @@ const CustomerProfile = () => {
                       alt=""
                     />
                     <input type="file" onChange={handleFileChange} accept="image/*" />
-                  </td>
+                  </td>*/}
                 </tr>
                 <tr>
                   <td className="label">Customer Name:</td>
