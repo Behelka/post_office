@@ -1,25 +1,27 @@
 .dashboard-container {
-    max-width: 800px;
+    width: 100%;
+    max-width: 80vw;                /* Limit container width to 80% of viewport */
     margin: 60px auto;
     padding: 20px;
     border: 1px solid #494343a0;
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;               /* Enables horizontal scroll if needed */
 }
 
 .dashboard-container h1 {
     font-family: Arial, sans-serif; /* Change to your desired font */
-    font-weight: bold;              /* Makes the text bold */
-    color: black;                   /* Sets the text color to black */
+    font-weight: bold;
+    color: black;
     text-align: center;
     margin-bottom: 20px;
+    font-size: clamp(1.2em, 3vw, 2em); /* Responsive font size */
 }
 
 .tab-buttons {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
-    
 }
 
 .tab-buttons button {
@@ -31,6 +33,7 @@
     font-weight: bold;
     transition: background-color 0.3s;
     border-radius: 4px;
+    font-size: clamp(0.8em, 1.5vw, 1em); /* Responsive font size */
 }
 
 .tab-buttons button.active {
@@ -42,24 +45,31 @@
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    table-layout: auto;            /* Allows the table to resize based on content */
+    font-size: clamp(10px, 1vw, 16px); /* Overall responsive font size */
 }
 
 .package-table th,
 .package-table td {
-    font-family: Arial, sans-serif; /* Change to your desired font */
-    font-weight: bold;              /* Makes the text bold */
-    color: black;                   /* Sets the text color to black */
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    color: black;
     padding: 12px;
     text-align: left;
     border: 1px solid #80efc1;
+    font-size: clamp(0.7em, 1.2vw, 1em); /* Adjusted responsive font size */
 }
 
 .package-table th {
-    background-color: #ffa9e9;
+    background-color: #ffcff3;
 }
 
 .package-table tbody tr:nth-child(even) {
-    background-color: #fed09dfd;
+    background-color: #fbd7adfd;
+}
+
+.package-table tbody tr:nth-child(odd) {
+    background-color: #ffead2fd;
 }
 
 .package-table tbody tr:hover {
@@ -73,6 +83,7 @@
 
 .details {
     padding: 15px;
+    font-size: clamp(0.9em, 1.2vw, 1em); /* Responsive font size for details */
 }
 
 .selected {
