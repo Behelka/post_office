@@ -156,7 +156,7 @@ const Cart = ({ products, productQuantities, totalQuantity, totalAmount, clearCa
 
   return (
     <div className="cart">
-      <h2>Shopping Cart</h2>
+      <h2 className='h_shoppingCart'>Shopping Cart</h2>
       <ul>
         {products.map(product => {
           const quantity = productQuantities[product.Product_ID];
