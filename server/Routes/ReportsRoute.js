@@ -26,10 +26,9 @@ const reportsRoute = (req, res) => {
                 }
         
                 // stock filter
-                if (stock) {
-                    query += ' AND p.Product_Stock >= ?';
-                    queryParams.push(stock);
-    
+                if (stock !== null && stock !== undefined) {
+                    query += ' AND p.Product_Stock <= ?';
+                    queryParams.push(parseInt(stock, 10));
                 }
         
                 // group by
@@ -81,7 +80,7 @@ const reportsRoute = (req, res) => {
             
                 // product type filter
                 if (productType) {
-                    query += (queryParams.length ? ' AND' : ' WHERE') + ' p.Product_Name = ?';
+                    query += ' AND p.Product_Name = ?';
                     queryParams.push(productType);
                 }
             
