@@ -78,6 +78,22 @@ const Dashboard = () => {
         return `${day}\n${month},${dayOfMonth},${year}\n${time} Local time`;
     };
 
+    const formatDatenum = (dateString) => {
+        if (!dateString) {
+            return '';  // Return an empty string or any default value if the dateString is null or undefined
+        }
+        
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
+        const dayOfMonth = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+        return `${year}-${month}-${dayOfMonth} ${hours}:${minutes}:${seconds} (Local time)`;
+    };
+
     const formatLocation = (houseNumber, street, suffix, city, state, zipCode, country) => {
         return `${houseNumber} ${street} ${suffix}, ${city}, ${state} ${zipCode}, ${country}`;
     };
@@ -85,6 +101,7 @@ const Dashboard = () => {
     return (
         <div className="dashboard-container">
             <h1>Dashboard</h1>
+            <div className="table-wrapper">
             <table className="package-table">
                 <thead>
                     <tr>
@@ -105,7 +122,7 @@ const Dashboard = () => {
                                 <td>{pkg.Sender_Full_Name}</td>
                                 <td>{pkg.Recipient_Full_Name}</td>
                                 <td>{pkg.Latest_Location_Address}</td>
-                                <td>{pkg.Latest_Arrival_Date}</td>
+                                <td>{formatDatenum(pkg.Latest_Arrival_Date)}</td>
                             </tr>
                             {selectedPackage === pkg.Package_ID && (
                                 <tr className="details-row">
@@ -135,6 +152,7 @@ const Dashboard = () => {
                     ))}
                 </tbody>
             </table>
+            </div>
         </div>
     );
 };
