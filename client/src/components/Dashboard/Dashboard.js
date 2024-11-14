@@ -10,6 +10,7 @@ const Dashboard = () => {
     const email = localStorage.getItem("Customer_Email_Address");
 
     useEffect(() => {
+        document.body.classList.add('dashboard-page');
         const fetchCustomerId = async () => {
             try {
                 const response = await fetch(`${SERVER_URL}/api/customer?email=${email}`);
@@ -23,6 +24,9 @@ const Dashboard = () => {
         if (email) {
             fetchCustomerId();
         }
+        return () => {
+            document.body.classList.remove('dashboard-page');
+        };
     }, [email]);
 
     useEffect(() => {

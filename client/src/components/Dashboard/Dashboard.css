@@ -1,3 +1,18 @@
+
+html, body {
+    overscroll-behavior: none;  /* Prevent overscroll from causing the page to move beyond its bounds */
+}
+body.dashboard-page {
+    background: url('../../../public/assets/united_states_night.jpg') no-repeat center center fixed; /* Background image for the whole webpage */
+    background-size: cover;              /* Makes the image cover the entire screen */
+    background-color: rgba(255, 255, 255, 0.158); /* Adds a light overlay to soften the image */
+    background-blend-mode: overlay;      /* Blends the color overlay with the image */
+    font-family: sans-serif;             /* Optional: Sets a default font for the body */
+    margin: 0;
+    padding: 0;
+}
+
+
 .dashboard-container {
     width: 100%;
     max-width: 80vw;                /* Limit container width to 80% of viewport */
@@ -8,6 +23,29 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     overflow-x: auto;               /* Enables horizontal scroll if needed */
     font-family: sans-serif;
+    background-size: cover;
+    position: relative;             /* For overlay positioning */
+    
+}
+
+/* Semi-transparent overlay */
+.dashboard-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.5); /* Light transparent overlay */
+    pointer-events: none;            /* Allows interaction with content beneath */
+    border-radius: 8px;              /* Matches container border-radius */
+    z-index: 1;
+}
+
+/* Content layer positioned above overlay */
+.dashboard-container > * {
+    position: relative;
+    z-index: 2;
 }
 
 .dashboard-container h1 {
@@ -47,9 +85,11 @@
     table-layout: auto;            /* Allows the table to resize based on content */
     font-size: clamp(10px, 1vw, 16px); /* Overall responsive font size */
 }
+
 .package-table tr {
     border-radius: 8px;
 }
+
 .package-table th,
 .package-table td {
     color: black;
@@ -61,9 +101,7 @@
 
 .package-table th {
     background-color: #ffcff3;
-    
 }
-
 
 .package-table tbody tr:not(.details-row):nth-child(even) {
     background-color: #fbd7adfd;
