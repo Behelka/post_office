@@ -4,7 +4,7 @@ const url = require('url');
 const reportsRoute = (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const pathParts = parsedUrl.pathname.split('/');
-    const { startDate, endDate, productType, customerName, status, deliveryMethod } = parsedUrl.query;
+    const { startDate, endDate, productType, customerName, status, deliveryMethod, stock } = parsedUrl.query;
 
     if (req.method === 'GET' && pathParts[2] === 'reports') {
         const reportType = pathParts[3]; // Retrieves the specific report type after /api/reports/
@@ -14,48 +14,37 @@ const reportsRoute = (req, res) => {
 
         switch (reportType) {
             case 'inventory':
-                query = `SELECT 
-                           p.*,
-                        COALESCE(SUM(t.Quantity), 0) AS Units_Sold
-                        FROM 
-                            Products p
-                        LEFT JOIN 
-                            Transactions t ON p.Product_ID = t.Product_ID
-                        GROUP BY 
-                            p.Product_ID, p.Product_Name, p.Product_Stock`;
-
-
-                 if (productType) {
-                    query += ' WHERE p.Product_Name = ?';
-                    queryParams.push(productType);
-                } 
-
+                query = `SELECT p.*, COALESCE(SUM(t.Quantity), 0) AS Units_Sold
+                         FROM Products p
+                         LEFT JOIN Transactions t ON p.Product_ID = t.Product_ID
+                         WHERE p.Delete_Product != 1`; 
+        
+                // date filter
                 if (startDate && endDate) {
                     query += ' AND p.Last_Restock_Date BETWEEN ? AND ?';
                     queryParams.push(startDate, endDate);
                 }
-                break;
         
+                // stock filter
+                if (stock) {
+                    query += ' AND p.Product_Stock >= ?';
+                    queryParams.push(stock);
+    
+                }
+        
+                // group by
+                query += ` GROUP BY p.Product_ID, p.Product_Name, p.Product_Stock`;
+                break; 
+
             case 'package-delivery':
-                query =  `SELECT 
-                            p.*,
-                            th.*,
-                            sender.Customer_First_Name AS Sender_First_Name,
-                            sender.Customer_Middle_Name AS Sender_Middle_Name,
-                            sender.Customer_Last_Name AS Sender_Last_Name,
-                            recipient.Customer_First_Name AS Recipient_First_Name,
-                            recipient.Customer_Middle_Name AS Recipient_Middle_Name,
-                            recipient.Customer_Last_Name AS Recipient_Last_Name
-                        FROM 
-                            Package AS p
-                        JOIN 
-                            Tracking_History AS th ON p.Package_ID = th.Package_ID
-                        JOIN 
-                            Customer AS sender ON p.Sender_ID = sender.Customer_ID
-                        JOIN 
-                            Customer AS recipient ON th.Recipient_ID = recipient.Customer_ID
-                        WHERE 
-                            p.Delete_Package != 1`;
+                query =  `SELECT p.*, th.*, sender.Customer_First_Name AS Sender_First_Name, sender.Customer_Middle_Name AS Sender_Middle_Name,
+                        sender.Customer_Last_Name AS Sender_Last_Name, recipient.Customer_First_Name AS Recipient_First_Name, recipient.Customer_Middle_Name AS Recipient_Middle_Name,
+                        recipient.Customer_Last_Name AS Recipient_Last_Name
+                        FROM Package AS p
+                        JOIN Tracking_History AS th ON p.Package_ID = th.Package_ID
+                        JOIN Customer AS sender ON p.Sender_ID = sender.Customer_ID
+                        JOIN Customer AS recipient ON th.Recipient_ID = recipient.Customer_ID
+                        WHERE p.Delete_Package != 1`;
 
 
                 //date filter

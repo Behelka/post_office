@@ -16,8 +16,9 @@ const Reports = () => {
         customerName:'',
         status:'',
         deliveryMethod:'',
-        stock:'',
+        stock: '',    
     });
+    const [stock, setStock] = useState(0); 
     const [data, setData] = useState([]);
     const [sortField, setSortField] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
@@ -33,15 +34,14 @@ const Reports = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { reportType, startDate, endDate, customerName, productType, status, deliveryMethod } = formData;
+        const { reportType, startDate, endDate, customerName, productType, status, deliveryMethod, stock } = formData;
         const url = new URL(`http://localhost:3001/api/reports/${reportType}`);
 
         // sending backend fetch according to report type
          if (reportType === 'inventory') {
-            if (productType) url.searchParams.append("productType", productType);
             if (startDate) url.searchParams.append("startDate", startDate);
             if (endDate) url.searchParams.append("endDate", endDate);
-            //if (stock) url.searchParams.append("stock", stock);
+            if (stock) url.searchParams.append("stock", stock);
         } 
         else if (reportType === 'package-delivery'){
             if (startDate) url.searchParams.append("startDate", startDate);
@@ -86,7 +86,6 @@ const Reports = () => {
     });
     setData(sortedData);
 };
-
 //////////////
     const formatData = (result, reportType) => {
         if (reportType === 'inventory') {
@@ -187,7 +186,7 @@ const Reports = () => {
                             </th>
                         </tr>
                     </thead>
-                    <tbody> {/*added required columns to the package-delivery report table*/}
+                    <tbody> 
                         {data.map((item) => (
                             <tr key={item.package_id}>
                                 <td>{item.sender}</td>
@@ -276,28 +275,10 @@ const Reports = () => {
                             <option value="financial-transactions">Financial Transactions Report</option>
                         </select>
                     </div>
-                    {/*  */}
+                    {/* inventory report filters */}
                     {formData.reportType === 'inventory' && (
-                        <> {/*product category filter*/}
-                        <div className="form-group">
-                            <label htmlFor="productType">Product Category</label>
-                            <select
-                                id="productType"
-                                name="productType"
-                                value={formData.productType}
-                                onChange={handleChange}
-                            >
-                                <option value="">Select a product</option>
-                                <option value="stamps">Stamp</option>
-                                <option value="envelopes">Envelope</option>
-                                <option value="postcard">Post Card</option>
-                                <option value="small package">Small Package</option>
-                                <option value="medium package">Medium Package</option>
-                                <option value="large package">Large Package</option>
-                            </select>
-                        </div>
-                        {/*date filter*/}
-                        <div className="form-group">
+                        <>
+                            <div className="form-group">
                                 <label htmlFor="startDate">Start Date</label>
                                 <input
                                     type="date"
@@ -320,8 +301,22 @@ const Reports = () => {
                                     required
                                 />
                             </div>
-                            {/*stock level filter*/}
-                            {/*supplier name filter*/}
+
+                            <div className="form-group">
+                                <label>Stock Level</label>
+                                <div className="slider-group">
+                                    <label>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="1000"
+                                            value={stock}
+                                            onChange={(e) => setStock(e.target.value)}
+                                        />
+                                        <span>{stock}</span>
+                                    </label>
+                                </div>
+                            </div>
                         </>
                     )}
                     {/* date filtering for package delivery reports */}
@@ -459,5 +454,6 @@ const Reports = () => {
         </div>
     );
 };
+
 
 export default Reports;
