@@ -18,7 +18,6 @@ const Reports = () => {
         deliveryMethod:'',
         stock: '',    
     });
-    const [stock, setStock] = useState(0); 
     const [data, setData] = useState([]);
     const [sortField, setSortField] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
@@ -37,7 +36,7 @@ const Reports = () => {
             ...formData,
             reportType: e.target.value,
         });
-        setShowTable(false); // Hide the table when report type changes
+        setShowTable(false); 
     };
 
     const handleSubmit = async (e) => {

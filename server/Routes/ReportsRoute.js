@@ -14,7 +14,7 @@ const reportsRoute = (req, res) => {
 
         switch (reportType) {
             case 'inventory':
-                query = `SELECT p.*, COALESCE(SUM(t.Quantity), 0) AS Units_Sold
+                query = `SELECT p.Product_Name, p.Product_Stock, p.Last_Restock_Date, p.unit_price, COALESCE(SUM(t.Quantity), 0) AS Units_Sold
                          FROM Products p
                          LEFT JOIN Transactions t ON p.Product_ID = t.Product_ID
                          WHERE p.Delete_Product != 1`; 
@@ -66,7 +66,7 @@ const reportsRoute = (req, res) => {
             
             case 'financial-transactions':
                 query = `
-                    SELECT t.*, p.*, c.*
+                    SELECT t.*, p.Product_Name, c.*
                     FROM Transactions AS t
                     JOIN Products AS p ON t.Product_ID = p.Product_ID
                     JOIN Customer AS c ON t.Customer_ID = c.Customer_ID
