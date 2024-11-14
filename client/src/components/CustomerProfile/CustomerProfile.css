@@ -11,11 +11,20 @@
   transform: translateY(100px);
 }
 
-.Information {
+.C_Information {
   font-size: 20px;
   color: #101d0e;
   margin-top: 35px;
   flex: 0 0 150px;
+
+
+
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 850px;
+  border-radius: 30px;
+  padding-bottom: 2%;
 }
 
 .h {
@@ -39,9 +48,7 @@
   border-radius: 25px;
 }
 
-.button:hover {
-  background-color: #0056b3;
-}
+
 
 .number-input {
   font-family: inherit;
