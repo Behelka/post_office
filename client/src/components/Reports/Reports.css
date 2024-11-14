@@ -156,7 +156,7 @@ button:hover {
   transition: background-color 0.2s, color 0.2s;
 }
 
-button[type="submit"] {
+.report-button[type="submit"] {
   /* Set fixed dimensions */
   width: 100px; /* Adjust as needed */
   height: 40px;
@@ -175,9 +175,9 @@ button[type="submit"] {
   box-sizing: border-box;
 }
 
-button[type="submit"]:hover,
-button[type="submit"]:active,
-button[type="submit"]:focus {
+.report-button:hover,
+.report-button:active,
+.report-button:focus {
     transform: none; /* Prevents resizing */
     outline: none;
     border: 2px solid #A7E8FF;

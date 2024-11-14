@@ -438,7 +438,7 @@ const Reports = () => {
                             </div>
                         </>
                     )}
-                <button type="submit">Submit</button>
+                <button className="report-button" type="submit">Submit</button>
           
         </form>
         {showTable && (
