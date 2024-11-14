@@ -18,10 +18,10 @@ const Reports = () => {
         deliveryMethod:'',
         stock: '',    
     });
-    const [stock, setStock] = useState(0); 
     const [data, setData] = useState([]);
     const [sortField, setSortField] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
+    const [showTable, setShowTable] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -31,8 +31,17 @@ const Reports = () => {
         });
     };
 
+    const handleReportChange = (e) => {
+        setFormData({
+            ...formData,
+            reportType: e.target.value,
+        });
+        setShowTable(false); 
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setShowTable(true);
 
         const { reportType, startDate, endDate, customerName, productType, status, deliveryMethod, stock } = formData;
         const url = new URL(`${SERVER_URL}/api/reports/${reportType}`);
@@ -93,7 +102,7 @@ const Reports = () => {
                 productName: item.Product_Name,
                 stock: item.Product_Stock,
                 restockDate: new Date(item.Last_Restock_Date).toLocaleDateString(),
-                unitPrice: item.unit_price,
+                unitPrice: `$${item.unit_price}`,
                 itemsSold: item.Units_Sold, 
             }));
         } else if (reportType === 'package-delivery') {
@@ -176,10 +185,10 @@ const Reports = () => {
                                 Package Address {sortField === 'address' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
                             <th onClick={() => handleSort('arrivalDate')}>
-                                Arrival Date {sortField === 'amount' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                Arrival Date {sortField === 'arrivalDate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
                             <th onClick={() => handleSort('shipping')}>
-                                Shipping Cost {sortField === 'time' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                                Shipping Cost {sortField === 'shipping' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                             </th>
                             <th onClick={() => handleSort('weight')}>
                                 Weight {sortField === 'weight' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
@@ -260,21 +269,12 @@ const Reports = () => {
             <main className="container">
                 <h2>Request a Report</h2>
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="reportType">Select Report Type</label>
-                        <select
-                            id="reportType"
-                            name="reportType"
-                            value={formData.reportType}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">-- Select Report Type --</option>
-                            <option value="inventory">Inventory Report</option>
-                            <option value="package-delivery">Package Delivery Report</option>
-                            <option value="financial-transactions">Financial Transactions Report</option>
-                        </select>
-                    </div>
+                    <select onChange={handleReportChange} value={formData.reportType}>
+                        <option value="">Select Report</option>
+                        <option value="inventory">Inventory Report</option>
+                        <option value="package-delivery">Package-Delivery Report</option>
+                        <option value="financial-transactions">Financial Transactions Report</option>
+                    </select>
                     {/* inventory report filters */}
                     {formData.reportType === 'inventory' && (
                         <>
@@ -305,15 +305,15 @@ const Reports = () => {
                             <div className="form-group">
                                 <label>Stock Level</label>
                                 <div className="slider-group">
-                                    <label>
+                                <label>
                                         <input
                                             type="range"
                                             min="0"
                                             max="1000"
-                                            value={stock}
-                                            onChange={(e) => setStock(e.target.value)}
+                                            value={formData.stock}
+                                            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                                         />
-                                        <span>{stock}</span>
+                                        <span>{formData.stock}</span>
                                     </label>
                                 </div>
                             </div>
@@ -417,8 +417,8 @@ const Reports = () => {
                                     onChange={handleChange}
                                 >
                                     <option value="">Select a product type</option>
-                                    <option value="stamps">Stamps</option>
-                                    <option value="envelopes">Envelopes</option>
+                                    <option value="stamp">Stamps</option>
+                                    <option value="envelope">Envelopes</option>
                                     <option value="small package">Small Package</option>
                                     <option value="medium package">Medium Package</option>
                                     <option value="large package">Large Package</option>
@@ -438,18 +438,21 @@ const Reports = () => {
                             </div>
                         </>
                     )}
-
-          <div className="form-group">
-            <button type="submit">Submit Request</button>
-          </div>
+                <button type="submit">Submit</button>
+          
         </form>
-
-                {data.length > 0 && (
-                    <div>
-                        <h3>Report Results:</h3>
-                        {renderTable()}
-                    </div>
-                )}
+        {showTable && (
+                <div className="reports-table">
+                    {data.length > 0 ? (
+                        <div>
+                            <h3>Report Results:</h3>
+                            {renderTable()}
+                        </div>
+                    ) : (
+                        <p>No data available for this report.</p>
+                    )}
+                </div>
+            )}
             </main>
         </div>
     );

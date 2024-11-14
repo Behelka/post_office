@@ -155,3 +155,30 @@ button:hover {
 .report-table th, .report-table td {
   transition: background-color 0.2s, color 0.2s;
 }
+
+button[type="submit"] {
+  /* Set fixed dimensions */
+  width: 100px; /* Adjust as needed */
+  height: 40px;
+
+  /* Stabilize padding */
+  padding: 8px 16px;
+
+  /* Avoid outline and add stable border style */
+  outline: none;
+  border: 2px solid #A7E8FF; /* Customize your border color */
+
+  /* Add transition to keep changes smooth */
+  transition: background-color 0.3s ease, transform 0.3s ease;
+
+  /* Prevent resizing on focus or active */
+  box-sizing: border-box;
+}
+
+button[type="submit"]:hover,
+button[type="submit"]:active,
+button[type="submit"]:focus {
+    transform: none; /* Prevents resizing */
+    outline: none;
+    border: 2px solid #A7E8FF;
+}
