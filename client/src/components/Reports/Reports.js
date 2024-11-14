@@ -35,7 +35,7 @@ const Reports = () => {
         e.preventDefault();
 
         const { reportType, startDate, endDate, customerName, productType, status, deliveryMethod, stock } = formData;
-        const url = new URL(`http://localhost:3001/api/reports/${reportType}`);
+        const url = new URL(`${SERVER_URL}/api/reports/${reportType}`);
 
         // sending backend fetch according to report type
          if (reportType === 'inventory') {
